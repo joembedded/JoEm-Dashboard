@@ -7,6 +7,7 @@ Features:
 - Responsive
 - Skalierbare Fonts
 - Internationalisierung
+- Interner QR-Code-Scanner
 - ...
 
 Live-Demo: https://github.com/joembedded/JoEm-Dashboard/deployments/github-pages
@@ -20,4 +21,4 @@ Live-Demo: https://github.com/joembedded/JoEm-Dashboard/deployments/github-pages
 ---
 
 ## Changelog ##
-- V0.00
+- V0.10 22.01.2024 First Fragment
