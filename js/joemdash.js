@@ -24,7 +24,6 @@ function dashToggleTheme() {
     cvar.forEach((e) => {
         const oval = parseInt(getComputedStyle(document.documentElement).getPropertyValue(e).substring(1),16);
         const nval = '#'+(oval^0xFFFFFF).toString(16).padStart(6,'0') // Invert
-console.log(e,nval)
         document.documentElement.style.setProperty(e, nval)
     })
 }
