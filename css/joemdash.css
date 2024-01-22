@@ -119,20 +119,22 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
     color: var(--txtblack);
     overflow: auto;
 
+    &.navhidden {
+        display: none;
+    }
+
     /*------- Nav-Links generell -------*/
-    a {
-        /* Links nicht unterstreichen */
-        text-decoration: none;
+    button {
         /* vertikal stapeln */
         display: block;
         padding: 8px;
         white-space: nowrap;
         overflow: hidden;
-
-        &:visited,
-        &:link {
-            color: var(--txtblack);
-        }
+        width: 100%;
+        text-align: left;
+        border: none;
+        background-color: var(--lightgray);
+        color: var(--txtblack);
 
         &:hover {
             background-color: var(--hovergray);
@@ -185,6 +187,7 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         color: var(--txtblack);
         background-color: var(--lightgray);
         opacity: 1;
+        border-radius: 4px;
         transition: var(--scrollms);
     }
 
@@ -234,15 +237,17 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
     width: calc(100svw - var(--lnavwidth_wrk));
     height: calc(100svh - var(--hdrheight) - var(--ftrheight));
     scroll-behavior: smooth;
-    overflow-x: hidden;
-    overflow-y: auto;
     white-space: nowrap;
+    overflow: auto;
 }
 
 .usection {
     height: calc(100svh - var(--hdrheight) - var(--ftrheight));
     background-color: var(--white);
+    color: var(--txtblack);
+    font-size: calc(1rem * var(--fontrel));
     padding: 8px;
+    overflow: hidden;
 }
 
 /***/

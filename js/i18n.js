@@ -7,25 +7,23 @@
   const translations = {
     // EN
     en: {
-      "header": {
-        "title": "English title",
-        "stitle": "Sub Titel",
+      "block": {
+        "title": "English title - Sprache EN",
+        "subtitle": "Sub Titel",
 
       },
-      "p-1": "This is some dummy text in order to test the translation files. You can mostly ignore what this says, especially anything from this point forward. Ok thanks, bye",
-      "p-2": "It also supports custom variable replacements. Examples;",
-      "variables": "Current date: {date}<br>Unix timestamp: {time}<br>Or static text: {static}",
+      "p-1": "English Dummy Text",
+      "p-2": "this is Line 2",
     },
 
     // DE
     de: {
-      "header": {
-        "title": "Deutscher Titel",
-        "stitle": "Unter Titel",
+      "block": {
+        "title": "Deutscher Titel  - Sprache DE",
+        "subtitle": "Unter Titel",
       },
-      "p-1": "Dies ist ein Dummy-Text, um die Übersetzungsdateien zu testen. Sie können größtenteils ignorieren, was dies sagt, insbesondere alles von diesem Punkt an. Ok danke, tschüss",
-      "p-2": "Es unterstützt auch benutzerdefinierte Variablenersetzungen. Beispiele;",
-      "variables": "Aktuelles Datum: {date}<br>Unix-Zeitstempel: {time}<br>Oder statischer Text: {static}",
+      "p-1": "Deutscher Dummy Text",
+      "p-2": "mit zweiter Zeile",
     },
 
   }

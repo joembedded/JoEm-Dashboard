@@ -1,7 +1,15 @@
 # Dashboard-Fragment #
 **Fragment**
 
-Fragment for a mobile Dashboard
+Fragment for a Desktop/Mobile Dashboard
+
+Features:
+- Responsive
+- Skalierbare Fonts
+- Internationalisierung
+- ...
+
+Live-Demo: https://github.com/joembedded/JoEm-Dashboard/deployments/github-pages
 
 ---
 

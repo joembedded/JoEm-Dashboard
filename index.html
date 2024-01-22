@@ -41,7 +41,7 @@
 
     <header class="cheader">
         <i class="fa fa-fw fa-bars " id="sidebar_menue"></i>
-        <span class="cheader-txt"><b>Dashboard-Template JoEmbedded JoEmbedded</b> JoEmbedded JoEmbedded
+        <span class="cheader-txt"><b>Dashboard-Template</b> JoEmbedded
             JoEmbedded</span>
     </header>
 
@@ -49,145 +49,105 @@
         <div class="hccontainer">
             <nav id="sidebar_left" class="clnav">
 
-                <a class="navitem" href="#">
-                    <i class="fa fa-fw fa-user"></i>
-                    <span class="navitem-txt">Device: LTX012345678 BLE</span>
-                    <span class="navitem-pointout">123</span>
-                </a>
+                <button class="navitem">
+                    <i class="fa-brands fa-fw fa-bluetooth fa-beat"></i>
+                    <span class="navitem-txt">Device: LTX012345678</span>
+                    <span class="navitem-pointout" style="background-color:green;">LINK</span>
+                </button>
 
+                <button class="navitem" >  <!-- class="navhidden" for Hidden.. -->
+                    <i class="fa-regular fa-fw fa-compass"></i>
+                    <span class="navitem-txt">Parameter</span>
+                </button>
 
-                <a class="navitem" href="#">
-                    <i id="cln_icon_scan" class="fa fa-fw fa-home"></i>
-                    <span class="navitem-txt">Home</span>
-                    <span class="navitem-pointout" style="background-color:magenta;">99</span>
-                </a>
-                <a class="navitem" href="#">
+                <button class="navitem" >  <!-- class="navhidden" for Hidden.. -->
+                    <i class="fa-solid fa-fw fa-upload"></i>
+                    <span class="navitem-txt">Parameter</span>
+                    <span class="navitem-simple-pointout">33K</span>
+                </button>
+
+                <button class="navitem" >  <!-- class="navhidden" for Hidden.. -->
                     <i class="fa fa-fw fa-wrench"></i>
+                    <span class="navitem-txt">Parameter</span>
+                </button>
+
+                <button class="navitem" >  <!-- class="navhidden" for Hidden.. -->
+                    <i class="fa-solid fa-fw fa-screwdriver-wrench"></i>
                     <span class="navitem-txt">Setup</span>
-                </a>
-                <a class="navitem" href="#">
-                    <i class="fa fa-fw fa-envelope"></i>
-                    <span class="navitem-txt">MyallContacts</span>
-                    <span class="navitem-pointout" style="background-color:green;">99</span>
-                </a>
-                <a class="navitem" href="#">
-                    <i id="cln_icon_scan" class="fa fa-fw fa-home"></i>
-                    <span class="navitem-txt">Home</span>
-                    <span class="navitem-pointout" style="background-color:magenta;">99</span>
-                </a>
+                </button>
+
+                
 
                 <div class="thin-hr"></div>
-                <div class="navinfo"><b>Message categories</b></div>
+                <div class="navinfo"><b>Interne Funktionen</b></div>
 
-                <a class="navitem" href="#">
+                <button class="navitem">
                     <i class="fa fa-fw fa-bell fa-shake" style="color:darkred"></i>
-                    <span class="navitem-txt">Zu Erledigen</span>
+                    <span class="navitem-txt">Alarms</span>
                     <span class="navitem-pointout" style="background-color:red">99</span>
-                </a>
-                <a class="navitem" href="#">
-                    <i class="fa fa-fw">&bull;</i> <!-- empty FA-Icon as Placeholder -->
-                    <span class="navitem-txt">Bullet</span>
-                    <span class="navitem-simple-pointout">99</span>
-                </a>
-                <a class="navitem" href="#">
-                    <i class="fa fa-fw" style="color:mediumseagreen;">&#10144;</i> <!-- empty FA-Icon as Placeholder -->
-                    <span class="navitem-txt">GrünerPfeil</span>
-                    <span class="navitem-simple-pointout">99</span>
-                </a>
+                </button>
+                <button class="navitem">
+                    <i class="fa-regular fa-fw fa-keyboard"></i>
+                    <span class="navitem-txt">Terminal</span>
+                    <span class="navitem-simple-pointout">33</span>
+                </button>
 
                 <div class="thin-hr"></div>
-                <div class="navinfo"><b>RECENT</b></div>
+                <div class="navinfo"><b>Dies und Das</b></div>
 
-                <a class="navitem" href="#" style="color:blue">
+                <button class="navitem" style="color:blue">
                     <i class="fa fa-fw fa-circle-plus"></i>
                     <span class="navitem-txt">Gerät hinzufügen</span>
-                </a>
-                <a class="navitem" href="#">
+                </button>
+                <button class="navitem">
                     <img src="./static/preview.png" alt="Test">
-                    <span class="navitem-txt">Torus-Sensor</span>
+                    <span class="navitem-txt">Logo</span>
                     <span class="navitem-pointout" style="background-color:green;">Online</span>
-                </a>
+                </button>
 
-                <a class="navitem" href="#">
-                    <i class="fa fa-fw">&#x1F3E1;</i> <!-- empty FA-Icon as Placeholder -->
+                <button class="navitem">
+                    <i class="fa fa-fw">&#x1F3E1;</i>
                     <span class="navitem-txt">Haus mit Garten</span>
                     <span class="navitem-simple-pointout">1</span>
-                </a>
-
+                </button>
             </nav>
 
             <div id="main_content" class="ucontent">
                 <div id="sect1" class="usection">
-                    Secttion1 $$english
-                    <a href="#sect2">Click Me to Smooth Scroll to Section 2</a>
-                    Zeile 1<br>Zeile 2<br>Zeile 3<br>Zeile 4<br>
-                    <span style="font-size:16px;"><i class="far fa-clock"></i> TEST-Span</span>
-                    <button onclick="get()">GET</button><br>
-                    <button onclick="hide()">HIDE</button><br>
-                    <button onclick="shrink()">SCHRINK(Collapse:ON)</button><br>
-                    <button onclick="expand()">EXPAND(Collapse:OFF)</button><br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    <span class="fa-stack fa-2x">
-                        <i class="fa-solid fa-camera fa-stack-1x fa-shake"></i>
-                        <i class="fa-solid fa-ban fa-stack-2x" style="color:Tomato"></i>
-                    </span>
-                    <div class="testclass" style="Background-color: yellow; margin:0;padding:0;">XXX</div>
+                    <a href="#sect1">
+                    <a href="#sect2">Click Scroll to Section 2</a>
 
-                    <p ll="header.title">You can put default text here if you want for SEO reasons</p>
-                    <p ll="header.stitle">Subtitle</p>
-                    <p ll="p-1">Pi</p>
-                    <p ll="p-xx">Pdummy</p>
-                    <p ll="p-2">P2</p>
-                    <p style="font-size:.9rem; opacity:.5;" ll="variables"></p>
 
+                    <br>
+                    <br>
+                    <button onclick="dashToggleTheme()">Toggle Thema</button><br><br>
+                    <br>
+
+
+                    <button onclick="document.documentElement.style.setProperty('--fontrel', 0.5)">Font 0.5</button><br><br>
+                    <button onclick="document.documentElement.style.setProperty('--fontrel', 0.75)">Font 0.75</button><br><br>
+                    <button onclick="document.documentElement.style.setProperty('--fontrel', 1)">Font 1</button><br><br>
+                    <button onclick="document.documentElement.style.setProperty('--fontrel', 1.5)">Font 1.5</button><br><br>
+                    <button onclick="document.documentElement.style.setProperty('--fontrel', 2)">Font 2</button><br><br>
+                    <br>
+
+                    <button onclick="i18localize('de')">Deutsch DE</button><br><br>
+                    <button onclick="i18localize('en')">Englisch EN</button><br><br>
+
+                    <br>
+                    <br>
+
+                    <p ll="block.title">Titel1</p>
+                    <p ll="block.subtitle">Titel2</p>
+                    <p ll="p-1">Zeile1</p>
+                    <p ll="p-2">Zeile1</p>
                 </div>
 
                 <div class="thin-hr"></div>
-                <div id="sect2" class="usection">
-                    Section2
-                    <a href="#sect1">Click Me to Smooth Scroll to Section 1</a>
 
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Zeilen.<br>
-                    Zeile 1<br>Zeile 2<br>Zeile 3<br>Zeile 4<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Zeilen.<br>
-                    Zeile 1<br>Zeile 2<br>Zeile 3<br>Zeile 4<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit 3<br>Content mit
-                    3<br>
-                    Zeilen.<br>
-                    Zeile 1<br>Zeile 2<br>Zeile 3<br>Zeile 4<br>
+                <div id="sect2" class="usection">
+                    <a href="#sect2">
+                    <a href="#sect1">Click Scroll to Section 1</a>
                 </div>
 
             </div>
@@ -195,15 +155,12 @@
     </div>
 
     <footer class="cfooter">
-        Footer-Line
+        Footer-Line fuer Infos...
     </footer>
 
 </body> <!-- BODY END -->
 
 <script> // interne Verwaltung
-    function get() {
-        i18localize('des')
-    }
 </script>
 
 
