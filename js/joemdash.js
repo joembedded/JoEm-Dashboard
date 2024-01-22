@@ -18,6 +18,16 @@ function sidebar() {
     document.documentElement.style.setProperty('--lnavwidth_wrk', pdst)
 }
 
+// Font setzen - Wichtig dabei nochmal Grenzen checken
+function dashSetFont(nrel) {
+    if(nrel<0.5) nrel = 0.5
+    else if (nrel>2) nrel = 2
+    document.documentElement.style.setProperty('--fontrel', nrel)
+    sidebarState = (sidebarState + 2) % 3
+    sidebar()
+}
+
+
 // Themen invertieren hell-dunkel
 function dashToggleTheme() {
     const cvar = ['--white', '--black', '--whitegray', '--lightgray', '--hovergray', '--midgray', '--darkgray', '--txtwhite', '--txtblack']

@@ -26,8 +26,8 @@
     /* == User-Aenderbare Vars ENDE == */
 
     /* Linearisation with Trend-line for fontrel 0.5.1,2 */
-    --lnavwidth_max: calc(33px + var(--fontrel)*283px);
-    --lnavwidth_small: calc(22px + var(--fontrel)*33px);
+    --lnavwidth_max: calc(32px + var(--fontrel)*280px);
+    --lnavwidth_small: calc(32px + var(--fontrel)*32px);
 
     /* Heights Header/Footer, unterschiedlich falls noch Menues rein muessen*/
     --hdrheight: calc(8px + var(--fontrel)*32px);
@@ -135,6 +135,7 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         border: none;
         background-color: var(--lightgray);
         color: var(--txtblack);
+        font-size: calc(1rem * var(--fontrel));
 
         &:hover {
             background-color: var(--hovergray);
@@ -248,6 +249,21 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
     font-size: calc(1rem * var(--fontrel));
     padding: 8px;
     overflow: hidden;
+
+    button {
+        font-size: calc(1rem * var(--fontrel));
+        padding: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-align: left;
+        border: none;
+        background-color: var(--lightgray);
+        color: var(--txtblack);
+
+        &:hover {
+            background-color: var(--hovergray);
+        }
+
 }
 
 /***/
