@@ -1,0 +1,248 @@
+/* joemdash.css - 21.01.2024 (C) JoEmbedded.de V1.0 */
+:root {
+    /*== Infos, Alerts, Dialogboxen, .. Schrift txtblack == User-Aenderbare Vars START ==*/
+    --white: #ffffff;
+    --black: #000000;
+    /* Main Content Schrift txtblack */
+    --whitegray: #f8f8f8;
+    /* Navi Schrift  txtblack*/
+    --lightgray: #e0e0e0;
+    /* Navi Schrift  Hovered*/
+    --hovergray: #c0c0c0;
+
+    /* Header Schrift txtblack */
+    --midgray: #b0b0b0;
+    /* Footer Schrift txtwhite */
+    --darkgray: #202020;
+
+    /* Schriftfarben */
+    --txtwhite: #f0f0f0;
+    --txtblack: #000000;
+
+    /* *** App Scaling ***  Einrueckung/Dyn. Elemente. Koennen gesetzt und gelesen werden. */
+    /* Default Font: 16px == 1rem, use rem for calc()! 0.5..2.0 OK */
+    --fontrel: 1;
+    --scrollms: 200ms;
+    /* == User-Aenderbare Vars ENDE == */
+
+    /* Linearisation with Trend-line for fontrel 0.5.1,2 */
+    --lnavwidth_max: calc(33px + var(--fontrel)*283px);
+    --lnavwidth_small: calc(22px + var(--fontrel)*33px);
+
+    /* Heights Header/Footer, unterschiedlich falls noch Menues rein muessen*/
+    --hdrheight: calc(8px + var(--fontrel)*32px);
+    --ftrheight: calc(8px + var(--fontrel)*32px);
+
+    /* Working var */
+    --lnavwidth_wrk: var(--lnavwidth_max);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--whitegray);
+    color: black;
+    font-family: sans-serif;
+    font-size: calc(1rem * var(--fontrel));
+}
+
+/*--- Spacer (thin black line) ---*/
+.thin-hr {
+    border-bottom: 1px solid var(--black);
+    opacity: 0.25;
+    margin: 0 8px;
+}
+
+/* Screen-Height-Container: Header-Ccontent-Footer */
+.shcontainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.cheader {
+    background-color: var(--midgray);
+    color: var(--txtblack);
+    height: var(--hdrheight);
+    padding-left: 8px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+
+    i {
+        /* Traditionell icons via i, fuer Text ruecksetzen */
+        font-style: normal;
+        font-size: calc(2rem * var(--fontrel));
+        vertical-align: middle;
+        background-color: var(--lightgray);
+        border-radius: 4px;
+
+        &:hover {
+            background-color: var(--hovergray)
+        }
+    }
+
+    .cheader-txt {
+        margin-left: 10px;
+    }
+}
+
+.ccontent {
+    display: static;
+}
+
+.cfooter {
+    background-color: var(--darkgray);
+    color: var(--txtwhite);
+    height: var(--ftrheight);
+    padding-left: 8px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Horizontaler Container fuer Menue und Content */
+.hccontainer {
+    display: flex;
+    flex-direction: row;
+}
+
+/* Navigation im Horizontalen Container clnav. 
+ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
+<a> gut geeignet wg. flexiblem href */
+.clnav {
+    width: var(--lnavwidth_wrk);
+    transition: all var(--scrollms);
+    height: calc(100svh - var(--hdrheight) - var(--ftrheight));
+    background-color: var(--lightgray);
+    color: var(--txtblack);
+    overflow: auto;
+
+    /*------- Nav-Links generell -------*/
+    a {
+        /* Links nicht unterstreichen */
+        text-decoration: none;
+        /* vertikal stapeln */
+        display: block;
+        padding: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+
+        &:visited,
+        &:link {
+            color: var(--txtblack);
+        }
+
+        &:hover {
+            background-color: var(--hovergray);
+        }
+    }
+
+    /*--- Info Line ---*/
+    .navinfo {
+        display: block;
+        padding: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        opacity: 1;
+        transition: var(--scrollms);
+
+    }
+
+    /* Elements of nav */
+    .navitem {
+        position: relative;
+        i {
+            /* Traditionell icons via i, fuer Text ruecksetzen */
+            font-style: normal;
+            font-size: calc(28px * var(--fontrel));
+            vertical-align: middle;
+            /* border: 1px solid black; TEST */
+        }
+        img {
+            vertical-align: middle;
+            padding: 0 4px;
+            width: calc(28px * var(--fontrel)); 
+            height: calc(28px * var(--fontrel));
+            /* border: 1px solid black; TEST */
+        }
+    }
+
+    /* Normaler Menue-Text */
+    .navitem-txt {
+        vertical-align: middle;
+        margin-left: 10px;
+        opacity: 1;
+        transition: var(--scrollms);
+    }
+
+    /* Simple-Info: unwichtig */
+    .navitem-simple-pointout {
+        position: absolute;
+        right: 8px;
+        padding: 5px;
+        color: var(--txtblack);
+        background-color: var(--lightgray);
+        opacity: 1;
+        transition: var(--scrollms);
+    }
+
+    /* Normale Info: Verziert am Smbol wenn minimiert*/
+    .navitem-pointout {
+        /* Default Color: blue: */
+        position: absolute;
+        right: 8px;
+        background-color: var(--darkgray);
+        padding: 5px;
+        border-radius: 4px;
+        color: var(--txtwhite);
+    }
+}
+
+/* Collapsed content */
+.collapse {
+    .navinfo {
+        opacity: 0;
+        transition: var(--scrollms);
+    }
+
+    .navitem-txt {
+        opacity: 0;
+        transition: var(--scrollms);
+    }
+
+    .navitem-pointout {
+        top: 4px;
+        left: calc(8px + var(--fontrel)*24px);
+        height: calc(var(--fontrel)*2px);
+        width: calc(var(--fontrel)*2px);
+        border-radius: 50%;
+        text-indent: -1000px;
+        border: 1px solid var(--txtwhite);
+        transition: var(--scrollms);
+    }
+
+    .navitem-simple-pointout {
+        opacity: 0;
+        transition: var(--scrollms);
+    }
+}
+
+/* User content im Horizontalen Container*/
+.ucontent {
+    width: calc(100svw - var(--lnavwidth_wrk));
+    height: calc(100svh - var(--hdrheight) - var(--ftrheight));
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    overflow-y: auto;
+    white-space: nowrap;
+}
+
+.usection {
+    height: calc(100svh - var(--hdrheight) - var(--ftrheight));
+    background-color: var(--white);
+    padding: 8px;
+}
+
+/***/
