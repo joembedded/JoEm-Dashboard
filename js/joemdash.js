@@ -1,6 +1,6 @@
 /* joemdash.js - Sidebar state machine 21.01.2024 (C) Joembedded */
 'use strict'
-let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden */
+let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
 function sidebar() {
     let pdst = "0px"
     const nb = document.querySelectorAll('.clnav');
@@ -23,7 +23,8 @@ function dashSetFont(nrel) {
     if(nrel<0.5) nrel = 0.5
     else if (nrel>2) nrel = 2
     document.documentElement.style.setProperty('--fontrel', nrel)
-    sidebarState = (sidebarState + 2) % 3
+    if(sidebarState == 5) sidebarState = 0 // If directly after init
+    else sidebarState = (sidebarState + 2) % 3
     sidebar()
 }
 
@@ -43,7 +44,7 @@ function dashInit() {
     const sbw = document.querySelector('.clnav').clientWidth;
     if (scw * 0.5 < sbw) {
         sidebar()   // initial Shrinked on small screens
-        sidebarState++; // Next CLick: Open
+        sidebarState=5; // Next CLick: Shrink 
     }
     document.getElementById("sidebar_menue").addEventListener("click", sidebar)
 }
