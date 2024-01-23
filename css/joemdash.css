@@ -140,6 +140,11 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         &:hover {
             background-color: var(--hovergray);
         }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     }
 
     /*--- Info Line ---*/
@@ -156,6 +161,7 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
     /* Elements of nav */
     .navitem {
         position: relative;
+
         i {
             /* Traditionell icons via i, fuer Text ruecksetzen */
             font-style: normal;
@@ -163,10 +169,11 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
             vertical-align: middle;
             /* border: 1px solid black; TEST */
         }
+
         img {
             vertical-align: middle;
             padding: 0 4px;
-            width: calc(28px * var(--fontrel)); 
+            width: calc(28px * var(--fontrel));
             height: calc(28px * var(--fontrel));
             /* border: 1px solid black; TEST */
         }
@@ -199,7 +206,7 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         right: 8px;
         background-color: var(--darkgray);
         padding: 5px;
-        border-radius: 4px;
+        border-radius: 32px;
         color: var(--txtwhite);
     }
 }
@@ -243,26 +250,43 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
 }
 
 .usection {
-    height: calc(100svh - var(--hdrheight) - var(--ftrheight));
+    /*height: calc(100svh - var(--hdrheight) - var(--ftrheight));
+    overflow: hidden;*/
     background-color: var(--white);
     color: var(--txtblack);
     font-size: calc(1rem * var(--fontrel));
     padding: 8px;
+}
+
+/* Allgemeines */
+button {
+    font-size: calc(1rem * var(--fontrel));
+    padding: 8px;
+    white-space: nowrap;
     overflow: hidden;
+    text-align: left;
+    border: none;
+    background-color: var(--lightgray);
+    color: var(--txtblack);
+    border-radius: 4px;
 
-    button {
-        font-size: calc(1rem * var(--fontrel));
-        padding: 8px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-align: left;
-        border: none;
-        background-color: var(--lightgray);
-        color: var(--txtblack);
+    &:hover {
+        background-color: var(--hovergray);
+    }
 
-        &:hover {
-            background-color: var(--hovergray);
-        }
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+dialog {
+    border: 1px solid var(--darkgray);;
+    border-radius: 4px;
+    background-color: var(--white);
+    color: var(--txtblack);
+    font-size: calc(1rem * var(--fontrel));
+    padding: 8px;
 
 }
 
