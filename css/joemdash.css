@@ -119,18 +119,22 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
     color: var(--txtblack);
     overflow: auto;
 
+	button {
+        /* In Sidenav: vertikal stapeln */
+        display: block;
+        width: 100%;
+        text-align: left;
+	}
+
     &.navhidden {
         display: none;
     }
 
     /*------- Nav-Links generell -------*/
     button {
-        /* vertikal stapeln */
-        display: block;
         padding: 8px;
         white-space: nowrap;
         overflow: hidden;
-        width: 100%;
         text-align: left;
         border: none;
         background-color: var(--lightgray);

@@ -32,6 +32,19 @@
     <!-- Internationalisation -->
     <script src="./js/i18n.js"></script>
 
+    <!-- BarcodeDetector - Polyfill Desktop -->
+    <script src="./js/jsQR.min.js"></script>
+    <!-- BarcodeDetector - Scanner-Dialog -->
+    <link rel="stylesheet" href="./css/qrscanner.css">
+    <script src="./js/qrscanner.js"></script>
+
+    <!-- BLX/Tools -->
+    <script src="./js/FileSaver.js"></script>
+    <!-- Distribution: uses Minified Files: -->
+    <script src="./js/blx.min.js"></script>
+    <script src="./js/blStore.min.js"></script>
+    <script src="./js/safari_polyfills.js"></script>
+
 
     <title>Dashboard-Template</title>
 
@@ -56,28 +69,28 @@
                     <span class="navitem-pointout" style="background-color:green;">LINK</span>
                 </button>
 
-                <button class="navitem" disabled>  <!-- class="navhidden" for Hidden.. -->
+                <button class="navitem" disabled> <!-- class="navhidden" for Hidden.. -->
                     <i class="fa-regular fa-fw fa-compass"></i>
                     <span class="navitem-txt">Messen</span>
                 </button>
 
-                <button class="navitem" >  <!-- class="navhidden" for Hidden.. -->
+                <button class="navitem"> <!-- class="navhidden" for Hidden.. -->
                     <i class="fa-solid fa-fw fa-upload"></i>
                     <span class="navitem-txt">System</span>
                     <span class="navitem-simple-pointout">33K</span>
                 </button>
 
-                <button class="navitem" >  <!-- class="navhidden" for Hidden.. -->
+                <button class="navitem"> <!-- class="navhidden" for Hidden.. -->
                     <i class="fa fa-fw fa-wrench"></i>
                     <span class="navitem-txt">System</span>
                 </button>
 
-                <button class="navitem" >  <!-- class="navhidden" for Hidden.. -->
+                <button class="navitem"> <!-- class="navhidden" for Hidden.. -->
                     <i class="fa-solid fa-fw fa-screwdriver-wrench"></i>
                     <span class="navitem-txt">Setup</span>
                 </button>
 
-                
+
 
                 <div class="thin-hr"></div>
                 <div class="navinfo"><b>Interne Funktionen</b></div>
@@ -98,7 +111,7 @@
 
                 <button class="navitem" style="color:blue">
                     <i class="fa fa-fw fa-circle-plus"></i>
-                    <span class="navitem-txt">Gerät hinzufügen</span>
+                    <span class="navitem-txt">Gerät hinzufügen</i></span>
                 </button>
                 <button class="navitem">
                     <img src="./static/preview.png" alt="Test">
@@ -111,6 +124,12 @@
                     <span class="navitem-txt">Haus mit Garten</span>
                     <span class="navitem-simple-pointout">1</span>
                 </button>
+
+                <div id="newdevices">
+
+                </div>
+
+
             </nav>
 
             <div id="main_content" class="ucontent">
@@ -134,7 +153,7 @@
                     <button onclick="i18localize('en')">Englisch EN</button><br><br>
 
                     <br>
-                    <button id="but1" disabled>Diabled</button> 
+                    <button id="but1" disabled>Diabled</button>
                     <button onclick="xget()">GET</button><br><br>
 
                     Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
@@ -153,13 +172,8 @@
 
                 <div id="sect2" class="usection">
                     <a href="#sect1">Click Scroll to Section 1</a>
-                    <br>Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-                    Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-                    Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-                    Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-                    Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
+                    <div id="terminal"></div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -168,35 +182,59 @@
         Footer-Line fuer Infos...
     </footer>
 
-    <!-- Dialog Elements <dialog> / Modal new in HTML5 -->    
-    <dialog id="myDialog">
-        This is a dialog window <br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-<hr>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-        Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
-
-        <button onclick = "document.getElementById('myDialog').close()">Close</button>
+    <!-- Dialog Elements <dialog> / Modal new in HTML5 -->
+    <dialog id='qrscanner-dialog'>
+        <video style="display: none;" id='qroriginal-video' playsinline mute></video>
+        <div id='qrvideo-header'><select id='qrcam-selector'></select></div>
+        <button id='qrscanner-btnClose'>&#10006;</button>
+        <button id='qrscanner-btnTorch'>&#x1F4A1;</button>
+        <div style='text-align:center;'><canvas id='qrscaled-videocanvas'></canvas></div>
     </dialog>
 
 
 </body> <!-- BODY END -->
 
 <script> // interne Verwaltung
-function xget(){
-    const dialog = document.getElementById("myDialog"); 
-    dialog.showModal();
-    location.hash = "#sect1"; // sofort
-}
+
+    /* Ab hier interne Verwaltung - optional. print() wird vom Scanner  */
+    let _log = [] // Logdaten
+    let lcnt = 0
+    const terminal = document.getElementById("terminal")
+    function print(txt) {
+        while (_log.length > 30) _log.pop()
+        _log.unshift(`${lcnt++}: ${txt}`)
+        if (terminal ) terminal.innerText = _log.join("\n")
+    }
+    function print_clr() {
+        _log = []
+        lcnt = 0
+    }
+    qrLogPrint = print
+
+
+    scanCallback = function (nd) {
+        blx.frq_ping(1000, 0.2, 0.5)
+
+        let ni = document.createElement('button')
+        ni.setAttribute("class", "navitem")
+        ni.innerHTML = `
+            <i class='fa fa-fw'>&#x1F3E1;</i>
+            <span class='navitem-txt'>${nd}</span>
+            `
+        document.getElementById("newdevices").appendChild(ni)
+
+
+        return 1
+    }
+    async function xget() {
+        await openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
+        console.log("SCAN...")
+        await scannerBusy()
+        console.log("ERGEBNIS: " + scannedResults.length + " gefunden")
+        scannedResults.forEach(e => {
+            console.log(`Found: '${e.qrValue}'`)
+        })
+    }
 </script>
 
 

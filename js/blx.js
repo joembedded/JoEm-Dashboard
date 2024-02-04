@@ -2435,7 +2435,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
       if (blxUserCB) blxUserCB('ERR', 0, blxErrMsg) // ERR Type 0 (nicht ausgewertet)
     }
   }
-
+  // console.log("BLXPreInit") // Nur zu Info
   blxSetup()
   //= =========the API==========
   return {
