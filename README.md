@@ -12,11 +12,10 @@ Features:
 
 Live-Demo: https://joembedded.github.io/JoEm-Dashboard/
 
-
 Note: Chrome-Entwickleroption: 
-1 - Aktiviere Entwicklermodus, indem Einstellungen > Über das Telefon und dann 7 Mal auf die Build-Nummer tippen.
-2 - Aktivieren USB-Debugging in den Entwickleroptionen.
-3 - chrome://inspect/#devices
+- Aktiviere Entwicklermodus, indem Einstellungen > Über das Telefon und dann 7 Mal auf die Build-Nummer tippen.
+- Aktivieren USB-Debugging in den Entwickleroptionen.
+- chrome://inspect/#devices
 ---
 
 ## 3.rd Party Software ##
@@ -27,4 +26,4 @@ Note: Chrome-Entwickleroption:
 ---
 
 ## Changelog ##
-- V0.10 22.01.2024 First Fragment
+- V0.11 05.02.2024 First Fragment

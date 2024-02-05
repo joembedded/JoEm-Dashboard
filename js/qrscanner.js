@@ -121,11 +121,25 @@ async function initCameras() {
         if (!availableCameras.length) throw ("No Camera(s) available on this device")
         if (qrLogPrint) qrLogPrint(`Found ${availableCameras.length} Camera${(availableCameras.length > 1 ? 's' : '')}`)
         let selectedCameraIdx = 0
+        let backcnt = 0
+        let facecnt = 0
         availableCameras.forEach((e, idx) => {
             const newoption = document.createElement("option"); // Von file:// anscheinend keine labels..
-            newoption.text = (e.label == '') ? '(Unknown)' : e.label
-            if (qrLogPrint) qrLogPrint(`Camera${idx}: '${newoption.text}'`)
-            if (e.label.toLowerCase().includes('back')) selectedCameraIdx = idx
+            var camname = (e.label == '') ? '(Unknown)' : e.label
+            if (qrLogPrint) qrLogPrint(`Camera${idx}: '${camname}'`)
+            if (e.label.toLowerCase().includes('back')) {
+                selectedCameraIdx = idx
+                camname = 'Back'
+                backcnt++
+                if(backcnt>1) camname += `(${backcnt})`
+            }
+            if (e.label.toLowerCase().includes('front')) {
+                camname = 'Front'
+                facecnt++
+                if(facecnt>1) camname += `(${facecnt})`
+            }
+            newoption.text = camname
+
             camSelector.add(newoption)
         })
         camSelector.selectedIndex = selectedCameraIdx
@@ -214,7 +228,6 @@ async function openSelectedCamera() {
 
         ctxCam = scaledVideoCanvas.getContext("2d", { willReadFrequently: true })
 
-        scannedResults = []
         camWorker()
 
         // WakeLock - Screen Dimming disablen
