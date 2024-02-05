@@ -217,16 +217,16 @@
 
         let ni = document.createElement('button')
         ni.setAttribute("class", "navitem")
+        ni.addEventListener("click",() => {alert("AlleAchtung"+nd)})
         ni.innerHTML = `
             <i class='fa fa-fw'>&#x1F3E1;</i>
             <span class='navitem-txt'>${nd}</span>
             `
         document.getElementById("newdevices").appendChild(ni)
-
-
         return 1
     }
     async function xget() {
+        scannedResults = []
         await openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
         console.log("SCAN...")
         await scannerBusy()

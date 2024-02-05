@@ -3,7 +3,7 @@
 /*
     qrscanner verwendet die BarcodeDetector API, ist aber Stand Anf. 2024 nur aauf Android vorhanden
     Ansonsten  Barcode Polyfill: - https://github.com/cozmo/jsQR  V1.4.0
-    Cozmo QR: works OK, but only for Text
+    Cozmo QR: works so lala, but only for Text
     Distribute: uglifyjs --warn ./js/jsQR.js -m -c -o ./js/jsQR.min.js
     (Version: uglify-es 3.3.9 )
     src="./js/jsQR.js" : 250kB
@@ -100,13 +100,13 @@ async function initCameras() {
         initQrCodeDOM()
 
         // Barcode-Teil
-        if (!('BarcodeDetector' in window)) {
+        if (!('BarcodeDetector' in window)  /* || 1 */ )  {
             if (qrLogPrint) qrLogPrint("ERROR: No Barcode API available, Use Polyfill!")
             window.BarcodeDetector = cozmoQR
         } else {
             if (qrLogPrint) qrLogPrint("Barcode API available!")
         }
-        barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] }) // Empty: All formats
+        barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] }) // API: Empty: All formats, Cozmo: QR only
 
         // Kamera-Teil
         const permissionStatus = await navigator.permissions.query({ name: "camera" })
@@ -161,9 +161,13 @@ async function openSelectedCamera() {
         camStream = await navigator.mediaDevices.getUserMedia({
             video: {
                 deviceId: availableCameras[selCam].deviceId,
-                // Default Canvas 640x480, Achtung: Wenn 'ideal' vorhanden: groesser/langsamer)
-                width: { min: 640 /*, ideal: 1920*/ },
-                height: { min: 480 /*, ideal: 1080*/ },
+                // Default Canvas 640x480, Achtung: Wenn 'ideal' (optional) vorhanden: groesser/langsamer)
+                /*
+                width: { min: 640  }, 
+                height: { min: 480 },
+                */
+                width: { min: 640 , ideal: 1920 }, 
+                height: { min: 480 , ideal: 1080 },
             }
         })
         // console.log(camStream)
@@ -205,7 +209,7 @@ async function openSelectedCamera() {
         scaledVideoCanvas.width = scaleWidth
         scaleVideo2Canvas = scaleWidth / videoWidth
 
-        if (qrLogPrint) qrLogPrint(`Cam: ${videoWidth}x${videoHeight} Pixels (Aspect-Ratio: ${arcam.toFixed(2)})`)
+        if (qrLogPrint) qrLogPrint(`Camera: ${videoWidth}x${videoHeight} Pixels (Aspect-Ratio: ${arcam.toFixed(2)})`)
         if (qrLogPrint) qrLogPrint(`Canvas: ${scaleWidth}x${scaleHeight} Pixels`)
 
         ctxCam = scaledVideoCanvas.getContext("2d", { willReadFrequently: true })

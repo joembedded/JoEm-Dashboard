@@ -39,6 +39,9 @@ function dashToggleTheme() {
     })
 }
 
+
+
+
 function dashInit() {
     const scw = document.documentElement.clientWidth;
     const sbw = document.querySelector('.clnav').clientWidth;
@@ -47,6 +50,7 @@ function dashInit() {
         sidebarState=5; // Next CLick: Shrink 
     }
     document.getElementById("sidebar_menue").addEventListener("click", sidebar)
+    
 }
 
 window.addEventListener("load", dashInit)
