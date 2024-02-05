@@ -10,7 +10,8 @@ Features:
 - Interner QR-Code-Scanner
 - ...
 
-Live-Demo: https://github.com/joembedded/JoEm-Dashboard/deployments/github-pages
+Live-Demo: https://joembedded.github.io/JoEm-Dashboard/
+
 
 Note: Chrome-Entwickleroption: 
 1 - Aktiviere Entwicklermodus, indem Einstellungen > Über das Telefon und dann 7 Mal auf die Build-Nummer tippen.
