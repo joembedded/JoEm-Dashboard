@@ -291,7 +291,6 @@ dialog {
     color: var(--txtblack);
     font-size: calc(1rem * var(--fontrel));
     padding: 8px;
-
 }
 
 /***/
