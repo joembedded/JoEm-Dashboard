@@ -33,8 +33,22 @@
     <link rel="stylesheet" href="./fontawesome/css/all.min.css">
     <!-- Basis-Funktionalitaet des Dashbords: -->
     <link rel="stylesheet" href="./css/joemdash.css">
+    <script src="./js/joemdash.js"></script>
+    <!-- Internationalisation -->
+    <script src="./js/i18n.js"></script>
+
+    <!-- BarcodeDetector - Polyfill Desktop -->
+    <script src="./js/jsQR.min.js"></script>
     <!-- BarcodeDetector - Scanner-Dialog -->
     <link rel="stylesheet" href="./css/qrscanner.css">
+    <script src="./js/qrscanner.js"></script>
+
+    <!-- BLX/Tools -->
+    <script src="./js/FileSaver.js"></script>
+    <!-- Distribution: uses Minified Files: -->
+    <script src="./js/blx.min.js"></script>
+    <script src="./js/blStore.min.js"></script>
+    <script src="./js/safari_polyfills.js"></script>
 
 
     <title>Dashboard-Template</title>
@@ -130,22 +144,22 @@
 
                     <br>
                     <br>
-                    <button id="butDashToggleTheme">Toggle Thema</button><br><br>
+                    <button onclick="dashToggleTheme()">Toggle Thema</button><br><br>
                     <br>
 
-                    <button id="dashSetFont0_5">Font 0.5</button><br>
-                    <button id="dashSetFont0_75">Font 0.75</button><br>
-                    <button id="dashSetFont1">Font 1</button><br>
-                    <button id="dashSetFont1_5">Font 1.5</button><br>
-                    <button id="dashSetFont2">Font 2</button><br>
+                    <button onclick="dashSetFont( 0.5)">Font 0.5</button><br>
+                    <button onclick="dashSetFont( 0.75)">Font 0.75</button><br>
+                    <button onclick="dashSetFont( 1)">Font 1</button><br>
+                    <button onclick="dashSetFont( 1.5)">Font 1.5</button><br>
+                    <button onclick="dashSetFont(2)">Font 2</button><br>
                     <br>
 
-                    <button id="i18localize_de">Deutsch DE</button><br><br>
-                    <button id="i18localize_en">Englisch EN</button><br><br>
+                    <button onclick="i18localize('de')">Deutsch DE</button><br><br>
+                    <button onclick="i18localize('en')">Englisch EN</button><br><br>
 
                     <br>
                     <button id="but1" disabled>Diabled</button>
-                    <button id="butXget">GET</button><br><br>
+                    <button onclick="xget()">GET</button><br><br>
 
                     Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
                     Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
@@ -185,14 +199,7 @@
 
 </body> <!-- BODY END -->
 
-<script type="module"> // interne Verwaltung
-
-    import * as JD from './js/joemdash.js'
-    import * as QRS from './js/qrscanner.js'
-    import './js/jsQR.min.js' // Polyfill for Desktop
-    import * as I18 from './js/i18n.js'
-
-    import './js/blx.min.js'
+<script> // interne Verwaltung
 
     /* Ab hier interne Verwaltung - optional. print() wird vom Scanner  */
     let _log = [] // Logdaten
@@ -201,52 +208,38 @@
     function print(txt) {
         while (_log.length > 30) _log.pop()
         _log.unshift(`${lcnt++}: ${txt}`)
-        if (terminal) terminal.innerText = _log.join("\n")
+        if (terminal ) terminal.innerText = _log.join("\n")
     }
     function print_clr() {
         _log = []
         lcnt = 0
     }
+    qrLogPrint = print
 
-    QRS.setQrLogPrint(print)
 
-    function scanFound(nd) {
+    scanCallback = function (nd) {
         blx.frq_ping(1000, 0.2, 0.5)
+
         let ni = document.createElement('button')
         ni.setAttribute("class", "navitem")
-        ni.addEventListener("click", () => { alert("AlleAchtung: " + nd) })
-        ni.innerHTML = `<i class='fa fa-fw'>&#x1F3E1;</i><span class='navitem-txt'>${nd}</span>`
+        ni.addEventListener("click",() => {alert("AlleAchtung"+nd)})
+        ni.innerHTML = `
+            <i class='fa fa-fw'>&#x1F3E1;</i>
+            <span class='navitem-txt'>${nd}</span>
+            `
         document.getElementById("newdevices").appendChild(ni)
         return 1
     }
-    QRS.setScanCallback(scanFound)
-
     async function xget() {
-        QRS.clearScannedResults()
-        await QRS.openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
+        scannedResults = []
+        await openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
         console.log("SCAN...")
-        await QRS.scannerBusy()
-        console.log("ERGEBNIS: " + QRS.scannedResults.length + " gefunden")
-        QRS.scannedResults.forEach(e => {
+        await scannerBusy()
+        console.log("ERGEBNIS: " + scannedResults.length + " gefunden")
+        scannedResults.forEach(e => {
             console.log(`Found: '${e.qrValue}'`)
         })
     }
-
-    document.getElementById("butXget").addEventListener("click", xget)
-
-    document.getElementById("butDashToggleTheme").addEventListener("click", JD.dashToggleTheme)
-    document.getElementById("dashSetFont0_5").addEventListener("click", () => JD.dashSetFont(0.5))
-    document.getElementById("dashSetFont0_75").addEventListener("click", () => JD.dashSetFont(0.75))
-    document.getElementById("dashSetFont1").addEventListener("click", () => JD.dashSetFont(1))
-    document.getElementById("dashSetFont1_5").addEventListener("click", () => JD.dashSetFont(1.5))
-    document.getElementById("dashSetFont2").addEventListener("click", () => JD.dashSetFont(2))
-
-    document.getElementById("i18localize_de").addEventListener("click", () => I18.i18localize('de'))
-    document.getElementById("i18localize_en").addEventListener("click", () => I18.i18localize('en'))
-
-
-
-
 </script>
 
 

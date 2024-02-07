@@ -1,6 +1,6 @@
 /* joemdash.js - Sidebar state machine 21.01.2024 (C) Joembedded */
-'use strict'
-let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
+
+export let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
 function sidebar() {
     let pdst = "0px"
     const nb = document.querySelectorAll('.clnav');
@@ -19,7 +19,7 @@ function sidebar() {
 }
 
 // Font setzen - Wichtig dabei nochmal Grenzen checken
-function dashSetFont(nrel) {
+export function dashSetFont(nrel) {
     if(nrel<0.5) nrel = 0.5
     else if (nrel>2) nrel = 2
     document.documentElement.style.setProperty('--fontrel', nrel)
@@ -30,7 +30,7 @@ function dashSetFont(nrel) {
 
 
 // Themen invertieren hell-dunkel
-function dashToggleTheme() {
+export function dashToggleTheme() {
     const cvar = ['--white', '--black', '--whitegray', '--lightgray', '--hovergray', '--midgray', '--darkgray', '--txtwhite', '--txtblack']
     cvar.forEach((e) => {
         const oval = parseInt(getComputedStyle(document.documentElement).getPropertyValue(e).substring(1),16);
@@ -38,9 +38,6 @@ function dashToggleTheme() {
         document.documentElement.style.setProperty(e, nval)
     })
 }
-
-
-
 
 function dashInit() {
     const scw = document.documentElement.clientWidth;
@@ -53,6 +50,7 @@ function dashInit() {
     
 }
 
+console.log("JoEmDash")
 window.addEventListener("load", dashInit)
 
 /***/

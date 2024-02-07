@@ -1,10 +1,10 @@
 /** Minimalistische Internationalisierung, aehnlich i18n **/
   // Locale translations.
-  const i18_availLang = ['en', 'de']   // List of available locales
-  const i18_defaultLang = 'en'   // Fallback/Default
-  let i18_currentLang = '??'
+  export const i18_availLang = ['en', 'de']   // List of available locales
+  export const i18_defaultLang = 'en'   // Fallback/Default
+  export let i18_currentLang = '??'
 
-  const translations = {
+  export const translations = {
     // EN
     en: {
       "block": {
@@ -29,7 +29,7 @@
   }
 
 /* Uebersetzt datierte Text ggfs. nach obiger Tabelle */
- function i18localize(newLang) {
+ export function i18localize(newLang) {
   let pageLang = i18_defaultLang
   if (i18_availLang.includes(newLang))  pageLang = newLang
   else console.warn(`i18n.js: New Language:'${newLang}' not found, Fallback:'${pageLang}'`)

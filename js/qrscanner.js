@@ -11,6 +11,7 @@
 
     <script src="./js/jsQR.min.js"></script>
 */
+
 class cozmoQR {
     constructor(setup) {
         this.setup = setup;
@@ -76,7 +77,9 @@ let barcodeScannerInit = false // Wenn true; verwendbar
 // Setup
 const camUpdateInterval = 50 // ms
 let qrLogPrint = console.log //  z.B. print() oder console.log(), null, ...
-
+export function setQrLogPrint(f){
+    qrLogPrint = f
+}
 let wakeLock = null
 
 // Global Temporaries
@@ -87,10 +90,16 @@ let scaleVideo2Canvas = 0
 
 // Results - Array of Objects (auch ignorierte)
 let qrScanDialogOpen = false
-let scannedResults = []
+export let scannedResults = []
+export function clearScannedResults(){
+    scannedResults = []
+}
 
 // Wertet Scanned Result aus - Return -1:Ignore,0:OkUndEnd,1:OkUndMehr
 let scanCallback = function () { return 1 }
+export function setScanCallback(f){
+    scanCallback = f
+}
 
 //--- init --- Muss nicht explizit aufgerufen werden, fordert aber ggfs. Permissions an
 async function initCameras() {
@@ -153,7 +162,8 @@ async function initCameras() {
         if (qrLogPrint) qrLogPrint(`ERROR(initCameras): ${err}`)
     }
 }
-async function openSelectedCamera() {
+
+export async function openSelectedCamera() {
     if (!barcodeScannerInit) await initCameras()
     if (qrLogPrint) qrLogPrint("INFO: OpenCamera")
     try {
@@ -327,11 +337,12 @@ async function qrSleepMs(ms = 1) { // use: await qrSleepMs()
     let np = new Promise(resolve => setTimeout(resolve, ms))
     return np;
 }
-async function scannerBusy() {
+export async function scannerBusy() {
     for (; ;) { // Poll reply in 10 ms steps
         if (qrScanDialogOpen !== true) break
         await qrSleepMs(50)
     }
 }
+console.log("Qrscanner")
 
 // ***
