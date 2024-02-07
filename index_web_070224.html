@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<!-- 
+    Template-Fragment fuer Dashboards nach aktueller Struktur. 
+    Benoetigt Server wenn import oder fetch(). (Dann location.protocol === 'file:' disabled)
+    Layout ist etwas komplizierter da Menueliste scrollbar und Footer eingebaut.
+    
+    Icons: Font Awesome V6 Free -> https://fontawesome.com/docs/web/style/styling
+
+    Kontakt: joembedded@gmail.com
+
+    Tests: 
+    http://localhost/wrk/joemdash/index.html
+    https://joembedded.github.io/JoEm-Dashboard/
+
+-->
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta meta property=“og:title“ content=“Dashboard“ />
+    <meta property="og:description" content="Template-Fragment for Dashboards" />
+    <meta name="description" content="Template-Fragment for Dashboards" />
+    <!-- Pfad zeigt auf volle URL (nur dann als Link immer korrekt darstellbar) -->
+    <meta property="og:image" content="https://joembedded.github.io/JoEm-Dashboard/static/preview.png" />
+
+    <!-- - App Icon entweder als Icon or SVG: -->
+    <link rel="icon" type="image/svg+xml" href="./static/favicon.svg">
+    <!-- <link rel="icon" type="image/x-icon" href="./static/favicon.ico">  -->
+
+    <link rel="stylesheet" href="./fontawesome/css/all.min.css">
+    <!-- Basis-Funktionalitaet des Dashbords: -->
+    <link rel="stylesheet" href="./css/joemdash.css">
+    <!-- BarcodeDetector - Scanner-Dialog -->
+    <link rel="stylesheet" href="./css/qrscanner.css">
+
+
+    <title>Dashboard-Template</title>
+
+</head>
+
+<body class="shcontainer"> <!-- BODY START -->
+
+    <header class="cheader">
+        <i class="fa fa-fw fa-bars " id="sidebar_menue"></i>
+        <span class="cheader-txt"><b>Dashboard-Template</b> JoEmbedded
+            JoEmbedded</span>
+    </header>
+
+    <div class="ccontent">
+        <div class="hccontainer">
+            <nav id="sidebar_left" class="clnav">
+                <div class="navinfo"><b>Main</b></div>
+
+                <button class="navitem">
+                    <i class="fa-brands fa-fw fa-bluetooth fa-beat"></i>
+                    <span class="navitem-txt">Device: LTX012345678</span>
+                    <span class="navitem-pointout" style="background-color:green;">LINK</span>
+                </button>
+
+                <button class="navitem" disabled> <!-- class="navhidden" for Hidden.. -->
+                    <i class="fa-regular fa-fw fa-compass"></i>
+                    <span class="navitem-txt">Messen</span>
+                </button>
+
+                <button class="navitem"> <!-- class="navhidden" for Hidden.. -->
+                    <i class="fa-solid fa-fw fa-upload"></i>
+                    <span class="navitem-txt">System</span>
+                    <span class="navitem-simple-pointout">33K</span>
+                </button>
+
+                <button class="navitem"> <!-- class="navhidden" for Hidden.. -->
+                    <i class="fa fa-fw fa-wrench"></i>
+                    <span class="navitem-txt">System</span>
+                </button>
+
+                <button class="navitem"> <!-- class="navhidden" for Hidden.. -->
+                    <i class="fa-solid fa-fw fa-screwdriver-wrench"></i>
+                    <span class="navitem-txt">Setup</span>
+                </button>
+
+
+
+                <div class="thin-hr"></div>
+                <div class="navinfo"><b>Interne Funktionen</b></div>
+
+                <button class="navitem">
+                    <i class="fa fa-fw fa-bell fa-shake" style="color:darkred"></i>
+                    <span class="navitem-txt">Alarms</span>
+                    <span class="navitem-pointout" style="background-color:red">99</span>
+                </button>
+                <button class="navitem">
+                    <i class="fa-regular fa-fw fa-keyboard"></i>
+                    <span class="navitem-txt">Terminal</span>
+                    <span class="navitem-simple-pointout">33</span>
+                </button>
+
+                <div class="thin-hr"></div>
+                <div class="navinfo"><b>Dies und Das</b></div>
+
+                <button class="navitem" style="color:blue">
+                    <i class="fa fa-fw fa-circle-plus"></i>
+                    <span class="navitem-txt">Gerät hinzufügen</i></span>
+                </button>
+                <button class="navitem">
+                    <img src="./static/preview.png" alt="Test">  <!-- class="fa-beat" geht da auch ;-) -->
+                    <span class="navitem-txt">Logo</span>
+                    <span class="navitem-pointout" style="background-color:green;">Online</span>
+                </button>
+
+                <button class="navitem">
+                    <i class="fa fa-fw">&#x1F3E1;</i>
+                    <span class="navitem-txt">Haus mit Garten</span>
+                    <span class="navitem-simple-pointout">1</span>
+                </button>
+
+                <div id="newdevices">
+
+                </div>
+
+
+            </nav>
+
+            <div id="main_content" class="ucontent">
+                <div id="sect1" class="usection">
+                    <a href="#sect2">Click Scroll to Section 2</a>
+
+
+                    <br>
+                    <br>
+                    <button id="butDashToggleTheme">Toggle Thema</button><br><br>
+                    <br>
+
+                    <button id="dashSetFont0_5">Font 0.5</button><br>
+                    <button id="dashSetFont0_75">Font 0.75</button><br>
+                    <button id="dashSetFont1">Font 1</button><br>
+                    <button id="dashSetFont1_5">Font 1.5</button><br>
+                    <button id="dashSetFont2">Font 2</button><br>
+                    <br>
+
+                    <button id="i18localize_de">Deutsch DE</button><br><br>
+                    <button id="i18localize_en">Englisch EN</button><br><br>
+
+                    <br>
+                    <button id="but1" disabled>Diabled</button>
+                    <button id="butXget">GET</button><br><br>
+
+                    Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
+                    Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
+                    Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
+                    Lies dieses lied leise Elise. The qick brown fox jumps over the lazy dog<br>
+                    <br>
+
+                    <p ll="block.title">Titel1</p>
+                    <p ll="block.subtitle">Titel2</p>
+                    <p ll="p-1">Zeile1</p>
+                    <p ll="p-2">Zeile1</p>
+                </div>
+
+                <div class="thin-hr"></div>
+
+                <div id="sect2" class="usection">
+                    <a href="#sect1">Click Scroll to Section 1</a>
+                    <div id="terminal"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="cfooter">
+        Footer-Line fuer Infos...
+    </footer>
+
+    <!-- Dialog Elements <dialog> / Modal new in HTML5 -->
+    <dialog id='qrscanner-dialog'>
+        <video style="display: none;" id='qroriginal-video' playsinline mute></video>
+        <div id='qrvideo-header'><select id='qrcam-selector'></select></div>
+        <button id='qrscanner-btnClose'>&#10006;</button>
+        <button id='qrscanner-btnTorch'>&#x1F4A1;</button>
+        <div style='text-align:center;'><canvas id='qrscaled-videocanvas'></canvas></div>
+    </dialog>
+
+
+</body> <!-- BODY END -->
+
+<script type="module"> // interne Verwaltung
+
+    import * as JD from './js/joemdash.js'
+    import * as QRS from './js/qrscanner.js'
+    import './js/jsQR.min.js' // Polyfill for Desktop
+    import * as I18 from './js/i18n.js'
+
+    import './js/blx.min.js'
+
+    /* Ab hier interne Verwaltung - optional. print() wird vom Scanner  */
+    let _log = [] // Logdaten
+    let lcnt = 0
+    const terminal = document.getElementById("terminal")
+    function print(txt) {
+        while (_log.length > 30) _log.pop()
+        _log.unshift(`${lcnt++}: ${txt}`)
+        if (terminal) terminal.innerText = _log.join("\n")
+    }
+    function print_clr() {
+        _log = []
+        lcnt = 0
+    }
+
+    QRS.setQrLogPrint(print)
+
+    function scanFound(nd) {
+        blx.frq_ping(1000, 0.2, 0.5)
+        let ni = document.createElement('button')
+        ni.setAttribute("class", "navitem")
+        ni.addEventListener("click", () => { alert("AlleAchtung: " + nd) })
+        ni.innerHTML = `<i class='fa fa-fw'>&#x1F3E1;</i><span class='navitem-txt'>${nd}</span>`
+        document.getElementById("newdevices").appendChild(ni)
+        return 1
+    }
+    QRS.setScanCallback(scanFound)
+
+    async function xget() {
+        QRS.clearScannedResults()
+        await QRS.openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
+        console.log("SCAN...")
+        await QRS.scannerBusy()
+        console.log("ERGEBNIS: " + QRS.scannedResults.length + " gefunden")
+        QRS.scannedResults.forEach(e => {
+            console.log(`Found: '${e.qrValue}'`)
+        })
+    }
+
+    document.getElementById("butXget").addEventListener("click", xget)
+
+    document.getElementById("butDashToggleTheme").addEventListener("click", JD.dashToggleTheme)
+    document.getElementById("dashSetFont0_5").addEventListener("click", () => JD.dashSetFont(0.5))
+    document.getElementById("dashSetFont0_75").addEventListener("click", () => JD.dashSetFont(0.75))
+    document.getElementById("dashSetFont1").addEventListener("click", () => JD.dashSetFont(1))
+    document.getElementById("dashSetFont1_5").addEventListener("click", () => JD.dashSetFont(1.5))
+    document.getElementById("dashSetFont2").addEventListener("click", () => JD.dashSetFont(2))
+
+    document.getElementById("i18localize_de").addEventListener("click", () => I18.i18localize('de'))
+    document.getElementById("i18localize_en").addEventListener("click", () => I18.i18localize('en'))
+
+
+
+
+</script>
+
+
+</html>

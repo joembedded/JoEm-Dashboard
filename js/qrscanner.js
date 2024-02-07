@@ -109,7 +109,7 @@ async function initCameras() {
         initQrCodeDOM()
 
         // Barcode-Teil
-        if (!('BarcodeDetector' in window)  /* || 1 */ )  {
+        if (!('BarcodeDetector' in window)   /* || 1 */)  {
             if (qrLogPrint) qrLogPrint("ERROR: No Barcode API available, Use Polyfill!")
             window.BarcodeDetector = cozmoQR
         } else {
@@ -173,7 +173,7 @@ export async function openSelectedCamera() {
         scanDialog.showModal()
 
         const layoutViewport = window.visualViewport
-        if (qrLogPrint) qrLogPrint("Viewport: " + layoutViewport.width + 'x' + layoutViewport.height)
+        if (qrLogPrint) qrLogPrint(`Viewport: ${Math.floor(layoutViewport.width)}x${Math.floor(layoutViewport.height)}`)
 
         const selCam = camSelector.selectedIndex
         if (qrLogPrint) qrLogPrint(`Open Camera${selCam}: '${availableCameras[selCam].label}'`)

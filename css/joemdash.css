@@ -254,8 +254,8 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
 }
 
 .usection {
-    /*height: calc(100svh - var(--hdrheight) - var(--ftrheight));
-    overflow: hidden;*/
+    height: calc(100svh - var(--hdrheight) - var(--ftrheight));
+    overflow: hidden;
     background-color: var(--white);
     color: var(--txtblack);
     font-size: calc(1rem * var(--fontrel));

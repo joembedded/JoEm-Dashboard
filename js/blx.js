@@ -299,120 +299,120 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
               blxIDs.disk.files.push(fileEntry)
               blxID_dirtyflag = true
             }
-            break
+              break
 
-          case 'X':
-            if (keep_conn) {
-              terminalPrint('Keep Connection Ping...')
-              blxDeviceCmd('')
-            } else {
-              terminalPrint('WARNING: Connection Auto-Disconnect soon')
-              if (blxUserCB) blxUserCB('WARN', 1, 'Connection Auto-Disconnect soon') // Warning 1
-            }
-            break
+            case 'X':
+              if (keep_conn) {
+                terminalPrint('Keep Connection Ping...')
+                blxDeviceCmd('')
+              } else {
+                terminalPrint('WARNING: Connection Auto-Disconnect soon')
+                if (blxUserCB) blxUserCB('WARN', 1, 'Connection Auto-Disconnect soon') // Warning 1
+              }
+              break
 
             // Messwerte
-          case 'e': {
-            // kan msec (Opt: Modem-State)
-            h = parseInt(txt_block.substring(3))
-            const hstr = txt_block.substring(txt_block.indexOf(' ') + 1)
-            h2 = parseInt(hstr)
-            if (h > 0 && h2 > 0) {
-              if (hstr.indexOf(' ') > 0) {
-                h3 = parseInt(hstr.substring(hstr.indexOf(' ') + 1))
-                terminalPrint('Measure (' + h + ' Channels in ' + h2 + ' msec) Modemstate: ' + h3)
-              } else {
-                terminalPrint('Measure (' + h + ' Channels in ' + h2 + ' msec)')
-              }
-            } else {
-              terminalPrint('Measure...')
-            }
-            if (blxUserCB) {
-              blxUserCB('MEAS_CH', h, 'Channels')
-              blxUserCB('MEAS_T', h2, 'msec')
-            }
-
-          }
-          break
-          case 'H': // HKs - Hc:TXT VALUE, chan >=90
-          case '#': // Channel - #CHAN: VALUE
-          {
-            const chan = parseInt(txt_block.substring(2)) 
-            const h = txt_block.substring(txt_block.indexOf(' ') + 1).trim() 
-            if (isNaN(chan)) { // H + Text: Info, meist Warnung erstmal
-              terminalPrint('Warning: ' + h)
-              if (blxUserCB) blxUserCB('MEAS_V', "Warning", h)
-            } else {
-              var txtchan = chan
-              if (chan >= 90) txtchan = 'H' + chan
-              terminalPrint('(' + txtchan + ')' + h)
-              if (blxUserCB) blxUserCB('MEAS_V', txtchan, h)
-            }
-          }
-          break
-          case 'h':
-            h = parseInt(txt_block.substring(3))
-            terminalPrint('Alarmbits: ' + h)
-            // if(blxUserCB)  *todo*
-            break
-          case '@': // Timeout for (Modem-)CMDs
-            h = parseInt(txt_block.substring(2))
-            blxGlTimeout = h // Overwrite
-            terminalPrint('Wait max. ' + (h / 1000).toFixed(0) + ' secs')
-            // if(blxUserCB)  *todo*
-            break
-          case '!': // Message
-            h = txt_block.substring(2)
-            terminalPrint('Info: ' + h)
-            if (blxUserCB) blxUserCB('INFO', 0, h)
-            break
-
-          case 'M': // Move (Accelerometer detetced Move)
-          {
-            h = parseInt(txt_block.substring(2))
-            const hstr = txt_block.substring(txt_block.indexOf(' ') + 1)
-            h2 = parseInt(hstr)
-            terminalPrint('Motion(' + h + ' Cnt), Measure in ' + h2 + ' secs')
-            movesound()
-            // if(blxUserCB)  *todo*
-          }
-          break
-          case 'Z': // Buzy Reason [param]
-          {
-            h = parseInt(txt_block.substring(2))
-            h3 = txt_block.indexOf(' ')
-            h2 = 0
-            if (h3 > 0) {
-              const hstr = txt_block.substring(h3 + 1)
+            case 'e': {
+              // kan msec (Opt: Modem-State)
+              h = parseInt(txt_block.substring(3))
+              const hstr = txt_block.substring(txt_block.indexOf(' ') + 1)
               h2 = parseInt(hstr)
+              if (h > 0 && h2 > 0) {
+                if (hstr.indexOf(' ') > 0) {
+                  h3 = parseInt(hstr.substring(hstr.indexOf(' ') + 1))
+                  terminalPrint('Measure (' + h + ' Channels in ' + h2 + ' msec) Modemstate: ' + h3)
+                } else {
+                  terminalPrint('Measure (' + h + ' Channels in ' + h2 + ' msec)')
+                }
+              } else {
+                terminalPrint('Measure...')
+              }
+              if (blxUserCB) {
+                blxUserCB('MEAS_CH', h, 'Channels')
+                blxUserCB('MEAS_T', h2, 'msec')
+              }
+
             }
-            switch (h) {
-              case 1:
-                if (h2 > 2) terminalPrint("Info: Measure (max. " + h2 + " sec)")
-                else terminalPrint("Info: Measure")
-                break;
-              case 9:
-                terminalPrint("Info: Internet in " + h2 + " sec")
-                break;
-              case 10:
-                terminalPrint("Info: Internet Transfer...")
-                break;
-              case 11:
-                if (h2) terminalPrint("Info: Internet Transfer Error:" + h2)
-                else terminalPrint("Info: Internet Transfer OK")
-                break;
-                // Unknown Z-Codes ignored
-            }
-            if (blxUserCB) blxUserCB('BZY', h, h2) // BuzyCode
-          }
-          break
+              break
+            case 'H': // HKs - Hc:TXT VALUE, chan >=90
+            case '#': // Channel - #CHAN: VALUE
+              {
+                const chan = parseInt(txt_block.substring(2))
+                const h = txt_block.substring(txt_block.indexOf(' ') + 1).trim()
+                if (isNaN(chan)) { // H + Text: Info, meist Warnung erstmal
+                  terminalPrint('Warning: ' + h)
+                  if (blxUserCB) blxUserCB('MEAS_V', "Warning", h)
+                } else {
+                  var txtchan = chan
+                  if (chan >= 90) txtchan = 'H' + chan
+                  terminalPrint('(' + txtchan + ')' + h)
+                  if (blxUserCB) blxUserCB('MEAS_V', txtchan, h)
+                }
+              }
+              break
+            case 'h':
+              h = parseInt(txt_block.substring(3))
+              terminalPrint('Alarmbits: ' + h)
+              // if(blxUserCB)  *todo*
+              break
+            case '@': // Timeout for (Modem-)CMDs
+              h = parseInt(txt_block.substring(2))
+              blxGlTimeout = h // Overwrite
+              terminalPrint('Wait max. ' + (h / 1000).toFixed(0) + ' secs')
+              // if(blxUserCB)  *todo*
+              break
+            case '!': // Message
+              h = txt_block.substring(2)
+              terminalPrint('Info: ' + h)
+              if (blxUserCB) blxUserCB('INFO', 0, h)
+              break
+
+            case 'M': // Move (Accelerometer detetced Move)
+              {
+                h = parseInt(txt_block.substring(2))
+                const hstr = txt_block.substring(txt_block.indexOf(' ') + 1)
+                h2 = parseInt(hstr)
+                terminalPrint('Motion(' + h + ' Cnt), Measure in ' + h2 + ' secs')
+                movesound()
+                // if(blxUserCB)  *todo*
+              }
+              break
+            case 'Z': // Buzy Reason [param]
+              {
+                h = parseInt(txt_block.substring(2))
+                h3 = txt_block.indexOf(' ')
+                h2 = 0
+                if (h3 > 0) {
+                  const hstr = txt_block.substring(h3 + 1)
+                  h2 = parseInt(hstr)
+                }
+                switch (h) {
+                  case 1:
+                    if (h2 > 2) terminalPrint("Info: Measure (max. " + h2 + " sec)")
+                    else terminalPrint("Info: Measure")
+                    break;
+                  case 9:
+                    terminalPrint("Info: Internet in " + h2 + " sec")
+                    break;
+                  case 10:
+                    terminalPrint("Info: Internet Transfer...")
+                    break;
+                  case 11:
+                    if (h2) terminalPrint("Info: Internet Transfer Error:" + h2)
+                    else terminalPrint("Info: Internet Transfer OK")
+                    break;
+                  // Unknown Z-Codes ignored
+                }
+                if (blxUserCB) blxUserCB('BZY', h, h2) // BuzyCode
+              }
+              break
 
 
-          default: // Kein Fehler melden, koennte Erweiterung sein
-            terminalPrint("ERROR: '" + txt_block + "' ???")
+            default: // Kein Fehler melden, koennte Erweiterung sein
+              terminalPrint("ERROR: '" + txt_block + "' ???")
           }
         } else {
-          const h = txt_block.trim() 
+          const h = txt_block.trim()
           if (blxUserCB) blxUserCB('MSG', 0, h) // MSG Type 0
           if (blxCmdBusy) terminalPrint("Reply: '" + h + "'")
           else if (blxModemTerm) terminalPrint("Modem: '" + h + "'")
@@ -471,83 +471,83 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
               break
 
             case 'T': // Time and Runtime
-            {
-              h = parseInt(txt_block.substring(3))
-              const d = new Date(h * 1000)
-              let tdelta = (((Date.now()) / 1000) - h).toFixed(0)
-              let tdinfo
-              const hstr = txt_block.substring(txt_block.indexOf(' ') + 1)
-              h2 = parseInt(hstr)
-              if (tdelta > 864000 || tdelta < -864000) {
-                tdinfo = ' (Warning: DeviceTime Lost!)'
-              } else {
-                if (tdelta <= 1 && tdelta >= -1) tdelta = 0 // Cosmetics
-                tdinfo = ' (Delta to App: ' + tdelta + ' sec)'
+              {
+                h = parseInt(txt_block.substring(3))
+                const d = new Date(h * 1000)
+                let tdelta = (((Date.now()) / 1000) - h).toFixed(0)
+                let tdinfo
+                const hstr = txt_block.substring(txt_block.indexOf(' ') + 1)
+                h2 = parseInt(hstr)
+                if (tdelta > 864000 || tdelta < -864000) {
+                  tdinfo = ' (Warning: DeviceTime Lost!)'
+                } else {
+                  if (tdelta <= 1 && tdelta >= -1) tdelta = 0 // Cosmetics
+                  tdinfo = ' (Delta to App: ' + tdelta + ' sec)'
+                }
+                if (h2) tdinfo += '(Run: ' + (h2 / 86400).toFixed(1) + ' d)'
+                blxIDs.deltaToApp = tdelta
+                terminalPrint('Time: [' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + '] ' + tdinfo)
               }
-              if (h2) tdinfo += '(Run: ' + (h2 / 86400).toFixed(1) + ' d)'
-              blxIDs.deltaToApp = tdelta
-              terminalPrint('Time: [' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + '] ' + tdinfo)
-            }
-            break
+              break
 
-          case 'V': // ~V:DEVICE_TYP DEVICE_FW_VERSION Bootloader_Cookie CPU Inet
-          {
-            const harr = txt_block.split(' ');
-            h = parseInt(txt_block.substring(3))
-            h2 = parseInt(harr[1])
-            h3 = new Date(parseInt(harr[2]) * 1000)
+            case 'V': // ~V:DEVICE_TYP DEVICE_FW_VERSION Bootloader_Cookie CPU Inet
+              {
+                const harr = txt_block.split(' ');
+                h = parseInt(txt_block.substring(3))
+                h2 = parseInt(harr[1])
+                h3 = new Date(parseInt(harr[2]) * 1000)
 
-            blxIDs.deviceType = h
-            blxIDs.firmwareVersion = (h2 / 10).toFixed(1)
-            blxIDs.firmwareBuilt = h3.toUTCString()
+                blxIDs.deviceType = h
+                blxIDs.firmwareVersion = (h2 / 10).toFixed(1)
+                blxIDs.firmwareBuilt = h3.toUTCString()
 
-            blxIDs.cpu = -1 // Unknown
-            if (harr.length > 3) blxIDs.cpu = parseInt(harr[3])
-            blxIDs.deviceHasInternet = 0;
-            if (harr.length > 4) blxIDs.deviceHasInternet = parseInt(harr[4])
-            terminalPrint('DeviceType: ' + h + ' V' + blxIDs.firmwareVersion + ' (Built: ' + blxIDs.firmwareBuilt + ') CPU:' + blxIDs.cpu)
-            if (blxIDs.deviceHasInternet) terminalPrint('Device has Internet');
-            blx_pin_ok = true
-          }
-          break
+                blxIDs.cpu = -1 // Unknown
+                if (harr.length > 3) blxIDs.cpu = parseInt(harr[3])
+                blxIDs.deviceHasInternet = 0;
+                if (harr.length > 4) blxIDs.deviceHasInternet = parseInt(harr[4])
+                terminalPrint('DeviceType: ' + h + ' V' + blxIDs.firmwareVersion + ' (Built: ' + blxIDs.firmwareBuilt + ') CPU:' + blxIDs.cpu)
+                if (blxIDs.deviceHasInternet) terminalPrint('Device has Internet');
+                blx_pin_ok = true
+              }
+              break
 
-          case 'E': // Pin ERROR! Alternativantwort auf /
-            blx_pin_ok = false // eh false, nur fuer Tests nochmal
-            blxErrMsg = 'PIN ERROR'
-            terminalPrint('ERROR: PIN ERROR')
-            errorsound()
-            break
+            case 'E': // Pin ERROR! Alternativantwort auf /
+              blx_pin_ok = false // eh false, nur fuer Tests nochmal
+              blxErrMsg = 'PIN ERROR'
+              terminalPrint('ERROR: PIN ERROR')
+              errorsound()
+              break
 
-          case 'N': // File-NAME, LEN, CTIME
-            h = parseInt(txt_block.substring(3))
-            h2 = new Date(parseInt(txt_block.substring(txt_block.indexOf(' ') + 1)) * 1000)
-            terminalPrint('Filesize: ' + h + ' Bytes')
-            infile_file_len = h
-            infile_file_ctime = h2
-            break
+            case 'N': // File-NAME, LEN, CTIME
+              h = parseInt(txt_block.substring(3))
+              h2 = new Date(parseInt(txt_block.substring(txt_block.indexOf(' ') + 1)) * 1000)
+              terminalPrint('Filesize: ' + h + ' Bytes')
+              infile_file_len = h
+              infile_file_ctime = h2
+              break
 
-          case 'L': // Received
-            h = parseInt(txt_block.substring(3))
-            terminalPrint(h + ' Bytes transferred')
-            break
+            case 'L': // Received
+              h = parseInt(txt_block.substring(3))
+              terminalPrint(h + ' Bytes transferred')
+              break
 
-          case 'P': // File Ready for PUT
-            terminalPrint('File Ready')
-            blxPutReady = true;
-            break
+            case 'P': // File Ready for PUT
+              terminalPrint('File Ready')
+              blxPutReady = true;
+              break
 
-          case 'I': // Memory Ready
-            terminalPrint('Memory Ready')
-            blxPutReady = true;
-            break
+            case 'I': // Memory Ready
+              terminalPrint('Memory Ready')
+              blxPutReady = true;
+              break
 
-          case 'K': // Cleared
-            // terminalPrint('Memory cleared') // zuviel Blabla...
-            break
+            case 'K': // Cleared
+              // terminalPrint('Memory cleared') // zuviel Blabla...
+              break
 
-          default: // Kein Fehler melden, koennte Erweiterung sein
-            terminalPrint("ERROR: '" + txt_block + "' ???")
-            blxErrMsg = txt_block;
+            default: // Kein Fehler melden, koennte Erweiterung sein
+              terminalPrint("ERROR: '" + txt_block + "' ???")
+              blxErrMsg = txt_block;
           }
         } else {
           // if(blxUserCB)  *todo*
@@ -581,40 +581,40 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
         break
 
       case BB_BLE_BINBLK_OUT: // BinaryData ankommend
-      // terminalPrint("BIN-Data: '"+datablock.length+"' Bytes");
-      {
-        h = infile_exp_len - infile_read_len
-        if (datablock.length > h) {
-          blxErrMsg = 'ERROR: Too many data'
-          break
+        // terminalPrint("BIN-Data: '"+datablock.length+"' Bytes");
+        {
+          h = infile_exp_len - infile_read_len
+          if (datablock.length > h) {
+            blxErrMsg = 'ERROR: Too many data'
+            break
+          }
+
+          // terminalPrint("Pos: "+infile_read_len+" Len: "+datablock.length+" Fehlt:"+h);
+          // Aufgabe datablock[] an infile_bytebuf[infile_read_len] kopieren
+          infile_bytebuf.set(datablock, infile_read_len)
+          infile_read_len += dlen
+
+          const tw_new = Date.now()
+          if (tw_new - infile_infot > 1000) { // Alle Sekunde Fortschritt
+            h = ((infile_read_len / infile_exp_len) * 100).toFixed(0)
+            if (blxUserCB) blxUserCB('PROG', h, '%') // % of Total
+            terminalPrint('Get: ' + h + '% / ' + infile_read_len + ' Bytes')
+            infile_infot = tw_new
+          }
+
+          h = infile_exp_len - infile_read_len
+          if (h === 0) { // Alles gelesen
+            let dtime = Date.now() - infile_t0
+            if (!dtime) dtime++
+            const speed = ((infile_read_len / dtime * 1000).toFixed(0))
+            terminalPrint('Get OK (' + dtime / 1000 + ' sec, ' + speed + ' Bytes/sec)')
+            if (blxUserCB) blxUserCB('GET_OK', speed, 'Bytes/sec')
+          }
         }
+        break
 
-        // terminalPrint("Pos: "+infile_read_len+" Len: "+datablock.length+" Fehlt:"+h);
-        // Aufgabe datablock[] an infile_bytebuf[infile_read_len] kopieren
-        infile_bytebuf.set(datablock, infile_read_len)
-        infile_read_len += dlen
-
-        const tw_new = Date.now()
-        if (tw_new - infile_infot > 1000) { // Alle Sekunde Fortschritt
-          h = ((infile_read_len / infile_exp_len) * 100).toFixed(0)
-          if (blxUserCB) blxUserCB('PROG', h, '%') // % of Total
-          terminalPrint('Get: ' + h + '% / ' + infile_read_len + ' Bytes')
-          infile_infot = tw_new
-        }
-
-        h = infile_exp_len - infile_read_len
-        if (h === 0) { // Alles gelesen
-          let dtime = Date.now() - infile_t0
-          if (!dtime) dtime++
-          const speed = ((infile_read_len / dtime * 1000).toFixed(0))
-          terminalPrint('Get OK (' + dtime / 1000 + ' sec, ' + speed + ' Bytes/sec)')
-          if (blxUserCB) blxUserCB('GET_OK', speed, 'Bytes/sec')
-        }
-      }
-      break
-
-    default:
-      terminalPrint("ERROR(Data): '" + txt_block + "'")
+      default:
+        terminalPrint("ERROR(Data): '" + txt_block + "'")
     }
   }
 
@@ -638,7 +638,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
 
     if (blxUserCB) blxUserCB('CON', 2, 'Connecting...') // 2 Connected, waiting for IDs
     let cnt_tries = 0
-    for (;;) {
+    for (; ;) {
       //---------for------
       try {
         if (mode) {
@@ -678,7 +678,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
     }
     if (full_connected_flag) {
       //terminalPrint("GID **9**")
-      if (read_id /* true or 1 */ ) {
+      if (read_id /* true or 1 */) {
         //terminalPrint("GID **10**")
         await blxDeviceIdentify(false) // Set Lowspeed later
       }
@@ -727,7 +727,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
   // =====Commands=====
   async function wait_blx(timeout_ms) {
     blxGlTimeout = timeout_ms
-    for (;;) { // Poll reply in 10 ms steps
+    for (; ;) { // Poll reply in 10 ms steps
       if (blxCmdBusy !== true) break
       await sleepMs(10)
       blxGlTimeout -= 10
@@ -975,7 +975,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
       if (blxErrMsg) return
     }
 
-    for (;;) { // Unlock Device (locked in FAST mode)
+    for (; ;) { // Unlock Device (locked in FAST mode)
       await blxDeviceCmd('v', 5000) // Get virtual Disk Dir
       if (blxErrMsg) break
 
@@ -1266,100 +1266,100 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
                 await blStore.remove(key)
                 terminalPrint("Removed '" + key + "' from Store")
               }
-              break
-            case 'l':
-            case 'list':
-              try {
-                let key
-                if (cmd_array.length < 3) key = infile_laststore_name
-                else key = cmd_array[2]
-                if (key === undefined) {
-                  blxErrMsg = 'ERROR(Store): No Key'
-                  break
+                break
+              case 'l':
+              case 'list':
+                try {
+                  let key
+                  if (cmd_array.length < 3) key = infile_laststore_name
+                  else key = cmd_array[2]
+                  if (key === undefined) {
+                    blxErrMsg = 'ERROR(Store): No Key'
+                    break
+                  }
+                  await blStore.get(key)
+                  const KeyVal = blStore.result()
+                  if (KeyVal === undefined) {
+                    blxErrMsg = 'ERROR(Store): No Value for this Key'
+                    break
+                  }
+                  const txt_val = new TextDecoder().decode(KeyVal.v.bytebuf)
+                  // console.log(KeyVal)
+                  // Split into array of lines
+                  // Attention: TextDecoder() includes '\r' (LTX can deal with '\r\n' and '\n'), adds 1 empty line!
+                  let txt_lines = txt_val.replace(/\r/g, '').split(/\n/)
+                  txt_lines.pop()
+                  const old_terminal_lines = terminal_lines
+                  if (terminal_lines < txt_val.length + 10) {
+                    terminal_lines = txt_val.length + 10 // Resize Terminal if required
+                  }
+                  terminalPrint("List Key '" + KeyVal.k + "' Len: " + txt_val.length + ' Bytes => ' + txt_lines.length + ' Lines')
+                  let i = 0
+                  for (const line of txt_lines) {
+                    terminalPrint(i + ': ' + (line.length ? line : '(empty)'))
+                    i++
+                  }
+                  terminal_lines = old_terminal_lines
+                } catch (err) {
+                  blxErrMsg = 'ERROR(Store): ' + err
                 }
-                await blStore.get(key)
-                const KeyVal = blStore.result()
-                if (KeyVal === undefined) {
-                  blxErrMsg = 'ERROR(Store): No Value for this Key'
-                  break
-                }
-                const txt_val = new TextDecoder().decode(KeyVal.v.bytebuf)
-                // console.log(KeyVal)
-                // Split into array of lines
-                // Attention: TextDecoder() includes '\r' (LTX can deal with '\r\n' and '\n'), adds 1 empty line!
-                let txt_lines = txt_val.replace(/\r/g, '').split(/\n/)
-                txt_lines.pop()
-                const old_terminal_lines = terminal_lines
-                if (terminal_lines < txt_val.length + 10) {
-                  terminal_lines = txt_val.length + 10 // Resize Terminal if required
-                }
-                terminalPrint("List Key '" + KeyVal.k + "' Len: " + txt_val.length + ' Bytes => ' + txt_lines.length + ' Lines')
-                let i = 0
-                for (const line of txt_lines) {
-                  terminalPrint(i + ': ' + (line.length ? line : '(empty)'))
-                  i++
-                }
-                terminal_lines = old_terminal_lines
-              } catch (err) {
-                blxErrMsg = 'ERROR(Store): ' + err
-              }
-              break
+                break
 
-            case 'm':
-            case 'modify':
-              try {
-                let key
-                const idx = cmd_array[2]
-                if (idx === undefined) {
-                  blxErrMsg = 'ERROR(Store): No Index'
-                  break
-                }
-                const nline = cmd_array[3] // No spaces allowed
-                if (cmd_array.length < 5) key = infile_laststore_name
-                else key = cmd_array[4]
-                if (key === undefined) {
-                  blxErrMsg = 'ERROR(Store): No Key'
-                  break
-                }
-                await blStore.get(key)
-                const KeyVal = blStore.result()
-                if (KeyVal === undefined) {
-                  blxErrMsg = 'ERROR(Store): No Value for this Key'
-                  break
-                }
-                const txt_val = new TextDecoder().decode(KeyVal.v.bytebuf)
-                // Split into array of lines
-                // Attention: TextDecoder() includes '\r' (LTX can deal with '\r\n' and '\n'), adds 1 empty line!
-                let txt_lines = txt_val.replace(/\r/g, '').split(/\n/)
-                txt_lines.pop()
+              case 'm':
+              case 'modify':
+                try {
+                  let key
+                  const idx = cmd_array[2]
+                  if (idx === undefined) {
+                    blxErrMsg = 'ERROR(Store): No Index'
+                    break
+                  }
+                  const nline = cmd_array[3] // No spaces allowed
+                  if (cmd_array.length < 5) key = infile_laststore_name
+                  else key = cmd_array[4]
+                  if (key === undefined) {
+                    blxErrMsg = 'ERROR(Store): No Key'
+                    break
+                  }
+                  await blStore.get(key)
+                  const KeyVal = blStore.result()
+                  if (KeyVal === undefined) {
+                    blxErrMsg = 'ERROR(Store): No Value for this Key'
+                    break
+                  }
+                  const txt_val = new TextDecoder().decode(KeyVal.v.bytebuf)
+                  // Split into array of lines
+                  // Attention: TextDecoder() includes '\r' (LTX can deal with '\r\n' and '\n'), adds 1 empty line!
+                  let txt_lines = txt_val.replace(/\r/g, '').split(/\n/)
+                  txt_lines.pop()
 
-                if (idx < 0 || idx > txt_lines.length) {
-                  blxErrMsg = 'ERROR(Store): Index Range'
-                  break
+                  if (idx < 0 || idx > txt_lines.length) {
+                    blxErrMsg = 'ERROR(Store): Index Range'
+                    break
+                  }
+                  let line = txt_lines[idx]
+                  terminalPrint('Old: ' + idx + ': ' + (line.length ? line : '(empty)'))
+                  txt_lines[idx] = nline
+                  line = txt_lines[idx]
+                  terminalPrint('New: ' + idx + ': ' + (line.length ? line : '(empty)'))
+                  const enc = new TextEncoder()
+                  KeyVal.v.bytebuf = enc.encode(txt_lines.join('\n') + '\n')
+                  // Set Metadata to to sth
+                  const nlen = KeyVal.v.bytebuf.length
+                  KeyVal.v.akt_len = nlen
+                  KeyVal.v.crc32 = crc32Calc(KeyVal.v.bytebuf) // Just as Info
+                  KeyVal.v.ctime = new Date()
+                  KeyVal.v.pos0 = 0
+                  KeyVal.v.total_len = nlen
+                  KeyVal.v.ucl_flag = false
+                  // Noch Modification Date etc...
+                  await blStore.set(key, KeyVal.v)
+                } catch (err) {
+                  blxErrMsg = 'ERROR(Store): ' + err
                 }
-                let line = txt_lines[idx]
-                terminalPrint('Old: ' + idx + ': ' + (line.length ? line : '(empty)'))
-                txt_lines[idx] = nline
-                line = txt_lines[idx]
-                terminalPrint('New: ' + idx + ': ' + (line.length ? line : '(empty)'))
-                const enc = new TextEncoder()
-                KeyVal.v.bytebuf = enc.encode(txt_lines.join('\n') + '\n')
-                // Set Metadata to to sth
-                const nlen = KeyVal.v.bytebuf.length
-                KeyVal.v.akt_len = nlen
-                KeyVal.v.crc32 = crc32Calc(KeyVal.v.bytebuf) // Just as Info
-                KeyVal.v.ctime = new Date()
-                KeyVal.v.pos0 = 0
-                KeyVal.v.total_len = nlen
-                KeyVal.v.ucl_flag = false
-                // Noch Modification Date etc...
-                await blStore.set(key, KeyVal.v)
-              } catch (err) {
-                blxErrMsg = 'ERROR(Store): ' + err
-              }
-              break
-            default:
-              blxErrMsg = 'ERROR(Store): Unknown Cmd'
+                break
+              default:
+                blxErrMsg = 'ERROR(Store): Unknown Cmd'
             }
           }
         } catch (err) {
@@ -1408,182 +1408,182 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
         frq_ping(frq, dur, vol)
         terminalPrint('Audio-Ping Frq:' + frq + ' Hz, (Dur: ' + dur + ' Vol: ' + vol + ')')
       }
-      break
+        break
 
-    case 'k':
-    case 'keep':
-      if (cmd_array.length > 1) {
-        val = parseInt(cmd_array[1])
-        keep_conn = Boolean(val)
-      }
-      terminalPrint('Keep Connection: ' + (keep_conn ? 'ON' : 'OFF'))
-      break
-
-    case 'rs':
-    case 'rssi': // Rssi
-      if (cmd_array.length > 1) {
-        val = parseInt(cmd_array[1])
-        show_rssi = Boolean(val)
-      }
-      terminalPrint('RSSI: ' + (show_rssi ? 'ON' : 'OFF'))
-      break
-
-    case 'cf':
-    case 'connectionfast':
-      if (cmd_array.length > 1) {
-        if (cmd_array[1].charAt(0).toLowerCase() === 'f') con_fast_speed = 'F'
-        else {
+      case 'k':
+      case 'keep':
+        if (cmd_array.length > 1) {
           val = parseInt(cmd_array[1])
-          if (val < 3) val = 3
-          else if (val > 30) val = 30
-          con_fast_speed = val.toString()
+          keep_conn = Boolean(val)
         }
-        if (cmd_array.length > 2) {
+        terminalPrint('Keep Connection: ' + (keep_conn ? 'ON' : 'OFF'))
+        break
+
+      case 'rs':
+      case 'rssi': // Rssi
+        if (cmd_array.length > 1) {
           val = parseInt(cmd_array[1])
-          if (val < 3) val = 3 // Only Number allowed
-          else if (val > 30) val = 30
-          con_memfast_speed = val.toString()
+          show_rssi = Boolean(val)
         }
-      } {
-        let cas
-        if (con_act_speed !== undefined) cas = con_act_speed
-        else cas = '(Unknown)'
-        terminalPrint("Fast Connection Speed: " + con_fast_speed + ", Current: " + cas)
-        terminalPrint("Fast Memory Download Speed: " + con_memfast_speed)
-      }
-      break
+        terminalPrint('RSSI: ' + (show_rssi ? 'ON' : 'OFF'))
+        break
 
-    case 'l':
-    case 'lines': // No. of lines
-      if (cmd_array.length > 1) terminal_lines = parseInt(cmd_array[1])
-      terminalPrint('Lines: ' + terminal_lines)
-      break
+      case 'cf':
+      case 'connectionfast':
+        if (cmd_array.length > 1) {
+          if (cmd_array[1].charAt(0).toLowerCase() === 'f') con_fast_speed = 'F'
+          else {
+            val = parseInt(cmd_array[1])
+            if (val < 3) val = 3
+            else if (val > 30) val = 30
+            con_fast_speed = val.toString()
+          }
+          if (cmd_array.length > 2) {
+            val = parseInt(cmd_array[1])
+            if (val < 3) val = 3 // Only Number allowed
+            else if (val > 30) val = 30
+            con_memfast_speed = val.toString()
+          }
+        } {
+          let cas
+          if (con_act_speed !== undefined) cas = con_act_speed
+          else cas = '(Unknown)'
+          terminalPrint("Fast Connection Speed: " + con_fast_speed + ", Current: " + cas)
+          terminalPrint("Fast Memory Download Speed: " + con_memfast_speed)
+        }
+        break
 
-    case 'sl': // 's' in use..
-    case 'sleep': // Sleep x msec - Test function
-      if (cmd_array.length > 1) val = parseInt(cmd_array[1])
-      terminalPrint('Sleep: ' + val + ' msec...')
-      await sleepMs(val)
-      terminalPrint('...OK')
-      break
+      case 'l':
+      case 'lines': // No. of lines
+        if (cmd_array.length > 1) terminal_lines = parseInt(cmd_array[1])
+        terminalPrint('Lines: ' + terminal_lines)
+        break
 
-    case 'd':
-    case 'disconnect':
-      if (full_connected_flag === true) {
-        NUS_device.gatt.disconnect() // Works always
-      } else {
-        blxErrMsg = 'ERROR(Cmd): Not connected!'
-      }
-      break
+      case 'sl': // 's' in use..
+      case 'sleep': // Sleep x msec - Test function
+        if (cmd_array.length > 1) val = parseInt(cmd_array[1])
+        terminalPrint('Sleep: ' + val + ' msec...')
+        await sleepMs(val)
+        terminalPrint('...OK')
+        break
 
-    case 'c':
-    case 'connect':
-      if (full_connected_flag === true) {
-        NUS_device.gatt.disconnect() // Optionally disconnect first, Works always
-      }
-      // opt. Take PIN
-      if (cmd_array.length > 1) blx_pin_val = cmd_array[1]
-      await blxSelect()
-      if (!blxErrMsg) await blxConnectNus(1, 1) // Connect, With SCAN
-      break
+      case 'd':
+      case 'disconnect':
+        if (full_connected_flag === true) {
+          NUS_device.gatt.disconnect() // Works always
+        } else {
+          blxErrMsg = 'ERROR(Cmd): Not connected!'
+        }
+        break
 
-    case 'r':
-    case 'reconnect':
-      // opt. Take PIN
-      if (cmd_array.length > 1) blx_pin_val = cmd_array[1]
-      if (full_connected_flag === true) {
-        blxErrMsg = 'ERROR(Cmd): Already connected!'
-      } else if (NUS_device === undefined) {
-        blxErrMsg = 'ERROR(Cmd): Nothing to Reconnect!'
-      } else {
-        await blxConnectNus(0, 1) // Reconnect, With SCAN
-      }
-      break
+      case 'c':
+      case 'connect':
+        if (full_connected_flag === true) {
+          NUS_device.gatt.disconnect() // Optionally disconnect first, Works always
+        }
+        // opt. Take PIN
+        if (cmd_array.length > 1) blx_pin_val = cmd_array[1]
+        await blxSelect()
+        if (!blxErrMsg) await blxConnectNus(1, 1) // Connect, With SCAN
+        break
 
-    case 'i':
-    case 'identify':
-      // opt. Take PIN
-      if (cmd_array.length > 1) blx_pin_val = cmd_array[1]
-      await blxConnectionFast()
-      await blxDeviceIdentify()
-      if (identify_ok_flag === false) {
-        blxErrMsg = 'ERROR(Cmd): identify failed!'
-      }
-      if (blx_pin_ok === true) chordsound(500) // OK
-      break
+      case 'r':
+      case 'reconnect':
+        // opt. Take PIN
+        if (cmd_array.length > 1) blx_pin_val = cmd_array[1]
+        if (full_connected_flag === true) {
+          blxErrMsg = 'ERROR(Cmd): Already connected!'
+        } else if (NUS_device === undefined) {
+          blxErrMsg = 'ERROR(Cmd): Nothing to Reconnect!'
+        } else {
+          await blxConnectNus(0, 1) // Reconnect, With SCAN
+        }
+        break
+
+      case 'i':
+      case 'identify':
+        // opt. Take PIN
+        if (cmd_array.length > 1) blx_pin_val = cmd_array[1]
+        await blxConnectionFast()
+        await blxDeviceIdentify()
+        if (identify_ok_flag === false) {
+          blxErrMsg = 'ERROR(Cmd): identify failed!'
+        }
+        if (blx_pin_ok === true) chordsound(500) // OK
+        break
 
       // ** File cmds **
-    case 'm':
-    case 'memory':
-      await calcMem()
-      if (!blxErrMsg) {
-        let mperc
-        if (blxDataMem.max > 0) mperc = (blxDataMem.total * 100 / blxDataMem.max).toFixed(2)
-        else mperc = 'Unknown'
+      case 'm':
+      case 'memory':
+        await calcMem()
+        if (!blxErrMsg) {
+          let mperc
+          if (blxDataMem.max > 0) mperc = (blxDataMem.total * 100 / blxDataMem.max).toFixed(2)
+          else mperc = 'Unknown'
 
-        let mmode = "???"
-        switch (blxDataMem.mode) {
-          case 2:
-          case 0:
-            mmode = "Rec.OFF";
-            break
-          case 1:
-            mmode = "LINEAR";
-            break;
-          case 3:
-            mmode = "RING"
+          let mmode = "???"
+          switch (blxDataMem.mode) {
+            case 2:
+            case 0:
+              mmode = "Rec.OFF";
+              break
+            case 1:
+              mmode = "LINEAR";
+              break;
+            case 3:
+              mmode = "RING"
+          }
+          terminalPrint('Data(Bytes): Total:' + blxDataMem.total + '(' + mperc + '%, ' + mmode + '), New:' + blxDataMem.incnew)
         }
-        terminalPrint('Data(Bytes): Total:' + blxDataMem.total + '(' + mperc + '%, ' + mmode + '), New:' + blxDataMem.incnew)
-      }
-      break
-
-    case 'u':
-    case 'upload':
-      // u Upload data.edt/data.edt.old to store, fastspeed true by default
-      await upload(cmd_array)
-      break
-
-    case 'x':
-    case 'xtract':
-    // extract data for MAC
-    {
-      let xmac
-      if (cmd_array.length <= 1) xmac = blxIDs.deviceMAC
-      else xmac = cmd_array[1]
-
-      if (xmac == undefined || xmac.length != 16) {
-        blxErrMsg = 'ERROR(xtract): MAC Error'
         break
+
+      case 'u':
+      case 'upload':
+        // u Upload data.edt/data.edt.old to store, fastspeed true by default
+        await upload(cmd_array)
+        break
+
+      case 'x':
+      case 'xtract':
+        // extract data for MAC
+        {
+          let xmac
+          if (cmd_array.length <= 1) xmac = blxIDs.deviceMAC
+          else xmac = cmd_array[1]
+
+          if (xmac == undefined || xmac.length != 16) {
+            blxErrMsg = 'ERROR(xtract): MAC Error'
+            break
+          }
+          terminalPrint("Extract Data for MAC:'" + xmac + "' to Store")
+          await xtract(xmac)
+          if (!blxErrMsg) terminalPrint("Extracted")
+        }
+        break
+
+      case 'g':
+      case 'get':
+        // g FNAME - Alles  (oder get)
+        // g FNAME pos0 - ab pos0 (Mitte bis Ende)
+        // g FNAME pos0 anz - anz Bytes ab pos0 (Nur den Anfang)
+        await getfile(cmd_array) // autospeed true
+        break
+
+      case 'p':
+      case 'put': {
+        let syncflag = cmd_array[1]
+        if (syncflag === undefined) syncflag = 0;
+        terminalPrint('Put File (Syncflag: ' + syncflag + ')')
+        await blxSelectAndPutFile(syncflag)
       }
-      terminalPrint("Extract Data for MAC:'" + xmac + "' to Store")
-      await xtract(xmac)
-      if (!blxErrMsg) terminalPrint("Extracted")
-    }
-    break
+        break
 
-    case 'g':
-    case 'get':
-      // g FNAME - Alles  (oder get)
-      // g FNAME pos0 - ab pos0 (Mitte bis Ende)
-      // g FNAME pos0 anz - anz Bytes ab pos0 (Nur den Anfang)
-      await getfile(cmd_array) // autospeed true
-      break
-
-    case 'p':
-    case 'put': {
-      let syncflag = cmd_array[1]
-      if (syncflag === undefined) syncflag = 0;
-      terminalPrint('Put File (Syncflag: ' + syncflag + ')')
-      await blxSelectAndPutFile(syncflag)
-    }
-    break
-
-    case 'firmware': // Firmwareupdate
-      terminalPrint('Firmware Update')
-      if (blxDevice.deviceType >= 1000 || (blxDevice.disk !== undefined && blxDevice.disk.diskSize > 0)) { // Nur fuer Logger 
-        await blxSelectAndPutFile(0, '.sec') // Danach sofort return
-        break;
-      }
+      case 'firmware': // Firmwareupdate
+        terminalPrint('Firmware Update')
+        if (blxDevice.deviceType >= 1000 || (blxDevice.disk !== undefined && blxDevice.disk.diskSize > 0)) { // Nur fuer Logger 
+          await blxSelectAndPutFile(0, '.sec') // Danach sofort return
+          break;
+        }
       // falls through 
 
       case 'memput': {
@@ -1602,83 +1602,83 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
         let reset_flag = (cmd0 == 'firmware')
         await blxSelectAndMemPutFile(mem_addr, mem_size, reset_flag)
       }
-      break
+        break
 
-    case 'fput': {
-      const sname = cmd_array[1]
-      if (sname === undefined) {
-        blxErrMsg = 'ERROR(fput): No Filename'
-        break
-      }
-      const storemac = sname.substring(0, 17)
-      const fname = sname.substring(17)
-      if (storemac.length !== 17 || storemac.charAt(16) !== '_' || fname.charAt(0) === '#' || fname.length < 1 || fname.length > 21) {
-        blxErrMsg = 'ERROR(fput): Filename Error'
-        break
-      }
-      try {
-        await blStore.get(sname)
-        const KeyVal = blStore.result()
-        if (KeyVal === undefined) {
-          blxErrMsg = 'ERROR(fput): No Value for this Key'
+      case 'fput': {
+        const sname = cmd_array[1]
+        if (sname === undefined) {
+          blxErrMsg = 'ERROR(fput): No Filename'
           break
         }
-        const nlen = KeyVal.v.akt_len
-        const syncflag = KeyVal.v.esync_flag
-        if (!nlen) {
-          blxErrMsg = 'ERROR(fput): Empty File'
+        const storemac = sname.substring(0, 17)
+        const fname = sname.substring(17)
+        if (storemac.length !== 17 || storemac.charAt(16) !== '_' || fname.charAt(0) === '#' || fname.length < 1 || fname.length > 21) {
+          blxErrMsg = 'ERROR(fput): Filename Error'
           break
         }
-        terminalPrint("Put File ('" + storemac + "...') '" + fname + "' from Store")
-        terminalPrint('(Len: ' + nlen + ' Bytes, Syncflag: ' + syncflag + ')')
-        await blxSendBinblock(KeyVal.v.bytebuf, fname, syncflag) // Send as binary Block
-      } catch (err) {
-        blxErrMsg = 'ERROR(fput): ' + err
+        try {
+          await blStore.get(sname)
+          const KeyVal = blStore.result()
+          if (KeyVal === undefined) {
+            blxErrMsg = 'ERROR(fput): No Value for this Key'
+            break
+          }
+          const nlen = KeyVal.v.akt_len
+          const syncflag = KeyVal.v.esync_flag
+          if (!nlen) {
+            blxErrMsg = 'ERROR(fput): Empty File'
+            break
+          }
+          terminalPrint("Put File ('" + storemac + "...') '" + fname + "' from Store")
+          terminalPrint('(Len: ' + nlen + ' Bytes, Syncflag: ' + syncflag + ')')
+          await blxSendBinblock(KeyVal.v.bytebuf, fname, syncflag) // Send as binary Block
+        } catch (err) {
+          blxErrMsg = 'ERROR(fput): ' + err
+        }
       }
-    }
-    break
-
-    case 'del': // del FNAME , keine Kurzform
-      fname = cmd_array[1]
-      if (fname === undefined || fname.length < 1 || fname.length > 21) {
-        blxErrMsg = 'ERROR: Filename'
         break
-      }
-      await blxDeviceCmd('D:' + fname, 10000)
-      break
 
-    case 'format': // Flash Formatieren
-    {
-      const fval = parseInt(cmd_array[1])
-      if (fval > 0 && fval <= 2) {
-        terminalPrint('Wait... (up to 240 secs)')
-        await blxDeviceCmd('F' + fval, 250000) // Kann 4 Min dauern
-      } else {
-        blxErrMsg = "ERROR: 'format 1'(Chip Erase) or 'format 2'(Soft)"
-      }
-    }
-    break
+      case 'del': // del FNAME , keine Kurzform
+        fname = cmd_array[1]
+        if (fname === undefined || fname.length < 1 || fname.length > 21) {
+          blxErrMsg = 'ERROR: Filename'
+          break
+        }
+        await blxDeviceCmd('D:' + fname, 10000)
+        break
 
-    case 'reset': // Geraet Resetten
-      terminalPrint('Reset Device')
-      await blxDeviceCmd('')
-      if (blxErrMsg) break
-      await blxDeviceCmd('R', 2000) // Will Timeout!
-      await sleepMs(1000)
-      blxErrMsg = 0
-      break
+      case 'format': // Flash Formatieren
+        {
+          const fval = parseInt(cmd_array[1])
+          if (fval > 0 && fval <= 2) {
+            terminalPrint('Wait... (up to 240 secs)')
+            await blxDeviceCmd('F' + fval, 250000) // Kann 4 Min dauern
+          } else {
+            blxErrMsg = "ERROR: 'format 1'(Chip Erase) or 'format 2'(Soft)"
+          }
+        }
+        break
 
-    case 't':
-    case 'time': // time abfrage oder setzen
-    {
-      let tstr = 'T'
-      if (cmd_array[1] === 'set') tstr += +(Date.now() / 1000).toFixed(0) // APP TIME
-      await blxDeviceCmd(tstr, 5000)
-    }
-    break
+      case 'reset': // Geraet Resetten
+        terminalPrint('Reset Device')
+        await blxDeviceCmd('')
+        if (blxErrMsg) break
+        await blxDeviceCmd('R', 2000) // Will Timeout!
+        await sleepMs(1000)
+        blxErrMsg = 0
+        break
 
-    default:
-      blxErrMsg = 'ERROR(SysCmd): Command unknown'
+      case 't':
+      case 'time': // time abfrage oder setzen
+        {
+          let tstr = 'T'
+          if (cmd_array[1] === 'set') tstr += +(Date.now() / 1000).toFixed(0) // APP TIME
+          await blxDeviceCmd(tstr, 5000)
+        }
+        break
+
+      default:
+        blxErrMsg = 'ERROR(SysCmd): Command unknown'
     }
   }
 
@@ -1897,7 +1897,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
     }
 
     try {
-      for (;;) { // Device ignores unwanted Blocks
+      for (; ;) { // Device ignores unwanted Blocks
         let blen = txlen_total // Blocklen
         if (blen > sblk_len) blen = sblk_len
         const bdata = new Uint8Array(blen + 2)
@@ -1997,7 +1997,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
           case '.log':
             atype = 'text/plain;charset=utf-8'
             break
-            // etc...
+          // etc...
         }
       }
 
@@ -2203,7 +2203,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
     let newChan = 0
     let maxChan = parseInt(iparam[2])
     let lastidx
-    for (;;) { // Find last Channel
+    for (; ;) { // Find last Channel
       const h = blxFindIparamIdx(iparam, newChan)
       if (h < 0) break // Not found
       newChan++
@@ -2251,12 +2251,12 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
   function CompactIparam(iparam) {
     let lastActiveChannel = 0
     let test_chan = 0;
-    for (;;) {
-      let nChanIdx = blxFindIparamIdx(iparam, test_chan )
+    for (; ;) {
+      let nChanIdx = blxFindIparamIdx(iparam, test_chan)
       if (nChanIdx < 0) break // Not found
       if (parseInt(iparam[nChanIdx + 1]) > 0) {
         lastActiveChannel = test_chan;
-      } 
+      }
       test_chan++;
     }
     // Remove all entries after last used ch
@@ -2299,12 +2299,12 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
     if (nverify_int(iparam[16], 0, 255)) return "317: Error Policy"
     if (nverify_int(iparam[17], -40, 10)) return "318: MinTemp oC"
     if (nverify_int(iparam[18], 0, 0x7FFFFFFF)) return "319: Config0_U31"
-    if (iparam[19].length >79) return "320: Configuration Command Len"
+    if (iparam[19].length > 79) return "320: Configuration Command Len"
 
     let pidx = blxFindIparamIdx(iparam, 0)
     if (pidx < 19) return "600: Missing #0"
     let chan = 0
-    for (;;) {
+    for (; ;) {
       if (iparam.length - pidx < 13) return "601: No of Params #" + chan
       if (nverify_int(iparam[pidx + 1], 0, 255)) return "602: Action #" + chan
       if (nverify_int(iparam[pidx + 2], 0, 65535)) return "603: PhysChan #" + chan
@@ -2352,7 +2352,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
     if (nverify_int(sysparam[17], 1000, 2e31)) return "218: Max Ringsize"
     if (nverify_int(sysparam[18], 0, 1e9)) return "219: mAmsec/Measure"
 
-    if (sysparam.length < 20) sysparam[19]= '0' // NewItem
+    if (sysparam.length < 20) sysparam[19] = '0' // NewItem
     if (nverify_int(sysparam[19], 0, 255)) return "220: Mobile_Protocol"
     return undefined //  == OK
   }
@@ -2377,33 +2377,30 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
   }
 
   function movesound() {
-    if (audio_term) {
       frq_ping(100, 0.3, 0.2) // Bong
       frq_ping(99, 0.3, 0.2)
-    }
   }
 
   function clicksound() {
-    if (audio_term) frq_ping(1000, 0.05, 0.1) // Click
+    frq_ping(1000, 0.05, 0.1) // Click
   }
 
   function zirpsound() {
-    if (audio_term) frq_ping(3000, 0.04, 0.02) // Zirpen
+    frq_ping(3000, 0.04, 0.02) // Zirpen
   }
 
   function errorsound() {
-    if (audio_term) frq_ping(30, 0.2, 0.3)
+    frq_ping(30, 0.2, 0.3)
   }
 
   function chordsound(frq, dur = 0.3, vol = 0.05) { // Dur Akkord
-    if (audio_term) {
       frq_ping(frq, dur, vol)
       frq_ping(frq * 1.259, dur, vol)
       frq_ping(frq * 1.498, dur, vol)
-    }
   }
 
   function frq_ping(frq, dura = 0.1, vol = 0.05) { // Helper, extern available
+    if (!audio_term) return
     if (!acx) acx = new AudioContext()
     const oscillator = acx.createOscillator()
     // console.log("Sig: "+sig+" Frq: "+frq);
@@ -2450,12 +2447,13 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
     getMemory: () => blxDataMem,
     getPinOK: () => blx_pin_ok,
     frq_ping: frq_ping,
+    chordsound: chordsound,
     getCrc32: crc32Calc,
     IparamAddChannel: IparamAddChannel,
     CompactIparam: CompactIparam,
     IparamValidate: IparamValidateLTX_V1,
     SysParamValidate: SysParamValidateLTX_V1,
-	version: VERSION,
+    version: VERSION,
   }
 })()
 
