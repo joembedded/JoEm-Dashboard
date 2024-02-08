@@ -74,20 +74,91 @@
                 <div id="section_main" class="usection">
                     <div id="section_main_menue"> <!-- Top-Schnellstartleiste -->
                         <button onclick="location.href='#section_terminal'"> <i class="fa-regular fa-keyboard"></i>
-                            Terminal</a> </button>
-                    </div>
-                    MainContent<br>
-                    <button id="testping">PING</button>
-                    <button id="testscan">SCAN</button>
+                            Terminal</button> - MainContent
 
+                    </div>
+                    <hr>
+                    <div>
+                        <div>
+                            Device:<span id="blxDevice">-</span>
+                            MAC:<span id="blxMAC">-</span>
+                            Type:<span id="blxType">-</span>
+                            FW:V<span id="blxFW">-</span>
+                            Sig.(dbm):<span id="blxSignal">-</span>
+                            <br>
+                            <br>
+            
+                            <span id="blxBadge" style="display:none">
+                                <!-- print Badge only for Factory Setup-->
+                                <button disabled id="blxBadgeButton" onclick="blxPrintBadge()"><i>Print Badge</i></button>
+                                <br>
+                                <br>
+                            </span>
+            
+                            <span id="blxPinEnter" style="display:none">
+                                <button id="blxSetPinButton" onclick="blxSetPin()">SetPIN</button>
+                                PIN:<input type="text" id="blxPIN">
+                                <br>
+                                <br>
+                            </span>
+            
+                            <span id="blxInfoButtonSpan" style="display:none">
+                                <button disabled id="blxInfoButton" onclick="blxMemoryInfo()">Memory Info</button>
+                                Memory:<span id="blxMemory">-</span>
+                                <br>
+                                <br>
+                            </span>
+            
+                            <span id="blxSyncButtonSpan" style="display:none">
+                                <button disabled id="blxSyncButton" onclick="blxSyncTime()">Synchronize Time</button>
+                                Delta(sec):<span id="blxSync">-</span>
+                                <br>
+                                <br>
+                            </span>
+            
+                            <span id="blxUploadButtonSpan" style="display:none">
+                                <button disabled id="blxUploadButton" onclick="blxUpload()">Load Data from Device</button>
+                                <span id="blxGraph"> </span>
+                                <br>
+                                <br>
+                            </span>
+            
+                            <!-- Span MEASURE for Loggers AND Sensors -->
+                            <button disabled id="blxMeasureButton" onclick="blxMeasure()">Measure</button>
+                            Values:<span id="blxMeasureData">-</span>
+                            <br>
+                            <br>
+            
+                            <span id="blxClearButtonSpan" style="display:none">
+                                <button disabled id="blxClearButton" onclick="blxClear()">Clear Memory</button>
+                                <br>
+                                <br>
+                            </span>
+            
+                            <span id="blxParametersSpan" style="display:none; white-space: nowrap;">
+                                <button disabled id="blxParametersButton" onclick="blxParameters(true,0)">Device Parameter</button>
+                                <button disabled id="blxSysParButton" onclick="blxParameters(true,1)">Device SysPar</button>
+                                Parameters:<span id="blxParameterEdit">-</span>
+                                <br>
+                                <br>
+                            </span>
+            
+                            Info: <span id="blxInfoLine">-</span><br>
+                            State: <span id="blxStateText">Ready</span>(<span id="blxStateSpinner">-</span>)<br>
+                            Result: <span id="blxCmdRes">-</span>
+                        </div>
+                        <hr>
+                        List of known Devices: <button onclick="updateDeviceList()">Update</button>
+                        <div id='blxDeviceList'></div>
+                    </div>
+                    <hr>
                 </div>
 
                 <div id="section_terminal" class="usection">
                     <div id="section_teminal_menue"> <!-- Top-Schnellstartleiste -->
                         <button onclick="location.href='#section_main'"> <i class="fa-solid fa-house"></i>
-                            Top</a> </button>
+                            Top</a> </button> - Terminal
                     </div>
-                    Terminal
                     <div id="blxTerminal"></div>
                 </div>
             </div>
@@ -109,116 +180,6 @@
 
 </body> <!-- BODY END -->
 
-<script type="module">
-    import * as JD from './js/joemdash.js'
-    import * as QRS from './js/qrscanner.js'
-    import './js/jsQR.min.js' // Polyfill for Desktop
-    import * as I18 from './js/i18n.js'
-    import './js/blx.js' // *todo* './js/blx.min.js'
-    import './js/blStore.min.js' 
-
-    //--------- globals ------ 
-    let connectionLevel = 0
-    let advertisingName
-    let blxDevice
-
-    var urlpar = {} // Aufruf-Parameter, z.B. urlpar.test = abc fuer ?test=abc
-
-
-    //================ TESTSACHEN ANFANG ============
-    function testping() {
-        blx.chordsound(440, 0.3, 0.1)
-
-        let b = document.getElementById('button0-link')
-        console.log(b.querySelector('i').classList.toggle('fa-beat'))
-
-    }
-    document.getElementById('testping').addEventListener('click', testping)
-
-    async function testscan() {
-        QRS.clearScannedResults()
-        await QRS.openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
-        await QRS.scannerBusy()
-    }
-    document.getElementById('testscan').addEventListener('click', testscan)
-    //================ TESTSACHEN ENDE ============
-
-    // BLE Callback Callback currently to Console only  m:Message, v:Value, xinfo:Text
-    function bleCallback(m, v, xinfo) {
-        console.log("BLX: ", m, v, xinfo)
-    }
-		// Called all sec
-		function _blxBusyMonitor() {
-		}
-
-		//-------- subsystem for BLX ------------
-		// Pattern:
-		// await _blxCmdSend(CMD)
-		// if(_blxCmdResult) handle error: throw or alert ..
-		let _blxCmdResult // Report Result here (OK: 0, else String)
-		let _blxCmdBusyFlag = false
-		let _blxCmdFreeCnt = 0
-		async function _blxCmdSend(cmd, cmdtimeout) {
-//x			document.getElementById("blxStateText").textContent = "Busy"
-			_blxCmdResult = 0
-			_blxCmdBusyFlag = true
-			_blxCmdFreeCnt = 0
-			try {
-				await blx.userSendCmd(cmd, cmdtimeout);
-				console.log("CMD->", cmd)
-				_blxCmdBusyFlag = false
-				_blxCmdFreeCnt = 0
-//x				document.getElementById("blxStateText").textContent = "Ready"
-			} catch (error) {
-				_blxCmdBusyFlag = false
-				_blxCmdFreeCnt = 0
-//x				document.getElementById("blxStateText").textContent = "ERROR: " + error
-				_blxCmdResult = error
-			}
-		}
-
-
-        //---------- the buttons ----------------
-        // Buton COnnect/Disconnect gedrueckt
-		async function blxConnect() {
-//x   document.getElementById("blxCmdRes").textContent = '-'
-//x   disabler(true)
-			try {
-				if (connectionLevel >= 3) await _blxCmdSend(".d") // disconnect
-				else {
-					await _blxCmdSend(".c") // connect
-//x					await show_details()
-				}
-			} catch (error) {
-//x				document.getElementById("blxCmdRes").textContent = error
-			}
-//x			disabler(false)
-		}
-
-     //---------------- setup ------------
-    function setup() {
-        // Isolate URL Parameters
-        const qs = location.search.substr(1).split('&')
-        var urlpar = {}
-        for (let x = 0; x < qs.length; x++) {
-            let kv = qs[x].split('=')
-            if (kv[1] === undefined) kv[1] = ''
-            urlpar[kv[0]] = kv[1]
-        }
-
-        blx.setTerminal('blxTerminal', bleCallback) // Initially Show Terminal in div 'blxTerminal'
-        //blx.setTerminal(undefined, bleCallback) // Initially Hide Terminal in div 'blxTerminal'
-        setInterval(_blxBusyMonitor, 1000)
-
-        document.getElementById('button0-link').addEventListener('click', blxConnect)
-
-        // Scanner Output via Terminal
-        QRS.setQrLogPrint(blx.terminalPrint)
-
-    }
-    window.addEventListener("load", setup);
-
-
-</script>
+<script src = "./js/blxDash.js" type="module"></script>
 
 </html>

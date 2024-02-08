@@ -2177,8 +2177,8 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
     if (elementId !== undefined) {
       terminal_lines = lines
       terminalParent = document.getElementById(elementId)
-      terminalParent.innerHTML = "<div id='blxTerminalOut' style='border: 1px solid blue; margin: 3px'></div>" +
-        "<div>Cmd: &gt <input id='blxTerminalCmd' typ='text' style='width: 80%;' maxlength='80'> <button id='blxTerminalSend'>Send</button></div>"
+      terminalParent.innerHTML = "<div id='blxTerminalOut' style='border: 1px solid blue; margin: 6px 0'></div>" +
+        "<div><label>Cmd: &gt <input id='blxTerminalCmd' typ='text' style='min-width: 66%';' maxlength='80'></label> <button id='blxTerminalSend'>Send</button></div>"
       document.getElementById('blxTerminalCmd').addEventListener('keyup', terminalKeyUpEvent)
       document.getElementById('blxTerminalSend').addEventListener('click', terminalSendCmd)
       // No initial Scroll - document.getElementById('blxTerminalCmd').focus()
