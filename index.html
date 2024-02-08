@@ -51,26 +51,22 @@
             <nav id="sidebar_left" class="clnav">
                 <div class="navinfo"><b>Main</b></div>
 
-                <button id="button0-link" class="navitem">
+                <!-- Navigatiins-item besteht immer aus 2 oder 3 Elementen: -->
+                <button id="button0-link" class="navitem" style="color:blue">
                     <i class="fa-brands fa-fw fa-bluetooth"></i>
-                    <span class="navitem-txt">Device: LTX012345678</span>
-                    <span class="navitem-pointout" style="background-color:green;">
-                        -59 dBm
+                    <span class="navitem-txt">Connect</span>
+                    <span class="navitem-pointout" style="background-color:gray;" hidden>
+                        -xx dBm
                     </span>
                 </button>
 
                 <button class="navitem" disabled>
                     <!-- class="navhidden" for Weg-Hidden.. disabled fuer halbhell, hidden fuer unsichtbar -->
-                    <i class="fa-regular fa-fw fa-compass"></i>
-                    <span class="navitem-txt">Messen</span>
+                    <i class="fa-solid fa-fw fa-file-waveform"></i>                
+                    <span class="navitem-txt">(None)</span>
                 </button>
 
                 <div class="thin-hr"></div>
-
-                <button class="navitem">
-                    <img src="./static/preview.png" alt="Test">
-
-                </button>
 
             </nav>
 
@@ -92,7 +88,7 @@
                             Top</a> </button>
                     </div>
                     Terminal
-                    <div id="terminal"></div>
+                    <div id="blxTerminal"></div>
                 </div>
             </div>
         </div>
@@ -118,10 +114,20 @@
     import * as QRS from './js/qrscanner.js'
     import './js/jsQR.min.js' // Polyfill for Desktop
     import * as I18 from './js/i18n.js'
-    import './js/blx.js' // './js/blx.min.js'
+    import './js/blx.js' // *todo* './js/blx.min.js'
+    import './js/blStore.min.js' 
 
+    //--------- globals ------ 
+    let connectionLevel = 0
+    let advertisingName
+    let blxDevice
+
+    var urlpar = {} // Aufruf-Parameter, z.B. urlpar.test = abc fuer ?test=abc
+
+
+    //================ TESTSACHEN ANFANG ============
     function testping() {
-        blx.chordsound(440, 1, 0.1)
+        blx.chordsound(440, 0.3, 0.1)
 
         let b = document.getElementById('button0-link')
         console.log(b.querySelector('i').classList.toggle('fa-beat'))
@@ -135,6 +141,83 @@
         await QRS.scannerBusy()
     }
     document.getElementById('testscan').addEventListener('click', testscan)
+    //================ TESTSACHEN ENDE ============
+
+    // BLE Callback Callback currently to Console only  m:Message, v:Value, xinfo:Text
+    function bleCallback(m, v, xinfo) {
+        console.log("BLX: ", m, v, xinfo)
+    }
+		// Called all sec
+		function _blxBusyMonitor() {
+		}
+
+		//-------- subsystem for BLX ------------
+		// Pattern:
+		// await _blxCmdSend(CMD)
+		// if(_blxCmdResult) handle error: throw or alert ..
+		let _blxCmdResult // Report Result here (OK: 0, else String)
+		let _blxCmdBusyFlag = false
+		let _blxCmdFreeCnt = 0
+		async function _blxCmdSend(cmd, cmdtimeout) {
+//x			document.getElementById("blxStateText").textContent = "Busy"
+			_blxCmdResult = 0
+			_blxCmdBusyFlag = true
+			_blxCmdFreeCnt = 0
+			try {
+				await blx.userSendCmd(cmd, cmdtimeout);
+				console.log("CMD->", cmd)
+				_blxCmdBusyFlag = false
+				_blxCmdFreeCnt = 0
+//x				document.getElementById("blxStateText").textContent = "Ready"
+			} catch (error) {
+				_blxCmdBusyFlag = false
+				_blxCmdFreeCnt = 0
+//x				document.getElementById("blxStateText").textContent = "ERROR: " + error
+				_blxCmdResult = error
+			}
+		}
+
+
+        //---------- the buttons ----------------
+        // Buton COnnect/Disconnect gedrueckt
+		async function blxConnect() {
+//x   document.getElementById("blxCmdRes").textContent = '-'
+//x   disabler(true)
+			try {
+				if (connectionLevel >= 3) await _blxCmdSend(".d") // disconnect
+				else {
+					await _blxCmdSend(".c") // connect
+//x					await show_details()
+				}
+			} catch (error) {
+//x				document.getElementById("blxCmdRes").textContent = error
+			}
+//x			disabler(false)
+		}
+
+     //---------------- setup ------------
+    function setup() {
+        // Isolate URL Parameters
+        const qs = location.search.substr(1).split('&')
+        var urlpar = {}
+        for (let x = 0; x < qs.length; x++) {
+            let kv = qs[x].split('=')
+            if (kv[1] === undefined) kv[1] = ''
+            urlpar[kv[0]] = kv[1]
+        }
+
+        blx.setTerminal('blxTerminal', bleCallback) // Initially Show Terminal in div 'blxTerminal'
+        //blx.setTerminal(undefined, bleCallback) // Initially Hide Terminal in div 'blxTerminal'
+        setInterval(_blxBusyMonitor, 1000)
+
+        document.getElementById('button0-link').addEventListener('click', blxConnect)
+
+        // Scanner Output via Terminal
+        QRS.setQrLogPrint(blx.terminalPrint)
+
+    }
+    window.addEventListener("load", setup);
+
 
 </script>
 

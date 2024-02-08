@@ -31,7 +31,7 @@ Messages (Large XINFO add. Par.)
 const blx = (() => { // Import as 'Revealing Module Pattern'
   'use strict'
   // private 'globals'
-  const VERSION = 'V1.15 / 14.01.2024'
+  const VERSION = 'V1.16 / 08.02.2024'
   const COPYRIGHT = '(C)JoEmbedded.de'
   const HELP = 'BLX.JS and BlueShell are "living products". Questions and requests are always welcome.'
 
@@ -2181,7 +2181,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
         "<div>Cmd: &gt <input id='blxTerminalCmd' typ='text' style='width: 80%;' maxlength='80'> <button id='blxTerminalSend'>Send</button></div>"
       document.getElementById('blxTerminalCmd').addEventListener('keyup', terminalKeyUpEvent)
       document.getElementById('blxTerminalSend').addEventListener('click', terminalSendCmd)
-      document.getElementById('blxTerminalCmd').focus()
+      // No initial Scroll - document.getElementById('blxTerminalCmd').focus()
       terminalPrint()
       terminalUserEnable(true)
     } else {
@@ -2443,6 +2443,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
       if (blxCmdBusy === true) throw new Error('*** BLX BUSY (Since ' + (Date.now() - blxCmdBusy_t0).toFixed(0) + ' msec) ***')
     },
     // Info-Functions:
+    terminalPrint: terminalPrint,
     getDevice: () => blxIDs,
     getMemory: () => blxDataMem,
     getPinOK: () => blx_pin_ok,
