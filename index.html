@@ -54,7 +54,7 @@
                 <!-- Navigatiins-item besteht immer aus 2 oder 3 Elementen: -->
                 <button id="button0-link" class="navitem" style="color:blue">
                     <i class="fa-brands fa-fw fa-bluetooth"></i>
-                    <span class="navitem-txt">Connect</span>
+                    <span id="blxConnectButtonText" class="navitem-txt">Connect</span>
                     <span class="navitem-pointout" style="background-color:gray;" hidden>
                         -xx dBm
                     </span>
@@ -68,19 +68,21 @@
 
                 <div class="thin-hr"></div>
 
+                <button id="button1-terminal" class="navitem">
+                    <i class="fa-regular fa-keyboard"></i>
+                    <span class="navitem-txt">Terminal</span>
+                </button>
+
+
             </nav>
 
             <div id="main_content" class="ucontent">
                 <div id="section_main" class="usection">
-                    <div id="section_main_menue"> <!-- Top-Schnellstartleiste -->
-                        <button onclick="location.href='#section_terminal'"> <i class="fa-regular fa-keyboard"></i>
-                            Terminal</button> - MainContent
-
-                    </div>
+                    MainContent
                     <hr>
                     <div>
                         <div>
-                            Device:<span id="blxDevice">-</span>
+                            Device:<span id="blxDeviceName">-</span>
                             MAC:<span id="blxMAC">-</span>
                             Type:<span id="blxType">-</span>
                             FW:V<span id="blxFW">-</span>
@@ -155,10 +157,10 @@
                 </div>
 
                 <div id="section_terminal" class="usection">
-                    <div id="section_teminal_menue"> <!-- Top-Schnellstartleiste -->
-                        <button onclick="location.href='#section_main'"> <i class="fa-solid fa-house"></i>
-                            Top</a> </button> - Terminal
-                    </div>
+                    
+                        <button onclick="location.href='#section_main'"><i class="fa-solid fa-house"></i> Top</button> 
+                        - Terminal
+                    
                     <div id="blxTerminal"></div>
                 </div>
             </div>

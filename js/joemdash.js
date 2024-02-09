@@ -31,7 +31,7 @@ export function dashSetFont(nrel) {
 
 // Themen invertieren hell-dunkel
 export function dashToggleTheme() {
-    const cvar = ['--white', '--black', '--whitegray', '--lightgray', '--hovergray', '--midgray', '--darkgray', '--txtwhite', '--txtblack']
+    const cvar = ['--white', '--black', '--whitegray', '--lightgray', '--infogray' , '--hovergray', '--midgray', '--darkgray', '--txtwhite', '--txtblack']
     cvar.forEach((e) => {
         const oval = parseInt(getComputedStyle(document.documentElement).getPropertyValue(e).substring(1),16);
         const nval = '#'+(oval^0xFFFFFF).toString(16).padStart(6,'0') // Invert

@@ -7,6 +7,7 @@
     --whitegray: #f8f8f8;
     /* Navi Schrift  txtblack*/
     --lightgray: #e0e0e0;
+    --infogray: #d0d0d0;
     /* Navi Schrift  Hovered*/
     --hovergray: #c0c0c0;
 
@@ -46,7 +47,7 @@ body {
     font-size: calc(1rem * var(--fontrel));
 }
 
-/*--- Spacer (thin black line) ---*/
+/*--- Spacer (thin black line) (separate Menue items )---*/
 .thin-hr {
     border-bottom: 1px solid var(--black);
     opacity: 0.25;
@@ -153,6 +154,7 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
 
     /*--- Info Line ---*/
     .navinfo {
+        background-color: var(--infogray);
         display: block;
         padding: 8px;
         white-space: nowrap;

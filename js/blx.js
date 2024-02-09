@@ -2172,13 +2172,19 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
     terminalUserEnable(true)
   }
 
+  //         "<div><label>Cmd: &gt <input id='blxTerminalCmd' typ='text' style='min-width: 66%';' maxlength='80'></label> <button id='blxTerminalSend'>Send</button></div>"
+
+
   // Disable Callback by any argument that is not a function
   function setTerminal(elementId, userCB, lines = TERMINAL_LINES) { // (De-Assign Terminal to HTML Element)
     if (elementId !== undefined) {
       terminal_lines = lines
       terminalParent = document.getElementById(elementId)
-      terminalParent.innerHTML = "<div id='blxTerminalOut' style='border: 1px solid blue; margin: 6px 0'></div>" +
-        "<div><label>Cmd: &gt <input id='blxTerminalCmd' typ='text' style='min-width: 66%';' maxlength='80'></label> <button id='blxTerminalSend'>Send</button></div>"
+      // Format CMD-line as 3 component Flexbox with grow for input
+      terminalParent.innerHTML = "<div id='blxTerminalOut' style='border: 1px solid blue; margin: 6px 0; overflow:hidden;'></div>" +
+        "<div style='display:flex; align-items: baseline;'><label for='blxTerminalCmd'>Cmd: &gt </label>" +
+        "<input id='blxTerminalCmd' typ='text' style='flex-grow: 1; margin: 0 4px;' maxlength='80'>" +
+        "<button id='blxTerminalSend'>Send</button></div>"
       document.getElementById('blxTerminalCmd').addEventListener('keyup', terminalKeyUpEvent)
       document.getElementById('blxTerminalSend').addEventListener('click', terminalSendCmd)
       // No initial Scroll - document.getElementById('blxTerminalCmd').focus()
@@ -2377,8 +2383,8 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
   }
 
   function movesound() {
-      frq_ping(100, 0.3, 0.2) // Bong
-      frq_ping(99, 0.3, 0.2)
+    frq_ping(100, 0.3, 0.2) // Bong
+    frq_ping(99, 0.3, 0.2)
   }
 
   function clicksound() {
@@ -2394,9 +2400,9 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
   }
 
   function chordsound(frq, dur = 0.3, vol = 0.05) { // Dur Akkord
-      frq_ping(frq, dur, vol)
-      frq_ping(frq * 1.259, dur, vol)
-      frq_ping(frq * 1.498, dur, vol)
+    frq_ping(frq, dur, vol)
+    frq_ping(frq * 1.259, dur, vol)
+    frq_ping(frq * 1.498, dur, vol)
   }
 
   function frq_ping(frq, dura = 0.1, vol = 0.05) { // Helper, extern available
