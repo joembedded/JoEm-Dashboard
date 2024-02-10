@@ -8,7 +8,7 @@
     Kontakt: joembedded@gmail.com
 
     Tests: 
-    http://localhost/wrk/joemdash/index.html
+    http://localhost/wrk/joemdash/index.html oder http://localhost/wrk/joemdash/?badge
     https://joembedded.github.io/JoEm-Dashboard/
 
 -->
@@ -62,23 +62,28 @@
 
                 <button class="navitem" disabled>
                     <!-- class="navhidden" for Weg-Hidden.. disabled fuer halbhell, hidden fuer unsichtbar -->
-                    <i class="fa-solid fa-fw fa-file-waveform"></i>                
+                    <i class="fa-solid fa-fw fa-file-waveform"></i>
                     <span class="navitem-txt">(None)</span>
                 </button>
 
                 <div class="thin-hr"></div>
 
-                <button id="button1-terminal" class="navitem">
-                    <i class="fa-regular fa-keyboard"></i>
-                    <span class="navitem-txt">Terminal</span>
+                <button id="button2-maincontent" class="navitem">
+                    <i class="fa-solid fa-fw fa-display"></i>
+                    <span class="navitem-txt">Main Content</span>
                 </button>
 
+                <button id="button1-terminal" class="navitem">
+                    <i class="fa-solid fa-fw fa-keyboard"></i>
+                    <span class="navitem-txt">Terminal</span>
+                </button>
 
             </nav>
 
             <div id="main_content" class="ucontent">
                 <div id="section_main" class="usection">
-                    MainContent
+                    <hr>
+                    <b>Main Content</b>
                     <hr>
                     <div>
                         <div>
@@ -89,62 +94,65 @@
                             Sig.(dbm):<span id="blxSignal">-</span>
                             <br>
                             <br>
-            
+
                             <span id="blxBadge" style="display:none">
                                 <!-- print Badge only for Factory Setup-->
-                                <button disabled id="blxBadgeButton" onclick="blxPrintBadge()"><i>Print Badge</i></button>
+                                <button disabled id="blxBadgeButton"><i>Print Badge</i></button>
                                 <br>
                                 <br>
                             </span>
-            
+
                             <span id="blxPinEnter" style="display:none">
-                                <button id="blxSetPinButton" onclick="blxSetPin()">SetPIN</button>
+                                <button id="blxSetPinButton">SetPIN</button>
                                 PIN:<input type="text" id="blxPIN">
                                 <br>
                                 <br>
                             </span>
-            
+
                             <span id="blxInfoButtonSpan" style="display:none">
-                                <button disabled id="blxInfoButton" onclick="blxMemoryInfo()">Memory Info</button>
+                                <button disabled id="blxInfoButton">Memory Info</button>
                                 Memory:<span id="blxMemory">-</span>
                                 <br>
                                 <br>
                             </span>
-            
+
                             <span id="blxSyncButtonSpan" style="display:none">
-                                <button disabled id="blxSyncButton" onclick="blxSyncTime()">Synchronize Time</button>
+                                <button disabled id="blxSyncButton" >Synchronize Time</button>
                                 Delta(sec):<span id="blxSync">-</span>
                                 <br>
                                 <br>
                             </span>
-            
+
                             <span id="blxUploadButtonSpan" style="display:none">
-                                <button disabled id="blxUploadButton" onclick="blxUpload()">Load Data from Device</button>
+                                <button disabled id="blxUploadButton">Load Data from
+                                    Device</button>
                                 <span id="blxGraph"> </span>
                                 <br>
                                 <br>
                             </span>
-            
+
                             <!-- Span MEASURE for Loggers AND Sensors -->
-                            <button disabled id="blxMeasureButton" onclick="blxMeasure()">Measure</button>
+                            <button disabled id="blxMeasureButton">Measure</button>
                             Values:<span id="blxMeasureData">-</span>
                             <br>
                             <br>
-            
+
                             <span id="blxClearButtonSpan" style="display:none">
                                 <button disabled id="blxClearButton" onclick="blxClear()">Clear Memory</button>
                                 <br>
                                 <br>
                             </span>
-            
+
                             <span id="blxParametersSpan" style="display:none; white-space: nowrap;">
-                                <button disabled id="blxParametersButton" onclick="blxParameters(true,0)">Device Parameter</button>
-                                <button disabled id="blxSysParButton" onclick="blxParameters(true,1)">Device SysPar</button>
+                                <button disabled id="blxParametersButton" onclick="blxParameters(true,0)">Device
+                                    Parameter</button>
+                                <button disabled id="blxSysParButton" onclick="blxParameters(true,1)">Device
+                                    SysPar</button>
                                 Parameters:<span id="blxParameterEdit">-</span>
                                 <br>
                                 <br>
                             </span>
-            
+
                             Info: <span id="blxInfoLine">-</span><br>
                             State: <span id="blxStateText">Ready</span>(<span id="blxStateSpinner">-</span>)<br>
                             Result: <span id="blxCmdRes">-</span>
@@ -157,10 +165,9 @@
                 </div>
 
                 <div id="section_terminal" class="usection">
-                    
-                        <button onclick="location.href='#section_main'"><i class="fa-solid fa-house"></i> Top</button> 
-                        - Terminal
-                    
+                    <hr>
+                    <b>Terminal</b>
+                    <hr>
                     <div id="blxTerminal"></div>
                 </div>
             </div>
@@ -169,6 +176,7 @@
 
     <footer class="cfooter">
         Footer
+        &nbsp;<button id="dbg-action">DBG-Action</button>
     </footer>
 
     <!-- Dialog Elements <dialog> / Modal new in HTML5 -->
@@ -182,6 +190,6 @@
 
 </body> <!-- BODY END -->
 
-<script src = "./js/blxDash.js" type="module"></script>
+<script src="./js/blxDash.js" type="module"></script>
 
 </html>

@@ -31,7 +31,7 @@ Messages (Large XINFO add. Par.)
 const blx = (() => { // Import as 'Revealing Module Pattern'
   'use strict'
   // private 'globals'
-  const VERSION = 'V1.16 / 08.02.2024'
+  const VERSION = 'V1.17 / 09.02.2024'
   const COPYRIGHT = '(C)JoEmbedded.de'
   const HELP = 'BLX.JS and BlueShell are "living products". Questions and requests are always welcome.'
 
@@ -2182,9 +2182,9 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
       terminalParent = document.getElementById(elementId)
       // Format CMD-line as 3 component Flexbox with grow for input
       terminalParent.innerHTML = "<div id='blxTerminalOut' style='border: 1px solid blue; margin: 6px 0; overflow:hidden;'></div>" +
-        "<div style='display:flex; align-items: baseline;'><label for='blxTerminalCmd'>Cmd: &gt </label>" +
-        "<input id='blxTerminalCmd' typ='text' style='flex-grow: 1; margin: 0 4px;' maxlength='80'>" +
-        "<button id='blxTerminalSend'>Send</button></div>"
+        "<div style='display:flex; align-items: center;'>" +
+        "<input id='blxTerminalCmd' typ='text' maxlength='80' placeholder='>' style='flex-grow: 1; margin: 0 4px 0 2px; min-width: 16px;'>" +
+        "<button id='blxTerminalSend'>&#10004;</button></div>"
       document.getElementById('blxTerminalCmd').addEventListener('keyup', terminalKeyUpEvent)
       document.getElementById('blxTerminalSend').addEventListener('click', terminalSendCmd)
       // No initial Scroll - document.getElementById('blxTerminalCmd').focus()

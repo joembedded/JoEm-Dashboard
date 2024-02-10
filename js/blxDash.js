@@ -34,10 +34,60 @@ const blxMeasureData = document.getElementById("blxMeasureData")
 const blxDeviceName = document.getElementById("blxDeviceName")
 const blxMAC = document.getElementById("blxMAC")
 const blxType = document.getElementById("blxType")
-const blxFW =document.getElementById("blxFW")
+const blxFW = document.getElementById("blxFW")
 
+// BLE Buttons
+const blxPinEnter = document.getElementById("blxPinEnter")
+const blxBadgeButton = document.getElementById("blxBadgeButton")
+const blxSyncButton = document.getElementById("blxSyncButton")
+const blxMeasureButton = document.getElementById("blxMeasureButton")
+const blxUploadButton = document.getElementById("blxUploadButton")
+const blxInfoButton = document.getElementById("blxInfoButton")
+const blxClearButton = document.getElementById("blxClearButton")
+const blxParametersButton = document.getElementById("blxParametersButton")
+const blxSysParButton = document.getElementById("blxSysParButton")
+const blxSyncButtonSpan = document.getElementById("blxSyncButtonSpan")
+const blxUploadButtonSpan = document.getElementById("blxUploadButtonSpan")
+const blxInfoButtonSpan = document.getElementById("blxInfoButtonSpan")
+const blxClearButtonSpan = document.getElementById("blxClearButtonSpan")
+const blxParametersSpan = document.getElementById("blxParametersSpan")
+const blxSetPinButton = document.getElementById("blxSetPinButton")
+
+// Menue Buttons
+const button0Link = document.getElementById("button0-link")
+const button1Terminal = document.getElementById("button1-terminal")
+const button2MainMenu = document.getElementById("button2-maincontent")
 //================ TESTSACHEN ANFANG ============
 //================ TESTSACHEN ENDE ============
+function disabler(disf) { // Dis-/En-abler for clickable Elements
+    const pinOk = blx.getPinOK()
+    button0Link.disabled = disf
+
+    let dss = "none"
+    if (pinOk !== true && disf === false && connectionLevel >= 3) dss = "block"
+    blxPinEnter.style.display = dss
+    blxBadgeButton.disabled = disf // Only for Factory Setup, see urlpar.badge
+
+    if (connectionLevel == 0 || pinOk !== true) disf = true // Only disable if FULL Disconnected or PIN Error
+    blxSyncButton.disabled = disf
+    blxMeasureButton.disabled = disf
+
+    blxUploadButton.disabled = disf
+    blxInfoButton.disabled = disf
+    blxClearButton.disabled = disf
+    blxParametersButton.disabled = disf
+    blxSysParButton.disabled = disf
+
+    // Don't show Logger Buttons for "only" Sensors
+    if (blxDevice !== undefined && blxDevice.deviceType >= 1000) dss = "block"
+    else dss = "none"
+
+    blxSyncButtonSpan.style.display = dss
+    blxUploadButtonSpan.style.display = dss
+    blxInfoButtonSpan.style.display = dss
+    blxClearButtonSpan.style.display = dss
+    blxParametersSpan.style.display = dss
+}
 
 
 // Callback currently to Console only  m:Message, v:Value, xinfo:Text
@@ -181,23 +231,486 @@ async function _blxCmdSend(cmd, cmdtimeout) {
     }
 }
 
+async function calculateMemory(gflag) { // get flag (= with new) if true: disabler() by caller
+    let memstr = "???"
+    try {
+        if (gflag) {
+            await _blxCmdSend(".m") // calculate memory
+        }
+        let m = blx.getMemory()
+        let mperc
+        if (m.max > 0) mperc = (m.total * 100 / m.max).toFixed(2)
+        else mperc = 'Unknown'
+
+        let mmode = "???"
+        switch (m.mode) {
+            case 2:
+            case 0:
+                mmode = "Rec.OFF";
+                break
+            case 1:
+                mmode = "LINEAR";
+                break;
+            case 3:
+                mmode = "RING"
+        }
+        memstr = "[Total:" + m.total + "(" + mperc + "%," + mmode + ")"
+        if (gflag) memstr += " New:" + m.incnew
+        memstr += "] Bytes"
+    } catch (error) {
+        blxCmdRes.textContent = error
+    }
+    blxMemory.textContent = memstr
+}
+
+async function showLink() { // Check if (old) Graf Data is already in Store
+    let link = "(No Data)"
+    try {
+        await blStore.get(blxDevice.deviceMAC + '_xtract.edt')
+        const KeyVal = blStore.result() // undefined opt.
+        if (KeyVal !== undefined) {
+            link = "<a target='_blank' href='../gdraw.html?st=" + blxDevice.deviceMAC + "_xtract.edt&sn=" +
+                advertisingName + "'>Show Graph</a> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
+                    .toLocaleString() + ")"
+        }
+    } catch (error) {
+        blxCmdRes.textContent = error
+    }
+    blxGraph.innerHTML = link
+}
+
+async function show_details() {
+    if (connectionLevel >= 3) {
+        blxDevice = blx.getDevice()
+        blxMAC.textContent = blxDevice.deviceMAC
+        blxType.textContent = blxDevice.deviceType
+        blxFW.textContent = blxDevice.firmwareVersion
+        if (connectionLevel == 4 && blxDevice.deviceType >= 1000) { // Only for Loggers
+            await calculateMemory(true)
+            await showLink()
+        }
+        blxSync.textContent = blxDevice.deltaToApp
+        blxInfoLine.textContent = "Connected"
+        blxMeasureData.innerHTML = '-'
+        blxParameterEdit.innerHTML = ""
+    }
+}
+
+
 
 //---------- the buttons ----------------
 // Buton COnnect/Disconnect gedrueckt
 async function blxConnect() {
     blxCmdRes.textContent = '-'
-    //x   disabler(true)
+    disabler(true)
     try {
         if (connectionLevel >= 3) await _blxCmdSend(".d") // disconnect
         else {
             await _blxCmdSend(".c") // connect
-            //x					await show_details()
+            await show_details()
         }
     } catch (error) {
         blxCmdRes.textContent = error
     }
-    //x			disabler(false)
+    disabler(false)
 }
+
+// Print a Badge (if Labeprinter is enabled) Factory Function!
+function blxPrintBadge() {
+    let uflag = false
+    if (blxDevice === undefined) {
+        blxDevice = blx.getDevice()
+        uflag = true
+    }
+    let urlpar = "mac=" + blxDevice.deviceMAC +
+        "&type=" + blxDevice.deviceType +
+        "&fw=" + blxDevice.firmwareVersion +
+        "&advname=" + blxDevice.advertisingName
+
+    window.open("../labels/badge.html?" + encodeURI(urlpar), "_blank")
+    if (uflag === true) blxDevice = undefined
+}
+
+async function blxSetPin() { // CMD used to enable PIN
+    blxCmdRes.textContent = '-'
+    const pin = blxPIN.value
+    disabler(true)
+    try {
+        if (pin.length < 1) throw "ERROR: PIN EMPTY"
+        await _blxCmdSend(".i " + pin)
+        blxPIN.value = ''
+        await show_details()
+    } catch (error) {
+        blxCmdRes.textContent = error
+    }
+    disabler(false)
+}
+
+async function blxSyncTime() {
+    disabler(true)
+    try {
+        await _blxCmdSend(".t set")
+        blxSync.textContent = 0
+    } catch (error) {
+        blxCmdRes = error
+    }
+    disabler(false)
+}
+
+async function blxUpload() {
+    disabler(true)
+    try {
+        await _blxCmdSend(".u") // Upload
+        await calculateMemory(false) // no 'New'
+        await _blxCmdSend(".x") // Extract to 'MAC_xtract.edt'
+        await showLink()
+    } catch (error) {
+        blxCmdRes.textContent = error
+    }
+    disabler(false)
+}
+
+let measureData = "???"
+// *todo* Measure might take longer than standard Timeout 5 sec, 
+// add separate '.m' command in API
+async function blxMeasure() {
+    disabler(true)
+    blxMeasureData.innerHTML = "Wait..."
+    try {
+        await _blxCmdSend("e 1") // With HK
+    } catch (error) {
+        blxCmdRes.textContent = error
+    }
+    disabler(false)
+}
+
+async function blxClear() { // *todo* Ask if OK!
+    disabler(true)
+    try {
+        if (blxDevice.diskCheckOK !== undefined && blxDevice.diskCheckOK == true) {
+            blxInfoLine.textContent = "Start new Measure, Clear all Data"
+            await _blxCmdSend("n")
+        } else {
+            blxInfoLine.textContent =
+                "Start new Measure, Clear all Data (Clean FlashDisk, may need up to 240 sec)"
+            await _blxCmdSend("n1", 240000) // Possible slow!
+        }
+        blxMemory.textContent = '-'
+        await blStore.remove(blxDevice.deviceMAC + '_xtract.edt') // Also remove from Store
+        await showLink()
+
+    } catch (error) {
+        blxCmdRes.textContent = error
+    }
+    disabler(false)
+}
+
+//*********** Parameter-Edit START ******************
+// Description and Index of Parameters, see 'legacy/edit_lxp.php'
+// In strings '@' is not allowed at Pos 0 (replaced by '?')
+// '#' is treated as Remark-Separator (replaced by '?')
+// '$' for Len of strings (e.g. $11: 11 chars)
+const p100_beschr = [
+    "*@100_System",
+    "*DEVICE_TYP",
+    "*MAX_CHANNELS",
+    "*HK_FLAGS",
+    "*NewCookie [Parameter 10-digit Timestamp.32]",
+    "Device_Name[BLE:$11/total:$41]",
+    "Period_sec[10..86400]",
+    "Period_Offset_sec[0..(Period_sec-1)]",
+    "Period_Alarm_sec[0..Period_sec]",
+    "Period_Internet_sec[0..604799]",
+    "Period_Internet_Alarm_sec[0..Period_Internet_sec]",
+    "UTC_Offset_sec[-43200..43200]",
+    "Flags (B0:Rec B1:Ring) (0: RecOff) B2:Compress",
+    "HK_flags (B0:Bat B1:Temp B2.Hum B3.Perc B4.Baro)",
+    "HK_reload[0..255]",
+    "Net_Mode (0:Off 1:OnOff 2:On_5min 3:Online)",
+    "ErrorPolicy (O:None 1:RetriesForAlarms, 2:RetriesForAll)",
+    "MinTemp_oC[-40..10]",
+    "Config0_U31 (B0:OffPer.Inet:On/Off B1,2:BLE:On/Mo/Li/MoLi B3:EnDS B4:CE:Off/On B5:Live:Off/On)",
+    "Configuration_Command[$79]",
+]
+const pkan_beschr = [
+    "*@ChanNo",
+    "Action[0..65535] (B0:Meas B1:Cache B2:Alarms)",
+    "Physkan_no[0..65535]",
+    "Kan_caps_str[$8]",
+    "Src_index[0..255]",
+    "Unit[$8]",
+    "Mem_format[0..255]",
+    "DB_id[0..2e31]",
+    "Offset[float]",
+    "Factor[float]",
+    "Alarm_hi[float]",
+    "Alarm_lo[float]",
+    "Messbits[0..65535]",
+    "Xbytes[$32]"
+]
+const p200_beschr = [ // sys_param.lxp
+    "*@200_Sys_Param",
+    "APN[$41]",
+    "Server/VPN[$41]",
+    "Script/Id[$41]",
+    "API Key[$41]",
+    "ConFlags[0..255] (B0:Verbose B1:RoamAllow B4:LOG_FILE (B5:LOG_UART) B7:Debug)",
+    "SIM Pin[0..65535] (opt)",
+    "APN User[$41]",
+    "APN Password[$41]",
+    "Max_creg[10..255]",
+    "Port[1..65535]",
+    "Server_timeout_0[1000..65535]",
+    "Server_timeout_run[1000..65535]",
+    "Modem Check Reload[60..3600]",
+    "Bat. Capacity (mAh)[0..100000]",
+    "Bat. Volts 0%[float]",
+    "Bat. Volts 100%[float]",
+    "Max Ringsize (Bytes)[1000..2e31]",
+    "mAmsec/Measure[0..1e9]",
+    "Mobile Protocol[0..255] B0:0/1:HTTP/HTTPS B1:PRESET B2,3:TCP/UDPSetup"
+]
+
+let original_par // backup of original Parameters
+
+// Get Values of all visible Parameters inputs, each array entry has 1 input
+// Important: NO user input with '@' allowed!
+// Characters after '#' are treated as comments
+function blxEditedParamGet(typ) {
+    // Scan List of HTML elements with name '_pidxNN'
+    const plen = typ ? blxDevice.sys_param.length : blxDevice.iparam.length
+    for (let i = 0; i < plen; i++) {
+        let pinp = document.getElementById("_pidx" + i)
+        let nval = pinp.value.toString()
+        if (pinp.disabled === false) { // User Edit
+            // Checks...
+            // Replace first @ by '?'
+            if (nval.charAt(0) === '@') nval = '?' + nval.substr(1);
+            // Replace '#' by '?'
+            nval.replace("#", "?")
+        }
+        if (!typ) blxDevice.iparam[i] = nval
+        else blxDevice.sys_param[i] = nval
+    }
+}
+
+// Send Edited List, Check first if changed
+// Changed if synthesized CRC and/length is different
+//
+// If Parameter Transfer fails, Risk of not complete iparam.lxp on Device
+// Then retry! In any case: Last known Parameters are stored as '..#BAK#_iparam.lxp'
+async function blxParSend(typ) {
+    if (!typ) { // iparam
+        try {
+            blxEditedParamGet(0)
+            blx.CompactIparam(blxDevice.iparam)
+            blxParameters(false, 0) // Show Compacted Parameters
+
+            let cres = blx.IparamValidate(blxDevice.iparam)
+            if (cres) {
+                alert("ERROR: Iparam-Check(3):\n" + cres)
+                return
+            }
+
+            const enc = new TextEncoder()
+            let filebuf = enc.encode(blxDevice.iparam.join('\n') + '\n')
+            let crc32 = blx.getCrc32(filebuf)
+
+            await blStore.get(blxDevice.deviceMAC + '_iparam.lxp')
+            let store_iparam = blStore.result() // undefined opt.
+            if (store_iparam !== undefined &&
+                crc32 === store_iparam.v.crc32 &&
+                filebuf.length === store_iparam.v.akt_len &&
+                blxDevice.iparam_dirtyflag === false) {
+                // No Changes found
+                blxParameterEdit.innerHTML = ""
+                blxCmdRes.textContent = "No Changes"
+                return
+            } else if (store_iparam === undefined) {
+                store_iparam = {
+                    v: {}
+                } // Need Obj
+            }
+
+            // Changes! Set new Cookie and write back
+            blxEditedParamGet(0)
+            blxDevice.iparam[4] = (Date.now() / 1000).toFixed(0)
+            blxDevice.iparam_dirtyflag = true
+
+            const enc2 = new TextEncoder()
+            store_iparam.v.bytebuf = enc2.encode(blxDevice.iparam.join('\n') + '\n')
+            store_iparam.v.crc32 = blx.getCrc32(store_iparam.v.bytebuf)
+            store_iparam.v.total_len = store_iparam.v.bytebuf.length
+            store_iparam.v.akt_len = store_iparam.v.total_len
+            store_iparam.v.ctime = new Date(blxDevice.iparam[4] * 1000)
+            store_iparam.v.esync_flag = true // Not set by Server->Device!
+
+            await blStore.set(blxDevice.deviceMAC + '_iparam.lxp', store_iparam.v) // First Store
+            await _blxCmdSend(".fput " + blxDevice.deviceMAC + '_iparam.lxp') // Then Upload 
+            if (_blxCmdResult) {
+                throw _blxCmdResult
+            }
+            await _blxCmdSend("X") // Check iparam
+            if (_blxCmdResult) {
+                throw _blxCmdResult
+            }
+            // If all OK: Remove edited Params and store Backup
+            blxParameterEdit.innerHTML = ""
+            blxDevice.iparam_dirtyflag = false
+            await blStore.set(blxDevice.deviceMAC + '_#BAK_iparam.lxp', store_iparam.v)
+        } catch (err) {
+            alert(err + "\nRecommendation: Retry!")
+            blxCmdRes.textContent = err
+        }
+    } else { // SysParam
+        try {
+            blxEditedParamGet(1)
+            blxParameters(false, 1) // Show Compacted Parameters
+
+            let cres = blx.SysParamValidate(blxDevice.sys_param)
+            if (cres) {
+                alert("ERROR: SysParam-Check(3):\n" + cres)
+                return
+            }
+
+            const enc = new TextEncoder()
+            let filebuf = enc.encode(blxDevice.sys_param.join('\n') + '\n')
+            let crc32 = blx.getCrc32(filebuf)
+
+            await blStore.get(blxDevice.deviceMAC + '_sys_param.lxp')
+            let store_sysParam = blStore.result() // undefined opt.
+            if (store_sysParam !== undefined &&
+                crc32 === store_sysParam.v.crc32 &&
+                filebuf.length === store_sysParam.v.akt_len &&
+                blxDevice.sys_param_dirtyflag === false) {
+                // No Changes found
+                blxParameterEdit.innerHTML = ""
+                blxCmdRes.textContent = "No Changes"
+                return
+            } else if (store_sysParam === undefined) {
+                store_sysParam = {
+                    v: {}
+                } // Need Obj
+            }
+
+            blxDevice.sys_param_dirtyflag = true
+
+            const enc2 = new TextEncoder()
+            store_sysParam.v.bytebuf = enc2.encode(blxDevice.sys_param.join('\n') + '\n')
+            store_sysParam.v.crc32 = blx.getCrc32(store_sysParam.v.bytebuf)
+            store_sysParam.v.total_len = store_sysParam.v.bytebuf.length
+            store_sysParam.v.akt_len = store_sysParam.v.total_len
+            store_sysParam.v.ctime = new Date(blxDevice.sys_param[4] * 1000)
+            store_sysParam.v.esync_flag = true // Not set by Server->Device!
+
+            await blStore.set(blxDevice.deviceMAC + '_sys_param.lxp', store_sysParam.v) // First Store
+            await _blxCmdSend(".fput " + blxDevice.deviceMAC + '_sys_param.lxp') // Then Upload 
+            if (_blxCmdResult) {
+                throw _blxCmdResult
+            }
+            await _blxCmdSend("Y") // Check SysParam
+            if (_blxCmdResult) {
+                throw _blxCmdResult
+            }
+
+            // If all OK: Remove edited Params and store Backup
+            blxParameterEdit.innerHTML = ""
+            blxDevice.sys_param_dirtyflag = false
+            await blStore.set(blxDevice.deviceMAC + '_#BAK_sys_param.lxp', store_sysParam.v)
+        } catch (err) {
+            alert(err + "\nRecommendation: Retry!")
+            document.getElementById("blxCmdRes").textContent = err
+        }
+    }
+} // blxParSend
+
+function blxParCancel(typ) {
+    if (!typ) blxDevice.iparam = original_par
+    else blxDevice.sys_param = original_par
+    blxParameterEdit.innerHTML = ""
+    blxCmdRes.textContent = "Edit Parameters Cancelled"
+}
+
+function blxIparamAddChannel() { // Only for iparam
+    try {
+        blxEditedParamGet() // Get changes first
+        blx.IparamAddChannel(blxDevice.iparam, true)
+        blxParameterEdit.innerHTML = ""
+        blxParameters(false, 0)
+    } catch (error) {
+        blxCmdRes.textContent = error
+    }
+}
+
+// Edit Parameters typ: 0:iparam, 1:sys_param
+function blxParameters(orig_copy, typ) {
+    const parray = typ ? blxDevice.sys_param : blxDevice.iparam
+    if (orig_copy === true) {
+        // Make Deep Copy from Original if called from GUI
+        original_par = []
+        if (parray === undefined) {
+            alert("ERROR: Iparam-Check(1):\nNo Parameters found!")
+            return
+        }
+        for (let i = 0; i < parray.length; i++) original_par[i] = parray[i]
+        let cres = blx.IparamValidate(blxDevice.iparam)
+        if (cres) {
+            alert("ERROR: Iparam-Check(2):\n" + cres)
+            return
+        }
+    }
+
+    let beschr
+    let bidx = 0
+    let rel = 0
+    let phtml = ""
+    let lparam = '???'
+    let section = -1
+    for (let i = 0; i < parray.length; i++) {
+        lparam = parray[i]
+        if (lparam.charAt(0) === '@') {
+            section = parseInt(lparam.substr(1))
+            if (section === 100) {
+                beschr = p100_beschr
+                beschr[0] = "*=== System ==="
+            } else if (section === 200) {
+                beschr = p200_beschr
+                beschr[0] = "*=== Sys_Param ==="
+            } else {
+                beschr = pkan_beschr
+                beschr[0] = "*=== Channel #" + section + " ==="
+            }
+            bidx = 0
+            rel = 0
+            phtml += "<hr>"
+        } else {
+            rel++
+        }
+        // Build 1 line and name Elements '_pidxNN'
+        phtml += '[' + i + '(+' + rel + ')]' + '<input type="text" id="_pidx' + i + '"  value="' + lparam + '"'
+        if (beschr[rel] !== undefined && beschr[rel].charAt(0) === '*') phtml += " disabled"
+        phtml += "> '" + beschr[rel] + "'<br>"
+    }
+    phtml += "<br><button onclick='blxParSend(" + typ + ")'>Send..</button> "
+    // iparam cann add channel
+    if (!typ) phtml += "<button onclick='blxIparamAddChannel()'>Add Channel</button> "
+    phtml += "&nbsp;&nbsp;&nbsp;<button onclick='blxParCancel(" + typ + ")'>Cancel</button> "
+    phtml += "<hr>"
+    blxParameterEdit.innerHTML = phtml
+}
+//*********** Parameter-Edit END ******************
+
+async function blxMemoryInfo() {
+    disabler(true)
+    try {
+        await _blxCmdSend("v") // Scan vdir first
+        await calculateMemory(true)
+    } catch (error) {
+        blxCmdRes.textContent = error
+    }
+    disabler(false)
+}
+
 
 //---------------- setup ------------
 function setup() {
@@ -210,17 +723,35 @@ function setup() {
         urlpar[kv[0]] = kv[1]
     }
 
+    if (urlpar.badge !== undefined) { // Show Print Badge
+        blxBadge.style.display = "block"
+    }
+
+
     blx.setTerminal('blxTerminal', bleCallback) // Initially Show Terminal in div 'blxTerminal'
     //blx.setTerminal(undefined, bleCallback) // Initially Hide Terminal in div 'blxTerminal'
     setInterval(_blxBusyMonitor, 1000)
 
-    document.getElementById('button0-link').addEventListener('click', blxConnect)
-    document.getElementById('button1-terminal').addEventListener('click', () => location.href = '#section_terminal')
+    button0Link.addEventListener('click', blxConnect)
+    button1Terminal.addEventListener('click', () => location.href = '#section_terminal')
+    button2MainMenu.addEventListener('click', () => location.href = '#section_main')
 
-    // Scanner Output via Terminal
+    blxBadgeButton.addEventListener('click', blxPrintBadge)
+    blxSetPinButton.addEventListener('click', blxSetPin)
+    blxInfoButton.addEventListener('click', blxMemoryInfo)
+    blxSyncButton.addEventListener('click',blxSyncTime)
+    blxUploadButton.addEventListener('click',blxUpload)
+    blxMeasureButton.addEventListener('click',blxMeasure)
+
+
+    // Scanner-printf via Terminal-printf
     QRS.setQrLogPrint(blx.terminalPrint)
-
 }
+
+// -- Debugging --
+function dbg_action() {
+}
+document.getElementById('dbg-action').addEventListener('click', dbg_action)
 
 setup()
 
