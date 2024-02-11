@@ -120,12 +120,12 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
     color: var(--txtblack);
     overflow: auto;
 
-	button {
+    button {
         /* In Sidenav: vertikal stapeln */
         display: block;
         width: 100%;
         text-align: left;
-	}
+    }
 
     &.navhidden {
         display: none;
@@ -156,7 +156,7 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
     .navinfo {
         background-color: var(--infogray);
         display: block;
-        padding: 8px;
+        padding: 2px 8px;
         white-space: nowrap;
         overflow: hidden;
         opacity: 1;
@@ -220,8 +220,10 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
 /* Collapsed content */
 .collapse {
     .navinfo {
-        opacity: 0;
-        transition: var(--scrollms);
+        text-overflow: ellipsis;
+        /* opacity: 0.5;
+        font-size: calc(0.75rem * var(--fontrel)); 
+        transition: var(--scrollms); */
     }
 
     .navitem-txt {
@@ -287,12 +289,44 @@ button {
 }
 
 dialog {
-    border: 4px solid var(--midgray);;
-    border-radius: 4px;
+    border: 4px solid var(--midgray);
+    border-radius: 8px;
     background-color: var(--white);
     color: var(--txtblack);
     font-size: calc(1rem * var(--fontrel));
     padding: 8px;
+    position: relative;
+    overflow: auto;
+    white-space: nowrap;
+
+    &#spinner {
+        border: none;
+        background-color: transparent;
+        overflow: hidden;
+    }
+
+    #dlgBtnClose, #editBtnClose {
+        position: absolute;
+        border: none;
+        background-color: var(--lightgray);
+        top: 0;
+        right: 0;
+        font-size: calc(1.5rem * var(--fontrel));
+        padding: 8px;
+
+        &:hover {
+            background-color: var(--hovergray);
+        }
+    }
+
+    #dlgBtnOK {
+        border: none;
+        background-color: var(--lightgray);
+        padding: 8px;
+        &:hover {
+            background-color: var(--hovergray);
+        }
+    }
 }
 
 /***/

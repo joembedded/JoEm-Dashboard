@@ -49,27 +49,10 @@
     <div class="ccontent">
         <div class="hccontainer">
             <nav id="sidebar_left" class="clnav">
-                <div class="navinfo"><b>Main</b></div>
-
-                <!-- Navigatiins-item besteht immer aus 2 oder 3 Elementen: -->
-                <button id="button0-link" class="navitem" style="color:blue">
-                    <i class="fa-brands fa-fw fa-bluetooth"></i>
-                    <span id="blxConnectButtonText" class="navitem-txt">Connect</span>
-                    <span class="navitem-pointout" style="background-color:gray;" hidden>
-                        -xx dBm
-                    </span>
-                </button>
-
-                <button class="navitem" disabled>
-                    <!-- class="navhidden" for Weg-Hidden.. disabled fuer halbhell, hidden fuer unsichtbar -->
-                    <i class="fa-solid fa-fw fa-file-waveform"></i>
-                    <span class="navitem-txt">(None)</span>
-                </button>
-
-                <div class="thin-hr"></div>
+                <div class="navinfo"><b>Menu</b></div>
 
                 <button id="button2-maincontent" class="navitem">
-                    <i class="fa-solid fa-fw fa-display"></i>
+                    <i class="fa-solid fa-fw fa-house"></i>
                     <span class="navitem-txt">Main Content</span>
                 </button>
 
@@ -77,6 +60,26 @@
                     <i class="fa-solid fa-fw fa-keyboard"></i>
                     <span class="navitem-txt">Terminal</span>
                 </button>
+
+
+                <div class="thin-hr"></div>
+
+                <!-- Navigatiins-item besteht immer aus 2 oder 3 Elementen: -->
+                <button id="button0-link" class="navitem" style="color:blue">
+                    <i class="fa-brands fa-fw fa-bluetooth"></i>
+                    <span id="blxConnectButtonText" class="navitem-txt">Connect</span>
+                    <span id="blxSignal" class="navitem-pointout" style="background-color:gray;" hidden>- dBm</span>
+                </button>
+
+
+                <button id="button3-device" class="navitem" disabled>
+                    <!-- class="navhidden" for Weg-Hidden.. disabled fuer halbhell, hidden fuer unsichtbar -->
+                    <i class="fa-solid fa-fw fa-file-waveform"></i>
+                    <span class="navitem-txt">(None)</span>
+                </button>
+
+                <div class="thin-hr"></div>
+
 
             </nav>
 
@@ -91,7 +94,6 @@
                             MAC:<span id="blxMAC">-</span>
                             Type:<span id="blxType">-</span>
                             FW:V<span id="blxFW">-</span>
-                            Sig.(dbm):<span id="blxSignal">-</span>
                             <br>
                             <br>
 
@@ -117,7 +119,7 @@
                             </span>
 
                             <span id="blxSyncButtonSpan" style="display:none">
-                                <button disabled id="blxSyncButton" >Synchronize Time</button>
+                                <button disabled id="blxSyncButton">Synchronize Time</button>
                                 Delta(sec):<span id="blxSync">-</span>
                                 <br>
                                 <br>
@@ -138,18 +140,17 @@
                             <br>
 
                             <span id="blxClearButtonSpan" style="display:none">
-                                <button disabled id="blxClearButton" onclick="blxClear()">Clear Memory</button>
+                                <button disabled id="blxClearButton">Clear Memory</button>
                                 <br>
                                 <br>
                             </span>
 
                             <span id="blxParametersSpan" style="display:none; white-space: nowrap;">
-                                <button disabled id="blxParametersButton" onclick="blxParameters(true,0)">Device
+                                <button disabled id="blxParametersButton">Device
                                     Parameter</button>
-                                <button disabled id="blxSysParButton" onclick="blxParameters(true,1)">Device
+                                <button disabled id="blxSysParButton">Device
                                     SysPar</button>
-                                Parameters:<span id="blxParameterEdit">-</span>
-                                <br>
+
                                 <br>
                             </span>
 
@@ -157,9 +158,6 @@
                             State: <span id="blxStateText">Ready</span>(<span id="blxStateSpinner">-</span>)<br>
                             Result: <span id="blxCmdRes">-</span>
                         </div>
-                        <hr>
-                        List of known Devices: <button onclick="updateDeviceList()">Update</button>
-                        <div id='blxDeviceList'></div>
                     </div>
                     <hr>
                 </div>
@@ -180,6 +178,33 @@
     </footer>
 
     <!-- Dialog Elements <dialog> / Modal new in HTML5 -->
+    <dialog id="edit-params">
+        <button id='editBtnClose'>&#10006;</button>
+        <div id="blxParameterEdit">-</div>
+
+        <br>
+        <div>
+            <button id='editBtnSend'>Send...</button>
+            <button id='editBtnAddChannel' hidden>Add Channel</button>
+        </div>
+    </dialog>
+
+    <!-- Globaler Spinner -->
+    <dialog id='spinner'>
+        <h1><i class="fa-solid fa-spinner fa-2xl fa-spin" style="color: blue"></i></h1>
+    </dialog>
+
+    <!-- Dialog mit OK und optional 2. Bestaetigung -->
+    <dialog id='ok-dialog'>
+        <button id='dlgBtnClose'>&#10006;</button>
+        <div id="ok-content">
+        </div>
+        <br>
+        <div style='text-align: center;'><input id='dlgBtnChk' type="checkbox"> <button id='dlgBtnOK' disabled>&#10004;
+                OK</button></div>
+    </dialog>
+
+    <!-- Externer Dialog aus qrscanner.js -->
     <dialog id='qrscanner-dialog'>
         <video style="display: none;" id='qroriginal-video' playsinline mute></video>
         <div id='qrvideo-header'><select id='qrcam-selector'></select></div>
