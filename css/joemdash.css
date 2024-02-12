@@ -27,7 +27,7 @@
     /* == User-Aenderbare Vars ENDE == */
 
     /* Linearisation with Trend-line for fontrel 0.5.1,2 */
-    --lnavwidth_max: calc(32px + var(--fontrel)*280px);
+    --lnavwidth_max: calc(32px + var(--fontrel)*220px);
     --lnavwidth_small: calc(32px + var(--fontrel)*32px);
 
     /* Heights Header/Footer, unterschiedlich falls noch Menues rein muessen*/
@@ -45,6 +45,13 @@ body {
     color: black;
     font-family: sans-serif;
     font-size: calc(1rem * var(--fontrel));
+}
+select, option {
+    font-size: inherit;
+}
+input[type=checkbox] {
+    width: calc(1rem * var(--fontrel));
+    height: calc(1rem * var(--fontrel));
 }
 
 /*--- Spacer (thin black line) (separate Menue items )---*/
@@ -305,7 +312,7 @@ dialog {
         overflow: hidden;
     }
 
-    #dlgBtnClose, #editBtnClose {
+    #dlgBtnClose, #editBtnClose, #setupBtnClose{
         position: absolute;
         border: none;
         background-color: var(--lightgray);
@@ -319,7 +326,7 @@ dialog {
         }
     }
 
-    #dlgBtnOK {
+    #dlgBtnOK , #setupBtnOK, #editBtnSend, #editBtnAddChannel {
         border: none;
         background-color: var(--lightgray);
         padding: 8px;

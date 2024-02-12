@@ -57,13 +57,14 @@ const blxParameterEdit = document.getElementById("blxParameterEdit")
 const button0Link = document.getElementById("button0-link")
 const button1Terminal = document.getElementById("button1-terminal")
 const button2MainMenu = document.getElementById("button2-maincontent")
-const button3Device = document.getElementById("button3-device")
+const button3Setup = document.getElementById("button3-setup")
 
 // Dialoge
 //const qrscannerDialog = document.getElementById("qrscanner-dialog") - via openSelectedCamera()
 const spinnerDLG = document.getElementById("spinner")
 const okDialogDOM = document.getElementById("ok-dialog")
 const editParamDLG = document.getElementById("edit-params")
+const setupDLG = document.getElementById("setup-dialog")
 
 //================ TESTSACHEN ANFANG ============
 //================ TESTSACHEN ENDE ============
@@ -248,6 +249,7 @@ async function _blxCmdSend(cmd, cmdtimeout) {
         _blxCmdFreeCnt = 0
         blxStateText.textContent = "ERROR: " + error
         _blxCmdResult = error
+        if (connectionLevel <= 2) bleCallback('CON', 0) // Reset Connection
     }
 }
 
@@ -309,7 +311,10 @@ async function show_details() {
             await calculateMemory(true)
             await showLink()
         }
-        blxSync.textContent = blxDevice.deltaToApp
+        const secs = blxDevice.deltaToApp
+        let delta = secs + " sec"
+        if (secs > 86400) delta = (secs / 86400).toFixed(3) + " d"
+        blxSync.textContent = delta
         blxInfoLine.textContent = "Connected"
         blxMeasureData.innerHTML = '-'
         blxParameterEdit.innerHTML = ""
@@ -335,6 +340,7 @@ async function blxConnect() {
     }
     spinnerClose()
     disabler(false)
+    JD.sidebarMax(0.5)
 }
 
 // Print a Badge (if Labeprinter is enabled) Factory Function!
@@ -510,8 +516,8 @@ function blxEditedParamGet(typ) {
 // If Parameter Transfer fails, Risk of not complete iparam.lxp on Device
 // Then retry! In any case: Last known Parameters are stored as '..#BAK#_iparam.lxp'
 async function blxParSend(typ) {
+    let result
     spinnerShow()
-console.log("IparamSendm Typ:",typ)
     if (!typ) { // iparam
         try {
             blxEditedParamGet(0)
@@ -532,10 +538,9 @@ console.log("IparamSendm Typ:",typ)
                 filebuf.length === store_iparam.v.akt_len &&
                 blxDevice.iparam_dirtyflag === false) {
                 // No Changes found
-                blxParameterEdit.innerHTML = ""
                 blxCmdRes.textContent = "No Changes"
                 spinnerClose()
-                return
+                return result
             } else if (store_iparam === undefined) {
                 store_iparam = {
                     v: {}
@@ -569,8 +574,9 @@ console.log("IparamSendm Typ:",typ)
             blxDevice.iparam_dirtyflag = false
             await blStore.set(blxDevice.deviceMAC + '_#BAK_iparam.lxp', store_iparam.v)
         } catch (err) {
-            alert(err + "\nRecommendation: Retry!")
+            await okDialogDo(`<b>Parameter Check 'iparam'</b><br><br><br>${err}<br>`)
             blxCmdRes.textContent = err
+            result = err
         }
     } else { // SysParam
         try {
@@ -593,8 +599,8 @@ console.log("IparamSendm Typ:",typ)
                 // No Changes found
                 blxParameterEdit.innerHTML = ""
                 blxCmdRes.textContent = "No Changes"
-                spinnerClose()  
-                return
+                spinnerClose()
+                return result
             } else if (store_sysParam === undefined) {
                 store_sysParam = {
                     v: {}
@@ -626,11 +632,13 @@ console.log("IparamSendm Typ:",typ)
             blxDevice.sys_param_dirtyflag = false
             await blStore.set(blxDevice.deviceMAC + '_#BAK_sys_param.lxp', store_sysParam.v)
         } catch (err) {
-            alert(err + "\nRecommendation: Retry!")
-            document.getElementById("blxCmdRes").textContent = err
+            await okDialogDo(`<b>Parameter Check 'sys_param'</b><br><br><br>${err}<br>`)
+            blxCmdRes.textContent = err
+            result = err
         }
     }
     spinnerClose()
+    return result
 } // blxParSend
 
 // Kaskadierbar
@@ -683,7 +691,7 @@ function blxParameters(orig_copy, typ) {
     let beschr
     let bidx = 0
     let rel = 0
-    let phtml = "<b>Parameter Edit ('" + (typ?"sys_param":"iparam")+"')</b><br><br><br>"
+    let phtml = "<b>Parameter Edit ('" + (typ ? "sys_param" : "iparam") + "')</b><br><br><br>"
     let lparam = '???'
     let section = -1
     for (let i = 0; i < parray.length; i++) {
@@ -711,10 +719,38 @@ function blxParameters(orig_copy, typ) {
         if (beschr[rel] !== undefined && beschr[rel].charAt(0) === '*') phtml += " disabled"
         phtml += "> '" + beschr[rel] + "'<br>"
     }
-
-    editParamDialogDo(typ,phtml)
+    blxParameterEdit.innerHTML = phtml
 
 }
+async function blxEditIparam() {
+    blxParameters(true, 0)
+    for (; ;) {
+        const res = await editParamDialogDo(0)
+        if (res === 's') {
+            const sres = await blxParSend(0)
+            if (!sres) break // Alles OK
+        } else {
+            blxParCancel(0)
+            break;
+        }
+    }
+}
+async function blxEditSysparam() {
+    blxParameters(true, 1)
+
+    blxParameters(true, 0)
+    for (; ;) {
+        const res = await editParamDialogDo(1)
+        if (res === 's') {
+            const sres = await blxParSend(1)
+            if (!sres) break // Alles OK
+        } else {
+            blxParCancel(1)
+            break;
+        }
+    }
+}
+
 //*********** Parameter-Edit END ******************
 
 async function blxMemoryInfo() {
@@ -753,83 +789,136 @@ async function blxClearDevice() {
     }
     disabler(false)
 }
+
+
 //---- helpers----
 async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
     let np = new Promise(resolve => setTimeout(resolve, ms))
     return np;
 }
-
-// Ein OK-Dialog mit optional Doppelter Bestaetigung
-// Bsp: "<b>Test</b><br><br><br>Was soll ich klicken?"
-
-x // Problem:  Anonyme Funktionen werdn JEDESMAL hinzugefuegt... Daher nur EINMALIG
-
+// ---------- okDialog -------------
+let okDialoginit = false
+let okDialogOpenFlag
+let okDialogResult
 async function okDialogDo(question, xconfirm = false) {
-    let okDialogOpenFlag = true
-    let okDialogResult = false
     blx.frq_ping(880, 0.3, 0.3)
     // addEventListener only one instance added
     okDialogDOM.querySelector('#ok-content').innerHTML = question
-    okDialogDOM.querySelector('#dlgBtnClose').addEventListener('click', () => {
-        okDialogDOM.close()
-        okDialogOpenFlag = false
-    })
     const okbut = okDialogDOM.querySelector('#dlgBtnOK')
     const okchk = okDialogDOM.querySelector('#dlgBtnChk')
-    okbut.addEventListener('click', () => {
-        okDialogResult = true
-        okDialogDOM.close()
-        okDialogOpenFlag = false
-    })
+    if (!okDialoginit) {
+        okbut.addEventListener('click', () => {
+            okDialogResult = true
+            okDialogOpenFlag = false
+        })
+        okDialogDOM.querySelector('#dlgBtnClose').addEventListener('click', () => {
+            okDialogOpenFlag = false
+        })
+        okchk.addEventListener('click', () => {
+            okbut.disabled = !okchk.checked
+        })
+        okDialoginit = true
+        okDialogResult = false
+    }
     if (!xconfirm) {  // Extra Confirm required
         okbut.disabled = false
         okchk.hidden = true
     } else {
         okbut.disabled = true
         okchk.hidden = false
-        okchk.addEventListener('click', (e) => {
-            okbut.disabled = !okchk.checked
-        })
     }
+
+    okDialogOpenFlag = true
     okDialogDOM.showModal()
     for (; ;) {
         await dashSleepMs(50)
-        if (!okDialogOpenFlag) return okDialogResult
+        if (!okDialogOpenFlag) break
     }
+    okDialogDOM.close()
+    return okDialogResult
+
 }
 
-async function editParamDialogDo(typ, html) {
-    console.log("Edit:",typ)
-    let editParamDialogOpenFlag = true
-    let editParamDialogResult = false
-    // addEventListener only one instance added
-    blxParameterEdit.innerHTML = html
-    editParamDLG.querySelector('#editBtnClose').addEventListener('click', () => {
-        editParamDLG.close()
-        editParamDialogOpenFlag = false
-    })
+// ------------- editParameterDialog ------------
+let editParamDialogInit = false
+let editParamDialogOpenFlag
+let editParamDialogResult
+async function editParamDialogDo(typ) {
     const achan = editParamDLG.querySelector('#editBtnAddChannel')
-    if(!typ){
+    if (!editParamDialogInit) {
+        editParamDLG.querySelector('#editBtnClose').addEventListener('click', () => {
+            editParamDialogResult = 'x' // Simple Close
+            editParamDialogOpenFlag = false
+        })
         achan.addEventListener('click', blxIparamAddChannel)
+        editParamDLG.querySelector('#editBtnSend').addEventListener('click', () => {
+            editParamDialogResult = 's' // SEND
+            editParamDialogOpenFlag = false
+        })
+        editParamDialogInit = true
+    }
+
+    if (!typ) {
         achan.hidden = false
-    }else{
+    } else {
         achan.hidden = true
     }
-    editParamDLG.querySelector('#editBtnSend').addEventListener('click', (e)=> {
-    console.log("Send:",typ)
-        blxParSend(typ)
-        editParamDLG.close()
-        editParamDialogOpenFlag = false
-    })
+    editParamDialogOpenFlag = true
+    editParamDialogResult = '?' // Unknown
     editParamDLG.showModal()
     for (; ;) {
         await dashSleepMs(50)
-        if (!editParamDialogOpenFlag) return editParamDialogResult
+        if (!editParamDialogOpenFlag) break
     }
+    editParamDLG.close()
+    return editParamDialogResult
+}
+
+//---------- SetupDialog ---------
+let setupDialogInit = false
+let setupDialogOpenFlag
+let setupOptions = { dtheme: false, font: 100, lang: 'en' }
+async function blxSetup() {
+    if (!setupDialogInit) {
+        setupDLG.querySelector('#setupBtnClose').addEventListener('click', () => {
+            setupDialogOpenFlag = false
+        })
+        setupDLG.querySelector('#setupBtnOK').addEventListener('click', () => {
+            setupDialogOpenFlag = false
+        })
+        setupDLG.querySelector('#jd-theme').addEventListener('click', (e) => {
+            JD.dashToggleTheme()
+            setupOptions.dtheme = !setupOptions.dtheme
+        })
+        setupDLG.querySelector('#jd-fontsize').addEventListener('change', (e) => {
+            const fs = setupDLG.querySelector('#jd-fontsize').value
+            setupOptions.font = parseInt(fs)
+            JD.dashSetFont(setupOptions.font / 100)
+        })
+        setupDLG.querySelector('#jd-lang').addEventListener('change', (e) => {
+            const ll = setupDLG.querySelector('#jd-lang').value
+            setupOptions.lang = ll
+            // Lang setzen
+        })
+        setupDialogInit = true
+    }
+
+    setupDLG.querySelector('#jd-theme').checked = setupOptions.dtheme
+    setupDLG.querySelector('#jd-fontsize').value = setupOptions.font + '%'
+    setupDLG.querySelector('#jd-lang').value = setupOptions.lang
+
+    setupDialogOpenFlag = true
+    setupDLG.showModal()
+    for (; ;) {
+        await dashSleepMs(50)
+        if (!setupDialogOpenFlag) break
+    }
+    setupDLG.close()
+    await blStore.set('#blxDash_#SETUP', setupOptions)
 }
 
 //---------------- setup ------------
-function setup() {
+async function setup() {
     // Isolate URL Parameters
     const qs = location.search.substr(1).split('&')
     var urlpar = {}
@@ -843,14 +932,19 @@ function setup() {
         blxBadge.style.display = "block"
     }
 
-
     blx.setTerminal('blxTerminal', bleCallback) // Initially Show Terminal in div 'blxTerminal'
     //blx.setTerminal(undefined, bleCallback) // Initially Hide Terminal in div 'blxTerminal'
     setInterval(_blxBusyMonitor, 1000)
 
     button0Link.addEventListener('click', blxConnect)
-    button1Terminal.addEventListener('click', () => location.href = '#section_terminal')
-    button2MainMenu.addEventListener('click', () => location.href = '#section_main')
+    button1Terminal.addEventListener('click', () => {
+        location.href = '#section_terminal'
+        JD.sidebarMax(0.5)
+    })
+    button2MainMenu.addEventListener('click', () => {
+        location.href = '#section_main'
+        JD.sidebarMax(0.5)
+    })
 
     blxBadgeButton.addEventListener('click', blxPrintBadge)
     blxSetPinButton.addEventListener('click', blxSetPin)
@@ -860,17 +954,27 @@ function setup() {
     blxMeasureButton.addEventListener('click', blxMeasure)
     blxClearButton.addEventListener('click', blxClearDevice)
 
-    blxParametersButton.addEventListener('click', () => blxParameters(true, 0))
-    blxSysParButton.addEventListener('click', () => blxParameters(true, 1))
+    blxParametersButton.addEventListener('click', blxEditIparam)
+    blxSysParButton.addEventListener('click', blxEditSysparam)
+    button3Setup.addEventListener('click', blxSetup)
 
     // Scanner-printf via Terminal-printf
     QRS.setQrLogPrint(blx.terminalPrint)
+
+    await blStore.get('#blxDash_#SETUP')
+    const so = blStore.result()
+    if(so!==undefined) {
+        setupOptions = so.v
+        if(setupOptions.dtheme)   JD.dashToggleTheme()
+        if(setupOptions.font) JD.dashSetFont(setupOptions.font / 100)
+        // if(so.lang) // lang setzen
+    }
 }
 
 // -- Debugging --
 async function dbg_action() {
-    editParamDialogDo(1,"<b>Edit Parameter</b>")
-    
+    //await editParamDialogDo(1, "<b>Edit Parameter</b>")
+    await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false)
 }
 document.getElementById('dbg-action').addEventListener('click', dbg_action)
 

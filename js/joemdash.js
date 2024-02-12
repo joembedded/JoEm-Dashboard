@@ -18,6 +18,15 @@ function sidebar() {
     document.documentElement.style.setProperty('--lnavwidth_wrk', pdst)
 }
 
+// Limit to x of viewport if expanded
+export function sidebarMax(factor) {
+    if(sidebarState) return
+    const scw = document.documentElement.clientWidth;
+    const sbw = document.querySelector('.clnav').clientWidth;
+    if(sbw > scw * factor)  document.documentElement.style.setProperty('--lnavwidth_wrk', (scw * factor) + "px")
+    sidebarState = 5
+}
+
 // Font setzen - Wichtig dabei nochmal Grenzen checken
 export function dashSetFont(nrel) {
     if(nrel<0.5) nrel = 0.5
@@ -42,12 +51,12 @@ export function dashToggleTheme() {
 function dashInit() {
     const scw = document.documentElement.clientWidth;
     const sbw = document.querySelector('.clnav').clientWidth;
+    //console.log("Viewpowrt-Width:",scw, " Max Nav-Width:",sbw)
     if (scw * 0.5 < sbw) {
         sidebar()   // initial Shrinked on small screens
         sidebarState=5; // Next CLick: Shrink 
     }
     document.getElementById("sidebar_menue").addEventListener("click", sidebar)
-    
 }
 
 console.log("JoEmDash")
