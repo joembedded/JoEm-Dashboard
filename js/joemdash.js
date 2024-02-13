@@ -3,7 +3,7 @@
 export let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
 function sidebar_hint(){
     // BLACK LEFT-/RIGHT POINTING POINTER
-    const sbh = ['&larr;','&larr;','&rarr;','','','&rarr;']
+    const sbh = ['&ltrif;','&ltrif;','&rtrif;','','','&rtrif;']
     document.getElementById('cheader-hint').innerHTML=sbh[sidebarState]
 }
 function sidebar() {

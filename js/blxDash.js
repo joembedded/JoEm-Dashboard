@@ -794,7 +794,7 @@ async function blxClearDevice() {
     disabler(false)
 }
 
-async function blxServerDataSync(){
+async function blxServerDataSync() {
     console.log("ServerSync")
 }
 
@@ -804,60 +804,64 @@ async function updateDeviceList() {
     let lenTotal = 0
     await blStore.iterate(function (value) {
         const storemac = value.k.substr(0, 16)
+        // Search only MACs
         if (storemac.length === 16 && value.k.charAt(16) === '_') {
-            // Find entry for this MAC
+            // Find entry for with MAC
+            // console.log("STORE:",value)        
             let idx
+            // Find if MAC already exists
             for (let i = 0; i < devs.length; i++) {
                 if (devs[i].mac === storemac) {
                     idx = i
                     break
                 }
             }
+            // Optionally add to array of MACs
             if (idx === undefined) {
                 idx = devs.length
                 devs.push({
-                    'mac': storemac,
-                    'files': 0,
-                    tflen: 0,
-                    'advname': '(unknown)'
+                    mac: storemac, // 16 Digits
+                    files: [], // List of Files
+                    advname: '(unknown)', // Advertising Name
+                    pin: 0
                 })
             }
+            // Spezielle Files filtern
+            const fname = value.k.substr(17)
+            // console.log(storemac,fname)
             if (value.k === storemac + '_#BlxIDs') { // others: mac_#xxx: internal
                 devs[idx].advname = value.v.advertisingName
-            } else if (value.k.charAt(17) !== '#') {
-                devs[idx].files++
+            } else if (value.k === storemac + '_#PIN') { // others: mac_#xxx: internal
+                devs[idx].pin = value.v
+            } else if (value.k.charAt(17) !== '#') { // ignore local Backupfiles
                 if (value.v.akt_len !== undefined) {
-                    devs[idx].tflen += value.v.akt_len
                     lenTotal += value.v.akt_len
                 }
+                let sflag = false
+                if(fname === 'data.edt') sflag = true // **** TEST ***
+                devs[idx].files.push({
+                    fname: fname,
+                    aktlen: value.v.akt_len,
+                    syncflag: sflag
+                })
             }
         }
     })
 
-    let devlist = ""
-    navDevicelist.innerHTML=''
-    console.log("Devices: ",devs.length)
+    // Iterate End
 
+    /* SHow Test Data
+    console.log("Devs:",devs.length, " Total kB:",lenTotal/1024)
     for (let i = 0; i < devs.length; i++) {
-        devlist += 'Device:' + (devs[i].advname) + ' MAC:' + (devs[i].mac) + ': ' + devs[i].files + ' Files (' +
-            devs[i].tflen + ' Bytes)'
-        // Test if Graph Data available
-        try {
-            await blStore.get(devs[i].mac + '_xtract.edt')
-            const KeyVal = blStore.result() // undefined opt.
-            if (KeyVal !== undefined) {
-                devlist += "<br> &nbsp;&nbsp; - <a target='_blank' href='../gdraw.html?st=" + devs[i].mac +
-                    "_xtract.edt&sn=" +
-                    devs[i].advname + "'>Show Graph</a> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
-                    .toLocaleString() + ")<br>"
-            } else devlist += "<br>"
-        } catch (error) {
-            devlist += ' / (No Data)<br>'
+        const vf = devs[i].files
+        for(let ii = 0; ii<vf.length; ii++){
+            if(vf[ii].syncflag) console.log("Sync: ",devs[i].advname,vf[ii].fname,vf[ii].aktlen)
         }
     }
-    if (devs.length) {  // Else empty List
-        navDevicelist.innerHTML = "<small>Total: " + lenTotal + " Bytes:<br>" + devlist + "</small>"
-    }
+    */
+
+    AJAX!
+
 }
 
 
@@ -970,7 +974,7 @@ async function blxSetup() {
             const lng = setupDLG.querySelector('#jd-lang').value
             setupOptions.lang = lng
             I18.i18localize(lng)
-            
+
         })
         setupDialogInit = true
     }
@@ -1037,20 +1041,22 @@ async function setup() {
 
     await blStore.get('#blxDash_#SETUP')
     const so = blStore.result()
-    if(so!==undefined) {
+    if (so !== undefined) {
         setupOptions = so.v
-        if(setupOptions.dtheme)   JD.dashToggleTheme()
-        if(setupOptions.font) JD.dashSetFont(setupOptions.font / 100)
-        if(setupOptions.lang) I18.i18localize(setupOptions.lang)
+        if (setupOptions.dtheme) JD.dashToggleTheme()
+        if (setupOptions.font) JD.dashSetFont(setupOptions.font / 100)
+        if (setupOptions.lang) I18.i18localize(setupOptions.lang)
     }
 
-    updateDeviceList()
+    await updateDeviceList()
 }
 
 // -- Debugging --
 async function dbg_action() {
     //await editParamDialogDo(1, "<b>Edit Parameter</b>")
-    await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false)
+    //await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false)
+    await updateDeviceList()
+
 }
 document.getElementById('dbg-action').addEventListener('click', dbg_action)
 
