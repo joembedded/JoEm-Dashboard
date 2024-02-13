@@ -36,6 +36,9 @@ const blxMAC = document.getElementById("blxMAC")
 const blxType = document.getElementById("blxType")
 const blxFW = document.getElementById("blxFW")
 
+const navDevicelist = document.getElementById('nav-devicelist')
+
+
 // BLE Buttons
 const blxPinEnter = document.getElementById("blxPinEnter")
 const blxBadgeButton = document.getElementById("blxBadgeButton")
@@ -58,6 +61,7 @@ const button0Link = document.getElementById("button0-link")
 const button1Terminal = document.getElementById("button1-terminal")
 const button2MainMenu = document.getElementById("button2-maincontent")
 const button3Setup = document.getElementById("button3-setup")
+const button4ServerSync = document.getElementById("button4-sync")
 
 // Dialoge
 //const qrscannerDialog = document.getElementById("qrscanner-dialog") - via openSelectedCamera()
@@ -790,6 +794,72 @@ async function blxClearDevice() {
     disabler(false)
 }
 
+async function blxServerDataSync(){
+    console.log("ServerSync")
+}
+
+async function updateDeviceList() {
+    let devs = []
+    await blStore.count()
+    let lenTotal = 0
+    await blStore.iterate(function (value) {
+        const storemac = value.k.substr(0, 16)
+        if (storemac.length === 16 && value.k.charAt(16) === '_') {
+            // Find entry for this MAC
+            let idx
+            for (let i = 0; i < devs.length; i++) {
+                if (devs[i].mac === storemac) {
+                    idx = i
+                    break
+                }
+            }
+            if (idx === undefined) {
+                idx = devs.length
+                devs.push({
+                    'mac': storemac,
+                    'files': 0,
+                    tflen: 0,
+                    'advname': '(unknown)'
+                })
+            }
+            if (value.k === storemac + '_#BlxIDs') { // others: mac_#xxx: internal
+                devs[idx].advname = value.v.advertisingName
+            } else if (value.k.charAt(17) !== '#') {
+                devs[idx].files++
+                if (value.v.akt_len !== undefined) {
+                    devs[idx].tflen += value.v.akt_len
+                    lenTotal += value.v.akt_len
+                }
+            }
+        }
+    })
+
+    let devlist = ""
+    navDevicelist.innerHTML=''
+    console.log("Devices: ",devs.length)
+
+    for (let i = 0; i < devs.length; i++) {
+        devlist += 'Device:' + (devs[i].advname) + ' MAC:' + (devs[i].mac) + ': ' + devs[i].files + ' Files (' +
+            devs[i].tflen + ' Bytes)'
+        // Test if Graph Data available
+        try {
+            await blStore.get(devs[i].mac + '_xtract.edt')
+            const KeyVal = blStore.result() // undefined opt.
+            if (KeyVal !== undefined) {
+                devlist += "<br> &nbsp;&nbsp; - <a target='_blank' href='../gdraw.html?st=" + devs[i].mac +
+                    "_xtract.edt&sn=" +
+                    devs[i].advname + "'>Show Graph</a> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
+                    .toLocaleString() + ")<br>"
+            } else devlist += "<br>"
+        } catch (error) {
+            devlist += ' / (No Data)<br>'
+        }
+    }
+    if (devs.length) {  // Else empty List
+        navDevicelist.innerHTML = "<small>Total: " + lenTotal + " Bytes:<br>" + devlist + "</small>"
+    }
+}
+
 
 //---- helpers----
 async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
@@ -877,9 +947,10 @@ async function editParamDialogDo(typ) {
 //---------- SetupDialog ---------
 let setupDialogInit = false
 let setupDialogOpenFlag
-let setupOptions = { dtheme: false, font: 100, lang: 'en' }
+let setupOptions = { dtheme: false, font: 100, lang: 'EN' } // in 2 Gross-Buchstaben
 async function blxSetup() {
     if (!setupDialogInit) {
+        // Close und OK erstmal identisch!
         setupDLG.querySelector('#setupBtnClose').addEventListener('click', () => {
             setupDialogOpenFlag = false
         })
@@ -896,9 +967,10 @@ async function blxSetup() {
             JD.dashSetFont(setupOptions.font / 100)
         })
         setupDLG.querySelector('#jd-lang').addEventListener('change', (e) => {
-            const ll = setupDLG.querySelector('#jd-lang').value
-            setupOptions.lang = ll
-            // Lang setzen
+            const lng = setupDLG.querySelector('#jd-lang').value
+            setupOptions.lang = lng
+            I18.i18localize(lng)
+            
         })
         setupDialogInit = true
     }
@@ -957,6 +1029,8 @@ async function setup() {
     blxParametersButton.addEventListener('click', blxEditIparam)
     blxSysParButton.addEventListener('click', blxEditSysparam)
     button3Setup.addEventListener('click', blxSetup)
+    button4ServerSync.addEventListener('click', blxServerDataSync)
+
 
     // Scanner-printf via Terminal-printf
     QRS.setQrLogPrint(blx.terminalPrint)
@@ -967,8 +1041,10 @@ async function setup() {
         setupOptions = so.v
         if(setupOptions.dtheme)   JD.dashToggleTheme()
         if(setupOptions.font) JD.dashSetFont(setupOptions.font / 100)
-        // if(so.lang) // lang setzen
+        if(setupOptions.lang) I18.i18localize(setupOptions.lang)
     }
+
+    updateDeviceList()
 }
 
 // -- Debugging --

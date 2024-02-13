@@ -1,9 +1,14 @@
 /* joemdash.js - Sidebar state machine 21.01.2024 (C) Joembedded */
 
 export let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
+function sidebar_hint(){
+    // BLACK LEFT-/RIGHT POINTING POINTER
+    const sbh = ['&larr;','&larr;','&rarr;','','','&rarr;']
+    document.getElementById('cheader-hint').innerHTML=sbh[sidebarState]
+}
 function sidebar() {
     let pdst = "0px"
-    const nb = document.querySelectorAll('.clnav');
+    const nb = document.querySelectorAll('.clnav')
     sidebarState = (sidebarState + 1) % 3
     if (sidebarState) {
         if (sidebarState == 1) pdst = getComputedStyle(document.documentElement).getPropertyValue('--lnavwidth_small')
@@ -16,6 +21,7 @@ function sidebar() {
         nb.forEach((e) => e.classList.remove('collapse'))
     }
     document.documentElement.style.setProperty('--lnavwidth_wrk', pdst)
+    sidebar_hint()
 }
 
 // Limit to x of viewport if expanded
@@ -25,6 +31,7 @@ export function sidebarMax(factor) {
     const sbw = document.querySelector('.clnav').clientWidth;
     if(sbw > scw * factor)  document.documentElement.style.setProperty('--lnavwidth_wrk', (scw * factor) + "px")
     sidebarState = 5
+    sidebar_hint()
 }
 
 // Font setzen - Wichtig dabei nochmal Grenzen checken
@@ -32,9 +39,12 @@ export function dashSetFont(nrel) {
     if(nrel<0.5) nrel = 0.5
     else if (nrel>2) nrel = 2
     document.documentElement.style.setProperty('--fontrel', nrel)
-    if(sidebarState == 5) sidebarState = 0 // If directly after init
-    else sidebarState = (sidebarState + 2) % 3
+    const os = sidebarState
+    if(os == 5 ) sidebarState=0
+    else sidebarState = (os + 2) % 3
     sidebar()
+    if(os == 5) sidebarState=5
+    sidebar_hint()
 }
 
 

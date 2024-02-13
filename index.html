@@ -42,8 +42,8 @@
 <body class="shcontainer"> <!-- BODY START -->
 
     <header class="cheader">
-        <i class="fa fa-fw fa-bars " id="sidebar_menue"></i>
-        <span class="cheader-txt"><b>BLX Dashboard</b></span>
+        <i class="fa fa-fw fa-bars" id="sidebar_menue"><span id="cheader-hint">X</span></i>
+        <span class="cheader-txt"><b>BLX Dashboard</b> <span ll="lang">HierdieSPrache</span> </span>
     </header>
 
     <div class="ccontent">
@@ -64,7 +64,7 @@
                 <div class="thin-hr"></div>
 
                 <!-- Navigatiins-item besteht immer aus 2 oder 3 Elementen: -->
-                <button id="button0-link" class="navitem" style="color:blue">
+                <button id="button0-link" class="navitem" style="color:dodgerblue">
                     <i class="fa-brands fa-fw fa-bluetooth"></i>
                     <span id="blxConnectButtonText" class="navitem-txt">Connect</span>
                     <span id="blxSignal" class="navitem-pointout" style="background-color:gray;" hidden>- dBm</span>
@@ -79,6 +79,11 @@
 
                 <div class="navinfo"><b>Devices</b></div>
 
+                <button id="button4-sync" class="navitem">
+                    <i class="fa-solid fa-fw fa-arrows-rotate"></i>
+                    <span class="navitem-txt">Server-Sync</span>
+                </button>
+
                 <!-- class="navhidden" for Weg-Hidden.. disabled fuer halbhell, hidden fuer unsichtbar  -->
                 <button id="button3-device" class="navitem" disabled>
                     <i class="fa-solid fa-fw fa-file-waveform"></i>
@@ -86,6 +91,10 @@
                 </button>
 
                 <div class="thin-hr"></div>
+
+                <!-- Hier Liste der Geraet in HTML -->
+                <div id="nav-devicelist">
+                </div>
 
             </nav>
 
@@ -214,9 +223,9 @@
     <dialog id='setup-dialog'>
         <button id='setupBtnClose'>&#10006;</button>
         <div id="setup-content">
-            Setup<br><br><br>
-            Theme Dark/White: <input type="checkbox" id="jd-theme"> <br><br>
-            Font:
+            <b>Setup</b><br><br><br>
+            <span ll="set.theme">Theme Dark/White:</span> <input type="checkbox" id="jd-theme"> <br><br>
+            <span ll="set.fontsize">Fontsize:</span>
             <select id="jd-fontsize">
                 <option>50%</option>
                 <option>75%</option>
@@ -228,10 +237,10 @@
             </select>
             <br>
             <br>
-            Language:
+            <span ll="set.lang">Language:</span>
             <select id="jd-lang">
-                <option>de</option>
-                <option>en</option>
+                <option>DE</option>
+                <option>EN</option>
             </select>
             <br>
 

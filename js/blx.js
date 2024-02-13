@@ -2181,7 +2181,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
       terminal_lines = lines
       terminalParent = document.getElementById(elementId)
       // Format CMD-line as 3 component Flexbox with grow for input
-      terminalParent.innerHTML = "<div id='blxTerminalOut' style='border: 1px solid blue; margin: 6px 0; overflow:hidden;'></div>" +
+      terminalParent.innerHTML = "<div id='blxTerminalOut' style='border: 1px solid dodgerblue; margin: 6px 0; overflow:hidden;'></div>" +
         "<div style='display:flex; align-items: center;'>" +
         "<input id='blxTerminalCmd' typ='text' maxlength='80' placeholder='>' style='flex-grow: 1; margin: 0 4px 0 2px; min-width: 16px;'>" +
         "<button id='blxTerminalSend'>&#10004;</button></div>"
