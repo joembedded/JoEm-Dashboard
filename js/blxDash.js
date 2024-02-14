@@ -741,8 +741,6 @@ async function blxEditIparam() {
 }
 async function blxEditSysparam() {
     blxParameters(true, 1)
-
-    blxParameters(true, 0)
     for (; ;) {
         const res = await editParamDialogDo(1)
         if (res === 's') {
@@ -860,7 +858,7 @@ async function updateDeviceList() {
     }
     */
 
-    AJAX!
+    //AJAX!
 
 }
 
