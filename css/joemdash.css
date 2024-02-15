@@ -92,8 +92,8 @@ input[type=checkbox] {
         #cheader-hint { /* Rechts,Links oder leer */
             color: dodgerblue;
             position: absolute;
-            bottom: -10px;
-            right: -10px;
+            bottom: calc(-10px * var(--fontrel));
+            right: calc(-10px * var(--fontrel));
             font-size: calc(1.5rem * var(--fontrel));
         }
 

@@ -836,7 +836,7 @@ async function updateDeviceList() {
                     lenTotal += value.v.akt_len
                 }
                 let sflag = false
-                if(fname === 'data.edt') sflag = true // **** TEST ***
+                if (fname === 'data.edt') sflag = true // **** TEST ***
                 devs[idx].files.push({
                     fname: fname,
                     aktlen: value.v.akt_len,
@@ -848,15 +848,15 @@ async function updateDeviceList() {
 
     // Iterate End
 
-    /* SHow Test Data
-    console.log("Devs:",devs.length, " Total kB:",lenTotal/1024)
+    /* Show Test Data */
+    console.log("Devs:", devs.length, " Total kB:", lenTotal / 1024)
     for (let i = 0; i < devs.length; i++) {
         const vf = devs[i].files
-        for(let ii = 0; ii<vf.length; ii++){
-            if(vf[ii].syncflag) console.log("Sync: ",devs[i].advname,vf[ii].fname,vf[ii].aktlen)
+        for (let ii = 0; ii < vf.length; ii++) {
+            if (vf[ii].syncflag) console.log("Sync: ", devs[i].advname, vf[ii].fname, vf[ii].aktlen)
         }
     }
-    */
+    /* */
 
     //AJAX!
 
@@ -1050,10 +1050,46 @@ async function setup() {
 }
 
 // -- Debugging --
+async function SyncData2Server(url, data) { // ATTENTION: Fetch only via HTTPS/localhos possible
+    try {
+        const response = await fetch(url, {
+                method: "POST",
+                mode: "cors",
+                //credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+
+            if (response.status === 200) {
+                const result = await response.json()
+ console.log("Data: ",data)
+ console.log("OK: ",result)
+
+                return result;
+            } else throw "'" + response.status + ": " + response.statusText+"'"
+    } catch (err) { // Catch e.g. CORS Errors
+        console.log("ERROR:", err)
+        return "ERROR: " + err // 'ERROR: Magic first word
+    }
+}
+
+
 async function dbg_action() {
     //await editParamDialogDo(1, "<b>Edit Parameter</b>")
     //await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false)
-    await updateDeviceList()
+    //await updateDeviceList()
+
+    const test = {
+        name: 'Jürgen & Ute Wickenhäuser',
+        alter: 59,
+        kids: ['Laura', 'Jan']
+    }
+
+    //const remurl = './sync/blxremote.php'
+    const remurl = 'https://joembedded.de/wrk/fetch/blxremote.php'
+    await SyncData2Server(remurl, test)
 
 }
 document.getElementById('dbg-action').addEventListener('click', dbg_action)
