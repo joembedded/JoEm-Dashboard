@@ -872,7 +872,9 @@ async function updateDeviceList() {
     let ndl = '';
     for (let i = 0; i < devs.length; i++) { // For each known Device
         const dev = devs[i]
-        const tel = `<button class="navitem"><i class="fa-solid fa-fw fa-file-waveform"></i><span class="navitem-txt">${dev.advname}</span></button>`
+        const tel = `<button class="navitem"><i class="fa-solid fa-fw fa-file-waveform"></i><span class="navitem-txt">${dev.advname}`
+        if(xx)
+        tel += `</span></button>`
         ndl += tel
 
         const vf = devs[i].files
