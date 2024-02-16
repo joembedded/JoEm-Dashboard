@@ -948,15 +948,18 @@ async function editParamDialogDo(typ) {
 
 //---------- SetupDialog ---------
 let setupDialogInit = false
+let setupDialogResult
 let setupDialogOpenFlag
-let setupOptions = { dtheme: false, font: 100, lang: 'EN' } // in 2 Gross-Buchstaben
+let setupOptions = { dtheme: false, font: 100, lang: 'EN', server: './sync/blxremote.php', accesstoken: '123456' } // in 2 Gross-Buchstaben
 async function blxSetup() {
+    setupDialogResult = undefined
     if (!setupDialogInit) {
-        // Close und OK erstmal identisch!
+        // Close und OK erstmal identisch! - Handler fuer 'Sofort'-Felder:
         setupDLG.querySelector('#setupBtnClose').addEventListener('click', () => {
             setupDialogOpenFlag = false
         })
         setupDLG.querySelector('#setupBtnOK').addEventListener('click', () => {
+            setupDialogResult = 'ok'
             setupDialogOpenFlag = false
         })
         setupDLG.querySelector('#jd-theme').addEventListener('click', (e) => {
@@ -981,6 +984,11 @@ async function blxSetup() {
     setupDLG.querySelector('#jd-fontsize').value = setupOptions.font + '%'
     setupDLG.querySelector('#jd-lang').value = setupOptions.lang
 
+    // Statische Daten
+    setupDLG.querySelector('#jd-server').value = setupOptions.server
+    setupDLG.querySelector('#jd-accesstoken').value = setupOptions.accesstoken
+
+
     setupDialogOpenFlag = true
     setupDLG.showModal()
     for (; ;) {
@@ -988,6 +996,12 @@ async function blxSetup() {
         if (!setupDialogOpenFlag) break
     }
     setupDLG.close()
+    if(setupDialogResult === 'ok'){
+        setupOptions.server = setupDLG.querySelector('#jd-server').value
+        setupOptions.accesstoken = setupDLG.querySelector('#jd-accesstoken').value
+    }
+
+
     await blStore.set('#blxDash_#SETUP', setupOptions)
 }
 
@@ -1050,23 +1064,28 @@ async function setup() {
 }
 
 // -- Debugging --
-async function SyncData2Server(url, data) { // ATTENTION: Fetch only via HTTPS/localhos possible
+async function Talk2Server(remurl, scmd, accessToken, mac, filename, data) { // ATTENTION: Fetch only via HTTPS/localhos possible
     try {
-        const response = await fetch(url, {
+        const v = {
+            mac: mac,
+            filename: filename,
+            data: data,
+        } 
+        const response = await fetch(remurl+"?k="+accessToken+"&cmd="+scmd, {
                 method: "POST",
                 mode: "cors",
-                //credentials: "include",
+                //credentials: "include", // nur wenn kein Mit Wildcard Access 
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(v)
             })
 
             if (response.status === 200) {
                 const result = await response.json()
- console.log("Data: ",data)
- console.log("OK: ",result)
-
+                const ts = result.timestamp
+                if(ts !== undefined) result.date = new Date(ts * 1000)
+                console.log("OK: ",result)
                 return result;
             } else throw "'" + response.status + ": " + response.statusText+"'"
     } catch (err) { // Catch e.g. CORS Errors
@@ -1081,15 +1100,21 @@ async function dbg_action() {
     //await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false)
     //await updateDeviceList()
 
-    const test = {
-        name: 'Jürgen & Ute Wickenhäuser',
-        alter: 59,
-        kids: ['Laura', 'Jan']
-    }
 
     //const remurl = './sync/blxremote.php'
-    const remurl = 'https://joembedded.de/wrk/fetch/blxremote.php'
-    await SyncData2Server(remurl, test)
+    //const remurl = 'https://joembedded.de/wrk/fetch/blxremote.php'
+    const remurl = setupOptions.server
+    const accessToken = setupOptions.accesstoken
+
+    const mac = '0011223344556677'
+    const filename = 'testfile.dat'
+    const scmd = 'upsync'
+    const data = {
+        name: 'Jürgen & Ute Wickenhäuser',
+/*        alter: 59,
+        kids: ['Laura', 'Jan'] */
+    }
+    await Talk2Server(remurl, scmd, accessToken, mac, filename, data)
 
 }
 document.getElementById('dbg-action').addEventListener('click', dbg_action)

@@ -47,8 +47,10 @@ body {
     font-size: calc(1rem * var(--fontrel));
 }
 
+/* ---Only for checkbox set size --- */
 select,
-option {
+option,
+input {
     font-size: inherit;
 }
 

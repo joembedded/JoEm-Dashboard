@@ -224,8 +224,8 @@
         <button id='setupBtnClose'>&#10006;</button>
         <div id="setup-content">
             <b>Setup</b><br><br><br>
-            <span ll="set.theme">Theme Dark/White:</span> <input type="checkbox" id="jd-theme"> <br><br>
-            <span ll="set.fontsize">Fontsize:</span>
+            <label ll="set.theme" for="jd-theme">Theme Dark/White:</label> <input type="checkbox" id="jd-theme"> <br><br>
+            <label ll="set.fontsize" for ="js-fontsize">Fontsize:</label>
             <select id="jd-fontsize">
                 <option>50%</option>
                 <option>75%</option>
@@ -237,11 +237,21 @@
             </select>
             <br>
             <br>
-            <span ll="set.lang">Language:</span>
+            <label ll="set.lang" for="jd-lang">Language:</label>
             <select id="jd-lang">
-                <option>DE</option>
-                <option>EN</option>
+                <option>EN - English</option>
+                <option>DE - Deutsch</option>
             </select>
+            <br>
+
+            <br>
+            <label ll="set.server" for="jd-server">Remote Server:</label>
+            <input type ="text" id = "jd-server" size="48">
+            <br>
+
+            <br>
+            <label ll="set.accesstoken" for="jd-accesstoken">Remote Server:</label>
+            <input type ="text" id = "jd-accesstoken" size="48">
             <br>
 
         </div>

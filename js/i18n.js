@@ -11,7 +11,9 @@
       "set": {
         "theme": "Theme Dark/White",
         "fontsize": "Fontsize",
-        "lang": "Language"
+        "lang": "Language",
+        "server": "Remote Server",
+        "accesstoken": "Access Token",
       },
     },
 
@@ -21,7 +23,9 @@
       "set": {
         "theme": "Thema Dunkel/Hell",
         "fontsize": "Schriftgröße",
-        "lang": "Sprache"
+        "lang": "Sprache",
+        "server": "Server-Addresse",
+        "accesstoken": "Zugriffs-Token",
       },
     },
 
@@ -40,7 +44,8 @@
   elements.forEach((element) => {
     const key = element.getAttribute('ll')
     const nc = key.split('.').reduce((obj, i) => (obj ? obj[i] : null), json)
-    if(nc !== null) element.innerHTML = nc
+console.log(key,nc)
+    if(nc !== undefined) element.innerHTML = nc
     else console.warn(`i18n.js: Key:'${key}', Language:'${pageLang}' not found!`)
   })
   const htmlElement = document.querySelector('html')

@@ -1,8 +1,11 @@
 <?php
-	error_reporting(E_ALL);
 	// blxremote.php - Data uploader - JoEmbedded.de
 	// Test: http://localhost/wrk/joemdash/sync/blxremote.php
 	// oder  https://joembedded.de/wrk/fetch/blxremote.php
+
+	error_reporting(E_ALL);
+
+	
 	
 	// --- Write alternating Logfiles ('.php' prevents readout) ---
 	function addlog($xlog)
@@ -23,10 +26,6 @@
 		}
 	}
 
-	function exit_error($err){
-		echo "ERROR: $err";
-		exit();
-	}
 
 	// --- MAIN ---
 	$mtmain_t0 = microtime(true);         // for Benchmark 
@@ -36,20 +35,52 @@
 	// CORS WRAPPER
 	header('Access-Control-Allow-Origin: *');
 	header('Access-Control-Allow-Credentials: true');
-	header('Access-Control-Allow-Methods: *'); // Mit Wildcard Access: kein 'includ' bei fetch()
+	header('Access-Control-Allow-Methods: *'); // Mit Wildcard Access: kein 'include' bei fetch()
 	header('Access-Control-Allow-Headers: *'); 
 
+	// Verschiedenen Arten des Requests - //DBG
+	//file_put_contents("dbg_request.txt",var_export($_REQUEST,true)); // Named Parameter
+	//file_put_contents("dbg_body.txt",file_get_contents('php://input')); // fetch-body Parameter
 
-	// Verschiedenen Arten des Requests - Fuer Dbg
-	 file_put_contents("dbg_request.txt",var_export($_REQUEST,true)); // Named Parameter
-	 file_put_contents("dbg_body.txt",file_get_contents('php://input')); // fetch-body Parameter
+	$raw_arg = file_get_contents('php://input'); 
+	$reply = array();
 
-	$body_arg = file_get_contents('php://input'); 
-	if (strlen($body_arg)<2 || $body_arg[0] !== '{') exit_error("JSON entity missing");
-	
-	$data = array("LEN"=>strlen($body_arg), time());
+	try{
+		$key = @$_REQUEST['k'];
+		if($key !== '123456') throw new Exception ("Access denied");
 
-	echo json_encode($data);
+		$cmd = @$_REQUEST['cmd'];
+		if(!isset($cmd)) $cmd = '';
+		$xlog .= "(CMD:'$cmd')";
+
+		if (strlen($raw_arg)<2 || $raw_arg[0] !== '{') throw new Exception ("JSON entity missing");
+		$args = json_decode($raw_arg, true); //true: Arg. in $args[] as Ass.Array
+
+		$mac = @$args['mac'];
+		if (strlen($mac) != 16) throw new Exception("MAC len");
+		$mac = strtoupper($mac);
+		$filename = @$args['filename'];
+		if (!isset($filename) || !strlen($filename) ) throw new Exception("No Filename");
+		if (!isset($args['data'])) throw new Exception ("No 'data'");
+		if(!file_exists("./$mac/")){
+			mkdir("./$mac");
+			$xlog .= "(Gen Dir '$mac')";
+		}
+		$data = json_encode($args['data']);
+		file_put_contents("./$mac/$filename",$data);
+		$olen = strlen($data);
+		if( $olen >10240) $dlen = round($olen/1024,3)."kB";
+		else $dlen = $olen."kB";
+		$xlog .= "($mac/$filename => $dlen)";
+		$reply['status'] = "OK";
+	} catch(Exception $e) {
+		$xmsg = 'ERROR: '.$e->getMessage();
+		$reply['status'] = $xmsg;
+	}
+	$reply['timestamp'] = time();
+
+	echo json_encode($reply);
+	//file_put_contents("dbg_reply.txt",$reply); //DBG
 	
 	$mtrun = round((microtime(true) - $mtmain_t0) * 1000, 4);
 	$xlog .= "(Run:$mtrun msec)"; // Script Runtime
