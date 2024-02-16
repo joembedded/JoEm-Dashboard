@@ -86,7 +86,7 @@
 
                 <!-- class="navhidden" for Weg-Hidden.. disabled fuer halbhell, hidden fuer unsichtbar  -->
                 <button id="button3-device" class="navitem" disabled>
-                    <i class="fa-solid fa-fw fa-file-waveform"></i>
+                    <i class="fa-solid fa-fw fa-circle-plus"></i>
                     <span class="navitem-txt">Add Device</span>
                 </button>
 
@@ -188,8 +188,10 @@
     </div>
 
     <footer class="cfooter">
-        Footer
-        &nbsp;<button id="dbg-action">DBG-Action</button>
+        <span id="jd-footeronline" style="color: limegreen;"><i  class="fa-solid fa-link fa-lg"></i> Online</span>
+        <span hidden id="jd-footeroffline" style="color: red;"><i  class="fa-solid fa-link-slash fa-lg" ></i> Offline</span>
+        &nbsp;&nbsp;&nbsp;
+        <button  id="dbg-action">(Debug)</button>
     </footer>
 
     <!-- Dialog Elements <dialog> / Modal new in HTML5 -->
@@ -224,8 +226,14 @@
         <button id='setupBtnClose'>&#10006;</button>
         <div id="setup-content">
             <b>Setup</b><br><br><br>
-            <label ll="set.theme" for="jd-theme">Theme Dark/White:</label> <input type="checkbox" id="jd-theme"> <br><br>
-            <label ll="set.fontsize" for ="js-fontsize">Fontsize:</label>
+
+            <label ll="set.lang" for="jd-lang">Language</label>:
+            <select id="jd-lang">
+                <option>EN - English</option>
+                <option>DE - Deutsch</option>
+            </select>
+            &nbsp;
+            <label ll="set.fontsize" for ="jd-fontsize">Fontsize</label>:
             <select id="jd-fontsize">
                 <option>50%</option>
                 <option>75%</option>
@@ -237,20 +245,19 @@
             </select>
             <br>
             <br>
-            <label ll="set.lang" for="jd-lang">Language:</label>
-            <select id="jd-lang">
-                <option>EN - English</option>
-                <option>DE - Deutsch</option>
-            </select>
-            <br>
+            <label ll="set.theme" for="jd-theme">Theme Dark/White:</label>: <input type="checkbox" id="jd-theme"> 
 
             <br>
-            <label ll="set.server" for="jd-server">Remote Server:</label>
+            <br>
+            <label ll="set.server" for="jd-server">Remote Server</label>:<br>
+            <i class="fa-solid fa-globe fa-fw"></i>
             <input type ="text" id = "jd-server" size="48">
+            <button id = "jd-servertest"><i class="fa-solid fa-globe "></i> ...</button>
             <br>
 
             <br>
-            <label ll="set.accesstoken" for="jd-accesstoken">Remote Server:</label>
+            <label ll="set.accesstoken" for="jd-accesstoken">Remote Server:</label>:<br>
+            <i class="fa-solid fa-key fa-fw"></i>
             <input type ="text" id = "jd-accesstoken" size="48">
             <br>
 

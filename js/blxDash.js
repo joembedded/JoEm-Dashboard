@@ -70,6 +70,11 @@ const okDialogDOM = document.getElementById("ok-dialog")
 const editParamDLG = document.getElementById("edit-params")
 const setupDLG = document.getElementById("setup-dialog")
 
+// UI Elemente
+const jdFooteronline = document.getElementById("jd-footeronline")
+const jdFooteroffline = document.getElementById("jd-footeroffline")
+const jdServertest = document.getElementById("jd-servertest")
+
 //================ TESTSACHEN ANFANG ============
 //================ TESTSACHEN ENDE ============
 function disabler(disf) { // Dis-/En-abler for clickable Elements
@@ -223,8 +228,16 @@ function bleCallback(m, v, xinfo) {
 
 
 // Called all sec
+let lastOnlineState 
 function _blxBusyMonitor() {
     blxStateSpinner.textContent = _blxCmdFreeCnt++
+    const ns =  navigator.onLine
+    if(lastOnlineState !== ns){
+        jdFooteronline.hidden = !ns
+        jdFooteroffline.hidden = ns
+        jdServertest.disabled = !ns
+        lastOnlineState = ns    
+    }
 }
 
 //-------- subsystem for BLX ------------
@@ -845,20 +858,30 @@ async function updateDeviceList() {
             }
         }
     })
-
     // Iterate End
 
-    /* Show Test Data */
+    devs.sort(
+        function(a, b){
+            return a.advname.localeCompare(b.advname)
+        }
+    );
+
+
+    /* Show Test Data in navDevicelist */
     console.log("Devs:", devs.length, " Total kB:", lenTotal / 1024)
-    for (let i = 0; i < devs.length; i++) {
+    let ndl = '';
+    for (let i = 0; i < devs.length; i++) { // For each known Device
+        const dev = devs[i]
+        const tel = `<button class="navitem"><i class="fa-solid fa-fw fa-file-waveform"></i><span class="navitem-txt">${dev.advname}</span></button>`
+        ndl += tel
+
         const vf = devs[i].files
         for (let ii = 0; ii < vf.length; ii++) {
             if (vf[ii].syncflag) console.log("Sync: ", devs[i].advname, vf[ii].fname, vf[ii].aktlen)
+
         }
     }
-    /* */
-
-    //AJAX!
+    navDevicelist.innerHTML = ndl
 
 }
 
@@ -866,7 +889,7 @@ async function updateDeviceList() {
 //---- helpers----
 async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
     let np = new Promise(resolve => setTimeout(resolve, ms))
-    return np;
+    return np
 }
 // ---------- okDialog -------------
 let okDialoginit = false
@@ -975,8 +998,12 @@ async function blxSetup() {
             const lng = setupDLG.querySelector('#jd-lang').value
             setupOptions.lang = lng
             I18.i18localize(lng)
-
         })
+        setupDLG.querySelector('#jd-servertest').addEventListener('click', (e) => {
+            window.open(setupDLG.querySelector('#jd-server').value);
+        })
+
+
         setupDialogInit = true
     }
 
@@ -1082,10 +1109,15 @@ async function Talk2Server(remurl, scmd, accessToken, mac, filename, data) { // 
             })
 
             if (response.status === 200) {
-                const result = await response.json()
+                let result
+                try {
+                    result = await response.json()
+                } catch (ierr) {
+                    result = {status: `ERROR: Server replies '${ierr}'`}
+                }
                 const ts = result.timestamp
                 if(ts !== undefined) result.date = new Date(ts * 1000)
-                console.log("OK: ",result)
+    console.log("ServerReply: ",result)
                 return result;
             } else throw "'" + response.status + ": " + response.statusText+"'"
     } catch (err) { // Catch e.g. CORS Errors
