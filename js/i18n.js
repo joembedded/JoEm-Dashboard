@@ -44,7 +44,7 @@
   elements.forEach((element) => {
     const key = element.getAttribute('ll')
     const nc = key.split('.').reduce((obj, i) => (obj ? obj[i] : null), json)
-console.log(key,nc)
+    // console.log(key,nc) // Dbg
     if(nc !== undefined) element.innerHTML = nc
     else console.warn(`i18n.js: Key:'${key}', Language:'${pageLang}' not found!`)
   })

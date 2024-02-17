@@ -29,8 +29,11 @@ export function sidebarMax(factor) {
     if(sidebarState) return
     const scw = document.documentElement.clientWidth;
     const sbw = document.querySelector('.clnav').clientWidth;
-    if(sbw > scw * factor)  document.documentElement.style.setProperty('--lnavwidth_wrk', (scw * factor) + "px")
-    sidebarState = 5
+    
+    if(sbw > scw * factor)  {
+        document.documentElement.style.setProperty('--lnavwidth_wrk', (scw * factor) + "px")
+        sidebarState = 5
+    }
     sidebar_hint()
 }
 

@@ -69,6 +69,7 @@ const spinnerDLG = document.getElementById("spinner")
 const okDialogDOM = document.getElementById("ok-dialog")
 const editParamDLG = document.getElementById("edit-params")
 const setupDLG = document.getElementById("setup-dialog")
+const deviceDialog = document.getElementById("device-dialog")
 
 // UI Elemente
 const jdFooteronline = document.getElementById("jd-footeronline")
@@ -132,8 +133,8 @@ function bleCallback(m, v, xinfo) {
                     blxType.textContent = '-'
                     blxFW.textContent = '-'
                     button0Link.querySelector('i').classList.add('fa-beat')
-                    blxSignal.textContent = '- dBm'
-                    blxSignal.style.backgroundColor = 'gray'
+                    blxSignal.textContent = '... dBm'
+                    blxSignal.style.backgroundColor = 'gray' // 
                     blxConnectButtonText.textContent = blxInfoLine.textContent = `Connecting '${advertisingName}'...`
                     blxGraph.innerHTML = "" // During Advertising no Link...
                     break
@@ -228,15 +229,15 @@ function bleCallback(m, v, xinfo) {
 
 
 // Called all sec
-let lastOnlineState 
+let lastOnlineState
 function _blxBusyMonitor() {
     blxStateSpinner.textContent = _blxCmdFreeCnt++
-    const ns =  navigator.onLine
-    if(lastOnlineState !== ns){
+    const ns = navigator.onLine
+    if (lastOnlineState !== ns) {
         jdFooteronline.hidden = !ns
         jdFooteroffline.hidden = ns
         jdServertest.disabled = !ns
-        lastOnlineState = ns    
+        lastOnlineState = ns
     }
 }
 
@@ -809,30 +810,34 @@ async function blxServerDataSync() {
     console.log("ServerSync")
 }
 
+let deviceListDB = []
 async function updateDeviceList() {
-    let devs = []
+    deviceListDB = []
     await blStore.count()
     let lenTotal = 0
+    let total2sync = 0
+    navDevicelist.innerHTML = ''
     await blStore.iterate(function (value) {
         const storemac = value.k.substr(0, 16)
         // Search only MACs
         if (storemac.length === 16 && value.k.charAt(16) === '_') {
             // Find entry for with MAC
-            // console.log("STORE:",value)        
+            console.log("STORE:",value)        
             let idx
             // Find if MAC already exists
-            for (let i = 0; i < devs.length; i++) {
-                if (devs[i].mac === storemac) {
+            for (let i = 0; i < deviceListDB.length; i++) {
+                if (deviceListDB[i].mac === storemac) {
                     idx = i
                     break
                 }
             }
             // Optionally add to array of MACs
             if (idx === undefined) {
-                idx = devs.length
-                devs.push({
+                idx = deviceListDB.length
+                deviceListDB.push({
                     mac: storemac, // 16 Digits
                     files: [], // List of Files
+                    synccnt: 0,
                     advname: '(unknown)', // Advertising Name
                     pin: 0
                 })
@@ -841,52 +846,70 @@ async function updateDeviceList() {
             const fname = value.k.substr(17)
             // console.log(storemac,fname)
             if (value.k === storemac + '_#BlxIDs') { // others: mac_#xxx: internal
-                devs[idx].advname = value.v.advertisingName
+                deviceListDB[idx].advname = value.v.advertisingName
             } else if (value.k === storemac + '_#PIN') { // others: mac_#xxx: internal
-                devs[idx].pin = value.v
+                deviceListDB[idx].pin = value.v
             } else if (value.k.charAt(17) !== '#') { // ignore local Backupfiles
                 if (value.v.akt_len !== undefined) {
                     lenTotal += value.v.akt_len
                 }
                 let sflag = false
                 if (fname === 'data.edt') sflag = true // **** TEST ***
-                devs[idx].files.push({
+                deviceListDB[idx].files.push({
                     fname: fname,
                     aktlen: value.v.akt_len,
                     syncflag: sflag
                 })
+                if (sflag) {
+                    deviceListDB[idx].synccnt++
+                    total2sync++
+                }
             }
         }
     })
     // Iterate End
 
-    devs.sort(
-        function(a, b){
-            return a.advname.localeCompare(b.advname)
-        }
-    );
+    deviceListDB.sort(function (a, b) {
+        return a.advname.localeCompare(b.advname)
+    })
 
-
-    /* Show Test Data in navDevicelist */
-    console.log("Devs:", devs.length, " Total kB:", lenTotal / 1024)
+    console.log("Devs:", deviceListDB.length, " Total kB:", (lenTotal / 1024).toFixed(3))
     let ndl = '';
-    for (let i = 0; i < devs.length; i++) { // For each known Device
-        const dev = devs[i]
-        const tel = `<button class="navitem"><i class="fa-solid fa-fw fa-file-waveform"></i><span class="navitem-txt">${dev.advname}`
-        if(xx)
-        tel += `</span></button>`
-        ndl += tel
-
-        const vf = devs[i].files
-        for (let ii = 0; ii < vf.length; ii++) {
-            if (vf[ii].syncflag) console.log("Sync: ", devs[i].advname, vf[ii].fname, vf[ii].aktlen)
-
+    for (let i = 0; i < deviceListDB.length; i++) { // For each known Device
+        const dev = deviceListDB[i]
+        const vf = dev.files
+        let tel
+        if (vf.length) {
+            tel = `<button class="navitem" id="butDevDetails${i}"><i class="fa-solid fa-fw fa-file-waveform"></i><span class="navitem-txt">'${dev.advname}'</span>`
+            if (dev.synccnt)
+                tel += `<span class="navitem-pointout" style="background-color:chocolate;">&utrif;${dev.synccnt}/${vf.length}</span>`
+            else
+                tel += `<span class="navitem-simple-pointout">${vf.length}</span>`
+        } else {
+            tel = `<button class="navitem" id="butDevDetails${i}"><i class="fa-regular fa-fw fa-file" style="color: gray"></i><span class="navitem-txt">'${dev.advname}'</span>`
         }
+        tel += '</button>'
+        ndl += tel
     }
     navDevicelist.innerHTML = ndl
 
-}
+    for (let i = 0; i < deviceListDB.length; i++) { // Setup Device-Handler
+        const ddet = document.getElementById(`butDevDetails${i}`)
+        ddet.addEventListener('click', () => deviceDialogDo(i))
+    }
 
+    const bsicl = button4ServerSync.querySelector('i').classList
+    const bspo = button4ServerSync.querySelector('.navitem-pointout')
+    if (total2sync) {
+        bsicl.add('fa-shake')
+        bspo.hidden = false
+        bspo.style.backgroundColor = 'chocolate'
+        bspo.innerHTML = `&utrif;${total2sync}`
+    } else {
+        bsicl.remove('fa-shake')
+        bspo.hidden = true
+    }
+}
 
 //---- helpers----
 async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
@@ -1025,14 +1048,66 @@ async function blxSetup() {
         if (!setupDialogOpenFlag) break
     }
     setupDLG.close()
-    if(setupDialogResult === 'ok'){
+    if (setupDialogResult === 'ok') {
         setupOptions.server = setupDLG.querySelector('#jd-server').value
         setupOptions.accesstoken = setupDLG.querySelector('#jd-accesstoken').value
     }
 
-
     await blStore.set('#blxDash_#SETUP', setupOptions)
 }
+
+
+// ------------- deviceDialogDialog ------------
+let deviceDialogInit = false
+let deviceDialogOpenFlag
+let deviceDialogResult
+async function deviceDialogDo(idx) {
+    if (!deviceDialogInit) {
+        deviceDialog.querySelector('#deviceDialogBtnClose').addEventListener('click', () => {
+            deviceDialogResult = 'x' // Simple Close
+            deviceDialogOpenFlag = false
+        })
+        deviceDialog.querySelector('#deviceDialogBtnOK').addEventListener('click', () => {
+            deviceDialogResult = 'ok' // SEND
+            deviceDialogOpenFlag = false
+        })
+        deviceDialogInit = true
+    }
+
+    const dev = deviceListDB[idx]
+    let tel = `<b>Name: '${dev.advname}'</b><br>MAC: ${dev.mac}<br><br>PIN: ${dev.pin}<br><br>`
+    // Was ist bekannt
+    console.log(dev)
+
+    const anzf = dev.files.length
+    if (!anzf) tel += 'No Files!'
+    else {
+        tel += '<table>'
+        for (let i = 0; i < anzf; i++) {
+            const defi = dev.files[i]
+            tel += `<tr><td>${i}:</td><td>'${defi.fname}'</td><td>${defi.aktlen} Bytes </td>`
+            // disabled *todo*
+            tel += `<td> &orarr;<input disabled type="checkbox" ${defi.syncflag ? 'checked' : ''}></td></tr>`
+        }
+        tel += "</table>"
+    }
+
+    const devdiacont = deviceDialog.querySelector('#deviceDialog-content')
+    devdiacont.innerHTML = tel
+
+    deviceDialogOpenFlag = true
+    deviceDialogResult = '?' // Unknown
+    deviceDialog.showModal()
+    for (; ;) {
+        await dashSleepMs(50)
+        if (!deviceDialogOpenFlag) break
+    }
+    deviceDialog.close()
+    devdiacont.innerHTML = ''
+    return deviceDialogResult
+}
+
+
 
 //---------------- setup ------------
 async function setup() {
@@ -1056,7 +1131,7 @@ async function setup() {
     button0Link.addEventListener('click', blxConnect)
     button1Terminal.addEventListener('click', () => {
         location.href = '#section_terminal'
-        JD.sidebarMax(0.5)
+        JD.sidebarMax(0.5) // Bei scroll auf kleinen screens opt. sidebar zusammenschieben
     })
     button2MainMenu.addEventListener('click', () => {
         location.href = '#section_main'
@@ -1099,29 +1174,29 @@ async function Talk2Server(remurl, scmd, accessToken, mac, filename, data) { // 
             mac: mac,
             filename: filename,
             data: data,
-        } 
-        const response = await fetch(remurl+"?k="+accessToken+"&cmd="+scmd, {
-                method: "POST",
-                mode: "cors",
-                //credentials: "include", // nur wenn kein Mit Wildcard Access 
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(v)
-            })
+        }
+        const response = await fetch(remurl + "?k=" + accessToken + "&cmd=" + scmd, {
+            method: "POST",
+            mode: "cors",
+            //credentials: "include", // nur wenn kein Mit Wildcard Access 
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(v)
+        })
 
-            if (response.status === 200) {
-                let result
-                try {
-                    result = await response.json()
-                } catch (ierr) {
-                    result = {status: `ERROR: Server replies '${ierr}'`}
-                }
-                const ts = result.timestamp
-                if(ts !== undefined) result.date = new Date(ts * 1000)
-    console.log("ServerReply: ",result)
-                return result;
-            } else throw "'" + response.status + ": " + response.statusText+"'"
+        if (response.status === 200) {
+            let result
+            try {
+                result = await response.json()
+            } catch (ierr) {
+                result = { status: `ERROR: Server replies '${ierr}'` }
+            }
+            const ts = result.timestamp
+            if (ts !== undefined) result.date = new Date(ts * 1000)
+            console.log("ServerReply: ", result)
+            return result;
+        } else throw "'" + response.status + ": " + response.statusText + "'"
     } catch (err) { // Catch e.g. CORS Errors
         console.log("ERROR:", err)
         return "ERROR: " + err // 'ERROR: Magic first word
@@ -1132,24 +1207,25 @@ async function Talk2Server(remurl, scmd, accessToken, mac, filename, data) { // 
 async function dbg_action() {
     //await editParamDialogDo(1, "<b>Edit Parameter</b>")
     //await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false)
-    //await updateDeviceList()
+    await updateDeviceList()
 
 
     //const remurl = './sync/blxremote.php'
     //const remurl = 'https://joembedded.de/wrk/fetch/blxremote.php'
-    const remurl = setupOptions.server
-    const accessToken = setupOptions.accesstoken
-
-    const mac = '0011223344556677'
-    const filename = 'testfile.dat'
-    const scmd = 'upsync'
-    const data = {
-        name: 'Jürgen & Ute Wickenhäuser',
-/*        alter: 59,
-        kids: ['Laura', 'Jan'] */
-    }
-    await Talk2Server(remurl, scmd, accessToken, mac, filename, data)
-
+    /*
+        const remurl = setupOptions.server
+        const accessToken = setupOptions.accesstoken
+    
+        const mac = '0011223344556677'
+        const filename = 'testfile.dat'
+        const scmd = 'upsync'
+        const data = {
+            name: 'Jürgen & Ute Wickenhäuser',
+                    alter: 59,
+                    kids: ['Laura', 'Jan'] 
+        }
+        await Talk2Server(remurl, scmd, accessToken, mac, filename, data)
+    */
 }
 document.getElementById('dbg-action').addEventListener('click', dbg_action)
 

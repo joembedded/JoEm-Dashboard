@@ -67,7 +67,7 @@
                 <button id="button0-link" class="navitem" style="color:dodgerblue">
                     <i class="fa-brands fa-fw fa-bluetooth"></i>
                     <span id="blxConnectButtonText" class="navitem-txt">Connect</span>
-                    <span id="blxSignal" class="navitem-pointout" style="background-color:gray;" hidden>- dBm</span>
+                    <span id="blxSignal" class="navitem-pointout" hidden>... dBm</span>
                 </button>
 
                 <div class="thin-hr"></div>
@@ -80,8 +80,10 @@
                 <div class="navinfo"><b>Devices</b></div>
 
                 <button id="button4-sync" class="navitem">
-                    <i class="fa-solid fa-fw fa-arrows-rotate"></i>
+                    <i class="fa-solid fa-fw fa-arrows-spin"></i>
                     <span class="navitem-txt">Server-Sync</span>
+                    <span class="navitem-pointout" hidden>0</span>
+
                 </button>
 
                 <!-- class="navhidden" for Weg-Hidden.. disabled fuer halbhell, hidden fuer unsichtbar  -->
@@ -94,6 +96,24 @@
 
                 <!-- Hier Liste der Geraet in HTML -->
                 <div id="nav-devicelist">
+
+                    <!-- 2 Test-Items, wie sie eingebaut werden koennen (wird uberschrieben von updateDeviceList())
+                        Das erste Icon zommt seinen Pointout ins Icon, Farbe i.d.R. variable (Default: irgendein Grau)
+                        das zweite ist nur informativ, Hintergrundfarbe ohne Hervorhebung, i.d.R. nicht aendern (Default wie Menue)
+                    <button class="navitem" style="color:orangered">
+                        <i class="fa-solid fa-fw fa-star"></i>
+                        <span class="navitem-txt">Test</span>
+                        <span class="navitem-pointout" style="background-color:darkorchid;">99 Stars</span>
+                    </button>
+                    <button class="navitem"> 
+                        <i class="fa-regular fa-fw fa-face-smile" style="color:green;"></i>
+                        <span class="navitem-txt">Test</span>
+                        <span class="navitem-simple-pointout">88 Luftballons</span>
+                    </button>
+                    -->
+
+
+
                 </div>
 
             </nav>
@@ -188,10 +208,11 @@
     </div>
 
     <footer class="cfooter">
-        <span id="jd-footeronline" style="color: limegreen;"><i  class="fa-solid fa-link fa-lg"></i> Online</span>
-        <span hidden id="jd-footeroffline" style="color: red;"><i  class="fa-solid fa-link-slash fa-lg" ></i> Offline</span>
+        <span id="jd-footeronline" style="color: limegreen;"><i class="fa-solid fa-link fa-lg"></i> Online</span>
+        <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-link-slash fa-lg"></i>
+            Offline</span>
         &nbsp;&nbsp;&nbsp;
-        <button  id="dbg-action">(Debug)</button>
+        <button id="dbg-action">(Debug)</button>
     </footer>
 
     <!-- Dialog Elements <dialog> / Modal new in HTML5 -->
@@ -224,8 +245,8 @@
     <!-- Setup Dialog  -->
     <dialog id='setup-dialog'>
         <button id='setupBtnClose'>&#10006;</button>
+        <b>Setup</b><br><br><br>
         <div id="setup-content">
-            <b>Setup</b><br><br><br>
 
             <label ll="set.lang" for="jd-lang">Language</label>:
             <select id="jd-lang">
@@ -233,7 +254,7 @@
                 <option>DE - Deutsch</option>
             </select>
             &nbsp;
-            <label ll="set.fontsize" for ="jd-fontsize">Fontsize</label>:
+            <label ll="set.fontsize" for="jd-fontsize">Fontsize</label>:
             <select id="jd-fontsize">
                 <option>50%</option>
                 <option>75%</option>
@@ -245,25 +266,36 @@
             </select>
             <br>
             <br>
-            <label ll="set.theme" for="jd-theme">Theme Dark/White:</label>: <input type="checkbox" id="jd-theme"> 
+            <label ll="set.theme" for="jd-theme">Theme Dark/White:</label>: <input type="checkbox" id="jd-theme">
 
             <br>
             <br>
             <label ll="set.server" for="jd-server">Remote Server</label>:<br>
             <i class="fa-solid fa-globe fa-fw"></i>
-            <input type ="text" id = "jd-server" size="48">
-            <button id = "jd-servertest"><i class="fa-solid fa-globe "></i> ...</button>
+            <input type="text" id="jd-server" size="48">
+            <button id="jd-servertest"><i class="fa-solid fa-globe "></i> ...</button>
             <br>
 
             <br>
             <label ll="set.accesstoken" for="jd-accesstoken">Remote Server:</label>:<br>
             <i class="fa-solid fa-key fa-fw"></i>
-            <input type ="text" id = "jd-accesstoken" size="48">
+            <input type="text" id="jd-accesstoken" size="48">
             <br>
 
         </div>
         <br>
         <div style='text-align: center;'><button id='setupBtnOK'>&#10004; OK</button></div>
+    </dialog>
+
+    <!-- Device Dialog  -->
+    <dialog id='device-dialog'>
+        <button id='deviceDialogBtnClose'>&#10006;</button>
+        <b>Device</b><br><br><br>
+        <div id="deviceDialog-content">
+            <!-- Dynamisch gefuellt -->
+        </div>
+        <br>
+        <div style='text-align: center;'><button id='deviceDialogBtnOK'>&#10004; OK</button></div>
     </dialog>
 
 
