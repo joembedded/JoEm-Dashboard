@@ -1,10 +1,10 @@
 /* joemdash.js - Sidebar state machine 21.01.2024 (C) Joembedded */
 
 export let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
-function sidebar_hint(){
+function sidebar_hint() {
     // BLACK LEFT-/RIGHT POINTING POINTER
-    const sbh = ['&ltrif;','&ltrif;','&rtrif;','','','&rtrif;']
-    document.getElementById('cheader-hint').innerHTML=sbh[sidebarState]
+    const sbh = ['&ltrif;', '&ltrif;', '&rtrif;', '', '', '&rtrif;']
+    document.getElementById('cheader-hint').innerHTML = sbh[sidebarState]
 }
 function sidebar() {
     let pdst = "0px"
@@ -26,11 +26,11 @@ function sidebar() {
 
 // Limit to x of viewport if expanded
 export function sidebarMax(factor) {
-    if(sidebarState) return
+    if (sidebarState) return
     const scw = document.documentElement.clientWidth;
     const sbw = document.querySelector('.clnav').clientWidth;
-    
-    if(sbw > scw * factor)  {
+
+    if (sbw > scw * factor) {
         document.documentElement.style.setProperty('--lnavwidth_wrk', (scw * factor) + "px")
         sidebarState = 5
     }
@@ -39,24 +39,25 @@ export function sidebarMax(factor) {
 
 // Font setzen - Wichtig dabei nochmal Grenzen checken
 export function dashSetFont(nrel) {
-    if(nrel<0.5) nrel = 0.5
-    else if (nrel>2) nrel = 2
+    if (nrel < 0.5) nrel = 0.5
+    else if (nrel > 2) nrel = 2
     document.documentElement.style.setProperty('--fontrel', nrel)
     const os = sidebarState
-    if(os == 5 ) sidebarState=0
+    if (os == 5) sidebarState = 0
     else sidebarState = (os + 2) % 3
     sidebar()
-    if(os == 5) sidebarState=5
+    if (os == 5) sidebarState = 5
     sidebar_hint()
 }
 
 
 // Themen invertieren hell-dunkel
 export function dashToggleTheme() {
-    const cvar = ['--white', '--black', '--whitegray', '--lightgray', '--infogray' , '--hovergray', '--midgray', '--darkgray', '--txtwhite', '--txtblack']
+    const cvar = ['--white', '--black', '--whitegray', '--lightgray', '--infogray', '--hovergray', '--midgray', '--darkgray', '--txtwhite', '--txtblack']
+    // const ignored = ['--dodgerblue'] // List for invarable colors
     cvar.forEach((e) => {
-        const oval = parseInt(getComputedStyle(document.documentElement).getPropertyValue(e).substring(1),16);
-        const nval = '#'+(oval^0xFFFFFF).toString(16).padStart(6,'0') // Invert
+        const oval = parseInt(getComputedStyle(document.documentElement).getPropertyValue(e).substring(1), 16);
+        const nval = '#' + (oval ^ 0xFFFFFF).toString(16).padStart(6, '0') // Invert
         document.documentElement.style.setProperty(e, nval)
     })
 }
@@ -67,7 +68,7 @@ function dashInit() {
     //console.log("Viewpowrt-Width:",scw, " Max Nav-Width:",sbw)
     if (scw * 0.5 < sbw) {
         sidebar()   // initial Shrinked on small screens
-        sidebarState=5; // Next CLick: Shrink 
+        sidebarState = 5; // Next CLick: Shrink 
     }
     document.getElementById("sidebar_menue").addEventListener("click", sidebar)
 }

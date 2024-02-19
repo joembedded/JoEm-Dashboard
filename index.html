@@ -87,7 +87,7 @@
                 </button>
 
                 <!-- class="navhidden" for Weg-Hidden.. disabled fuer halbhell, hidden fuer unsichtbar  -->
-                <button id="button3-device" class="navitem" disabled>
+                <button id="button3-device" class="navitem" style="color: darkgreen">
                     <i class="fa-solid fa-fw fa-circle-plus"></i>
                     <span class="navitem-txt">Add Device</span>
                 </button>
@@ -141,6 +141,7 @@
 
                             <span id="blxPinEnter" style="display:none">
                                 <button id="blxSetPinButton">SetPIN</button>
+                                <br class="mobile-br">
                                 PIN: <input type="text" id="blxPIN">
                                 <br>
                                 <br>
@@ -148,6 +149,7 @@
 
                             <span id="blxInfoButtonSpan" style="display:none">
                                 <button disabled id="blxInfoButton">Memory Info</button>
+                                <br class="mobile-br">
                                 Memory: <span id="blxMemory">-</span>
                                 <br>
                                 <br>
@@ -155,6 +157,7 @@
 
                             <span id="blxSyncButtonSpan" style="display:none">
                                 <button disabled id="blxSyncButton">Synchronize Time</button>
+                                <br class="mobile-br">
                                 Delta: <span id="blxSync">-</span>
                                 <br>
                                 <br>
@@ -163,6 +166,7 @@
                             <span id="blxUploadButtonSpan" style="display:none">
                                 <button disabled id="blxUploadButton">Load Data from
                                     Device</button>
+                                <br class="mobile-br">
                                 <span id="blxGraph"> </span>
                                 <br>
                                 <br>
@@ -170,6 +174,7 @@
 
                             <!-- Span MEASURE for Loggers AND Sensors -->
                             <button disabled id="blxMeasureButton">Measure</button>
+                            <br class="mobile-br">
                             Values:<span id="blxMeasureData">-</span>
                             <br>
                             <br>
@@ -183,6 +188,7 @@
                             <span id="blxParametersSpan" style="display:none; white-space: nowrap;">
                                 <button disabled id="blxParametersButton">Device
                                     Parameter</button>
+                                <br class="mobile-br">
                                 <button disabled id="blxSysParButton">Device
                                     SysPar</button>
 
@@ -208,43 +214,48 @@
     </div>
 
     <footer class="cfooter">
-        <span id="jd-footeronline" style="color: limegreen;"><i class="fa-solid fa-link fa-lg"></i> Online</span>
-        <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-link-slash fa-lg"></i>
+        <span id="jd-footeronline" style="color: limegreen;"><i class="fa-solid fa-fw fa-link fa-lg"></i> Online</span>
+        <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-fw fa-link-slash fa-lg"></i>
             Offline</span>
         &nbsp;&nbsp;&nbsp;
         <button id="dbg-action">(Debug)</button>
+        &nbsp;&nbsp;&nbsp;
+        <div id="footerReason">FooterReason</div>&nbsp;
+        <div id="footerInfo">FooterInfo</div>
     </footer>
 
     <!-- Dialog Elements <dialog> / Modal new in HTML5 -->
     <dialog id="edit-params">
-        <button id='editBtnClose'>&#10006;</button>
+        <button class="dlgBtnClose" id='editBtnClose'>&#10006;</button>
         <div id="blxParameterEdit">-</div>
 
         <br>
         <div style='text-align: center;'>
-            <button id='editBtnSend'>Send...</button>
-            <button id='editBtnAddChannel' hidden>Add Channel</button>
+            <button class="dlgBtnStandard" id='editBtnSend'>Send...</button>
+            <button class="dlgBtnStandard" id='editBtnAddChannel' hidden>Add Channel</button>
         </div>
     </dialog>
 
     <!-- Globaler Spinner -->
     <dialog id='spinner'>
-        <h1><i class="fa-solid fa-spinner fa-2xl fa-spin" style="color: blue"></i></h1>
+        <h1><i class="fa-solid fa-spinner fa-2xl fa-spin"></i></h1>
+        <div id="spinnerReason"></div>
     </dialog>
 
     <!-- Dialog mit OK und optional 2. Bestaetigung -->
     <dialog id='ok-dialog'>
-        <button id='dlgBtnClose'>&#10006;</button>
+        <button class="dlgBtnClose" id='okdlgBtnClose'>&#10006;</button>
         <div id="ok-content">
         </div>
         <br>
-        <div style='text-align: center;'><input id='dlgBtnChk' type="checkbox"> <button id='dlgBtnOK' disabled>&#10004;
-                OK</button></div>
+        <div style='text-align: center;'><input id='okdlgBtnChk' type="checkbox">
+            <button class="dlgBtnStandard" id='okdlgBtnOK' disabled>&#10004; OK</button>
+        </div>
     </dialog>
 
     <!-- Setup Dialog  -->
     <dialog id='setup-dialog'>
-        <button id='setupBtnClose'>&#10006;</button>
+        <button class="dlgBtnClose" id='setupBtnClose'>&#10006;</button>
         <b>Setup</b><br><br><br>
         <div id="setup-content">
 
@@ -253,7 +264,8 @@
                 <option>EN - English</option>
                 <option>DE - Deutsch</option>
             </select>
-            &nbsp;
+            <br>
+            <br>
             <label ll="set.fontsize" for="jd-fontsize">Fontsize</label>:
             <select id="jd-fontsize">
                 <option>50%</option>
@@ -271,31 +283,36 @@
             <br>
             <br>
             <label ll="set.server" for="jd-server">Remote Server</label>:<br>
-            <i class="fa-solid fa-globe fa-fw"></i>
-            <input type="text" id="jd-server" size="48">
-            <button id="jd-servertest"><i class="fa-solid fa-globe "></i> ...</button>
+            <div style="display: flex; align-items: center; ">
+                <i class="fa-solid fa-globe fa-fw"></i>
+                <input style="flex-grow: 1; margin: 0 5px;" type="text" id="jd-server">
+                <button id="jd-servertest"><i class="fa-solid fa-globe "></i> ...</button>
+            </div>
             <br>
-
-            <br>
-            <label ll="set.accesstoken" for="jd-accesstoken">Remote Server:</label>:<br>
-            <i class="fa-solid fa-key fa-fw"></i>
-            <input type="text" id="jd-accesstoken" size="48">
-            <br>
+            <label ll="set.accesstoken" for="jd-accesstoken">Access-Token:</label>:<br>
+            <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-key fa-fw"></i>
+                <input type="text" style="margin: 0 5px;" id="jd-accesstoken" size="20">
+            </div>
 
         </div>
         <br>
-        <div style='text-align: center;'><button id='setupBtnOK'>&#10004; OK</button></div>
+        <div style='text-align: center;'>
+            <button class="dlgBtnStandard" id='setupBtnOK'>&#10004; OK</button>
+        </div>
     </dialog>
 
     <!-- Device Dialog  -->
     <dialog id='device-dialog'>
-        <button id='deviceDialogBtnClose'>&#10006;</button>
+        <button class="dlgBtnClose" id='deviceDialogBtnClose'>&#10006;</button>
         <b>Device</b><br><br><br>
         <div id="deviceDialog-content">
             <!-- Dynamisch gefuellt -->
         </div>
         <br>
-        <div style='text-align: center;'><button id='deviceDialogBtnOK'>&#10004; OK</button></div>
+        <div style='text-align: center;'>
+            <button class="dlgBtnStandard" id='deviceDialogBtnOK'>&#10004; OK</button>
+        </div>
     </dialog>
 
 
@@ -303,7 +320,7 @@
     <dialog id='qrscanner-dialog'>
         <video style="display: none;" id='qroriginal-video' playsinline mute></video>
         <div id='qrvideo-header'><select id='qrcam-selector'></select></div>
-        <button id='qrscanner-btnClose'>&#10006;</button>
+        <button class="dlgBtnClose" id='qrscanner-btnClose'>&#10006;</button>
         <button id='qrscanner-btnTorch'>&#x1F4A1;</button>
         <div style='text-align:center;'><canvas id='qrscaled-videocanvas'></canvas></div>
     </dialog>

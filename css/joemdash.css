@@ -20,6 +20,9 @@
     --txtwhite: #f0f0f0;
     --txtblack: #000000;
 
+    /* Spezialmarkierungen */
+    --dodgerblue: #1E90FF; 
+
     /* *** App Scaling ***  Einrueckung/Dyn. Elemente. Koennen gesetzt und gelesen werden. */
     /* Default Font: 16px == 1rem, use rem for calc()! 0.5..2.0 OK */
     --fontrel: 1;
@@ -38,6 +41,15 @@
     --lnavwidth_wrk: var(--lnavwidth_max);
 }
 
+/* Variable Breakpoints Typ <br class='xx-br> */
+@media all and (min-width:551px) {
+    .desktop-br {display: inline;}
+    .mobile-br {display: none;}
+}
+@media all and (max-width:550px) {
+    .desktop-br {display: none;}
+    .mobile-br {display: inline;}
+}
 body {
     margin: 0;
     padding: 0;
@@ -92,7 +104,7 @@ input[type=checkbox] {
         position: relative;
 
         #cheader-hint { /* Rechts,Links oder leer */
-            color: dodgerblue;
+            color: var(--dodgerblue);
             position: absolute;
             bottom: calc(-10px * var(--fontrel));
             right: calc(-10px * var(--fontrel));
@@ -218,9 +230,9 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
     .navitem-simple-pointout {
         position: absolute;
         right: 8px;
-        padding: calc(3px * var(--fontrel));
+        padding: calc(5px * var(--fontrel));
         color: var(--txtblack);
-        background-color: var(--lightgray);
+        background-color: var(--infogray);
         opacity: 1;
         border-radius: 32px;
         transition: var(--scrollms);
@@ -309,8 +321,8 @@ button {
     }
 }
 
-/* die benannten Elemente zur EInfahcheit nict als Klasse.. */
 dialog {
+    min-width: 80%;
     border: 4px solid var(--midgray);
     border-radius: 8px;
     background-color: var(--white);
@@ -322,15 +334,14 @@ dialog {
     white-space: nowrap;
 
     &#spinner {
+        color: var(--dodgerblue);
         border: none;
         background-color: transparent;
         overflow: hidden;
+        text-align: center;
     }
 
-    #dlgBtnClose,
-    #editBtnClose,
-    #setupBtnClose,
-    #deviceDialogBtnClose {
+    .dlgBtnClose {
         position: absolute;
         border: none;
         background-color: var(--lightgray);
@@ -344,11 +355,7 @@ dialog {
         }
     }
 
-    #dlgBtnOK,
-    #setupBtnOK,
-    #editBtnSend,
-    #deviceDialogBtnOK,
-    #editBtnAddChannel {
+    .dlgBtnStandard {
         border: none;
         background-color: var(--lightgray);
         padding: 8px;

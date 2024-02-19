@@ -66,6 +66,8 @@ const button4ServerSync = document.getElementById("button4-sync")
 // Dialoge
 //const qrscannerDialog = document.getElementById("qrscanner-dialog") - via openSelectedCamera()
 const spinnerDLG = document.getElementById("spinner")
+/* Sub */ const spinnerReason = document.getElementById("spinnerReason")
+
 const okDialogDOM = document.getElementById("ok-dialog")
 const editParamDLG = document.getElementById("edit-params")
 const setupDLG = document.getElementById("setup-dialog")
@@ -75,6 +77,8 @@ const deviceDialog = document.getElementById("device-dialog")
 const jdFooteronline = document.getElementById("jd-footeronline")
 const jdFooteroffline = document.getElementById("jd-footeroffline")
 const jdServertest = document.getElementById("jd-servertest")
+const footerReason = document.getElementById("footerReason")
+const footerInfo = document.getElementById("footerInfo")
 
 //================ TESTSACHEN ANFANG ============
 //================ TESTSACHEN ENDE ============
@@ -227,20 +231,6 @@ function bleCallback(m, v, xinfo) {
 }
 
 
-
-// Called all sec
-let lastOnlineState
-function _blxBusyMonitor() {
-    blxStateSpinner.textContent = _blxCmdFreeCnt++
-    const ns = navigator.onLine
-    if (lastOnlineState !== ns) {
-        jdFooteronline.hidden = !ns
-        jdFooteroffline.hidden = ns
-        jdServertest.disabled = !ns
-        lastOnlineState = ns
-    }
-}
-
 //-------- subsystem for BLX ------------
 // Pattern:
 // await _blxCmdSend(CMD)
@@ -346,7 +336,7 @@ async function show_details() {
 async function blxConnect() {
     blxCmdRes.textContent = '-'
     disabler(true)
-    spinnerShow()
+    spinnerShow('Connect', 300)
     try {
         if (connectionLevel >= 3) await _blxCmdSend(".d") // disconnect
         else {
@@ -381,7 +371,7 @@ async function blxSetPin() { // CMD used to enable PIN
     blxCmdRes.textContent = '-'
     const pin = blxPIN.value
     disabler(true)
-    spinnerShow()
+    spinnerShow('Set PIN', 300)
     try {
         if (pin.length < 1) throw "ERROR: PIN EMPTY"
         await _blxCmdSend(".i " + pin)
@@ -396,7 +386,7 @@ async function blxSetPin() { // CMD used to enable PIN
 
 async function blxSyncTime() {
     disabler(true)
-    spinnerShow()
+    spinnerShow('Sync Device Time', 30)
     try {
         await _blxCmdSend(".t set")
         blxSync.textContent = 0
@@ -409,7 +399,7 @@ async function blxSyncTime() {
 
 async function blxUpload() {
     disabler(true)
-    spinnerShow()
+    spinnerShow('Upload Data', 600)
     try {
         await _blxCmdSend(".u") // Upload
         await calculateMemory(false) // no 'New'
@@ -420,6 +410,7 @@ async function blxUpload() {
     }
     spinnerClose()
     disabler(false)
+    await updateDeviceList()
 }
 
 let measureData = "???"
@@ -427,7 +418,7 @@ let measureData = "???"
 // add separate '.m' command in API
 async function blxMeasure() {
     disabler(true)
-    spinnerShow()
+    spinnerShow('Measure', 30)
     blxMeasureData.innerHTML = "Wait..."
     try {
         await _blxCmdSend("e 1") // With HK
@@ -535,7 +526,7 @@ function blxEditedParamGet(typ) {
 // Then retry! In any case: Last known Parameters are stored as '..#BAK#_iparam.lxp'
 async function blxParSend(typ) {
     let result
-    spinnerShow()
+    spinnerShow('Send Parameters', 120)
     if (!typ) { // iparam
         try {
             blxEditedParamGet(0)
@@ -660,15 +651,44 @@ async function blxParSend(typ) {
 } // blxParSend
 
 // Kaskadierbar
-var spinnerSHowLevel = 0
-function spinnerShow() {
-    if (!spinnerSHowLevel) spinnerDLG.showModal()
-    spinnerSHowLevel++
+var spinnerShowLevel = 0
+var spinnerMaxSec = 0
+let wakeLock = null
+async function spinnerShow(text, maxsec) {
+    // WakeLock - Screen Dimming disablen
+    if ("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen")
+
+    footerInfo.textContent = ''
+    /* Anzeig eim Spinner und Footer */
+    footerReason.textContent = text
+    spinnerReason.textContent = text
+    spinnerMaxSec = maxsec
+    if (!spinnerShowLevel) spinnerDLG.showModal()
+    spinnerShowLevel++
 }
 function spinnerClose() {
-    spinnerSHowLevel--
-    if (!spinnerSHowLevel) spinnerDLG.close()
+    if (spinnerShowLevel) spinnerShowLevel--
+    if (!spinnerShowLevel) spinnerDLG.close()
 }
+// Called all sec
+let lastOnlineState
+function _blxBusyMonitor() {
+    const info = `[F.cnt:${_blxCmdFreeCnt++} ${_blxCmdBusyFlag ? '(Busy)' : ''}]`
+    blxStateSpinner.textContent = _blxCmdFreeCnt++
+    footerInfo.textContent = info
+    // Automatisch schliessen 
+    if (_blxCmdFreeCnt > spinnerMaxSec && spinnerShowLevel) spinnerClose()
+
+    const ns = navigator.onLine
+    if (lastOnlineState !== ns) {
+        jdFooteronline.hidden = !ns
+        jdFooteroffline.hidden = ns
+        jdServertest.disabled = !ns
+        lastOnlineState = ns
+    }
+}
+
+
 
 function blxParCancel(typ) {
     if (!typ) blxDevice.iparam = original_par
@@ -771,7 +791,7 @@ async function blxEditSysparam() {
 
 async function blxMemoryInfo() {
     disabler(true)
-    spinnerShow()
+    spinnerShow('Memory Info', 60)
     try {
         await _blxCmdSend("v") // Scan vdir first
         await calculateMemory(true)
@@ -784,7 +804,7 @@ async function blxMemoryInfo() {
 async function blxClearDevice() {
     disabler(true)
     if (await okDialogDo('<b>Clear Device</b><br><br><br>OK to clear Device Memory?', true)) {
-        spinnerShow()
+        spinnerShow("Clear Device",250)
         try {
             if (blxDevice.diskCheckOK !== undefined && blxDevice.diskCheckOK == true) {
                 document.getElementById("blxInfoLine").textContent = "Start new Measure, Clear all Data"
@@ -806,11 +826,45 @@ async function blxClearDevice() {
     disabler(false)
 }
 
+let deviceListDB = []
 async function blxServerDataSync() {
-    console.log("ServerSync")
+    disabler(true)
+    spinnerShow("Synchronise with Server",300)
+    try {
+        const remurl = setupOptions.server
+        const accessToken = setupOptions.accesstoken
+        for (let i = 0; i < deviceListDB.length; i++) { // For each known Device
+            const dev = deviceListDB[i]
+            const vf = dev.files
+            
+            if (vf !== undefined && vf.length > 0) {
+                for (let fi = 0; fi < vf.length; fi++) {
+                    if (vf[fi].syncflag) {
+                        //console.log("Name/MAC:",dev.advname,dev.mac,"File:",vf[fi].fname)
+
+                        const key = `${dev.mac}_${vf[fi].fname}`
+                        await blStore.get(key)
+                        const KeyVal = blStore.result() // undefined opt.
+                        if (KeyVal !== undefined) { 
+                            const data = KeyVal.v
+                            const res = await Talk2Server(remurl, 'upsync', accessToken,  dev.mac, vf[fi].fname, data)
+                            if(typeof res == 'object' && res.status == 'OK'){
+                                data.tssync = res.tssync // Add Sync-TS
+                                await blStore.set(key, data) 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } catch (err) {
+        alert(`Problem: '${err}'`)
+    }
+    await updateDeviceList()
+    spinnerClose()
+    disabler(false)
 }
 
-let deviceListDB = []
 async function updateDeviceList() {
     deviceListDB = []
     await blStore.count()
@@ -822,7 +876,7 @@ async function updateDeviceList() {
         // Search only MACs
         if (storemac.length === 16 && value.k.charAt(16) === '_') {
             // Find entry for with MAC
-            console.log("STORE:",value)        
+            // console.log("STORE:",value)        
             let idx
             // Find if MAC already exists
             for (let i = 0; i < deviceListDB.length; i++) {
@@ -854,7 +908,7 @@ async function updateDeviceList() {
                     lenTotal += value.v.akt_len
                 }
                 let sflag = false
-                if (fname === 'data.edt') sflag = true // **** TEST ***
+                if (fname === 'data.edt' || fname === 'data.edt.old') sflag = true // **** TEST ***
                 deviceListDB[idx].files.push({
                     fname: fname,
                     aktlen: value.v.akt_len,
@@ -924,14 +978,14 @@ async function okDialogDo(question, xconfirm = false) {
     blx.frq_ping(880, 0.3, 0.3)
     // addEventListener only one instance added
     okDialogDOM.querySelector('#ok-content').innerHTML = question
-    const okbut = okDialogDOM.querySelector('#dlgBtnOK')
-    const okchk = okDialogDOM.querySelector('#dlgBtnChk')
+    const okbut = okDialogDOM.querySelector('#okdlgBtnOK')
+    const okchk = okDialogDOM.querySelector('#okdlgBtnChk')
     if (!okDialoginit) {
         okbut.addEventListener('click', () => {
             okDialogResult = true
             okDialogOpenFlag = false
         })
-        okDialogDOM.querySelector('#dlgBtnClose').addEventListener('click', () => {
+        okDialogDOM.querySelector('#okdlgBtnClose').addEventListener('click', () => {
             okDialogOpenFlag = false
         })
         okchk.addEventListener('click', () => {
@@ -1075,19 +1129,21 @@ async function deviceDialogDo(idx) {
     }
 
     const dev = deviceListDB[idx]
-    let tel = `<b>Name: '${dev.advname}'</b><br>MAC: ${dev.mac}<br><br>PIN: ${dev.pin}<br><br>`
+    let tel = `<b>Name: '${dev.advname}'</b><br>MAC: ${dev.mac}<br>`
+    tel += `<br>PIN: ${dev.pin > 0 ? dev.pin : '-'}`
+    tel += `<br><br>`
     // Was ist bekannt
     console.log(dev)
 
     const anzf = dev.files.length
     if (!anzf) tel += 'No Files!'
     else {
-        tel += '<table>'
+        tel += '<table style="text-align: left;"><tr><th>File</th><th>Bytes</th><th>&orarr;</th></tr>'
         for (let i = 0; i < anzf; i++) {
             const defi = dev.files[i]
-            tel += `<tr><td>${i}:</td><td>'${defi.fname}'</td><td>${defi.aktlen} Bytes </td>`
+            tel += `<td>'${defi.fname}'</td><td>${defi.aktlen}</td>`
             // disabled *todo*
-            tel += `<td> &orarr;<input disabled type="checkbox" ${defi.syncflag ? 'checked' : ''}></td></tr>`
+            tel += `<td> <input disabled type="checkbox" ${defi.syncflag ? 'checked' : ''}></td></tr>`
         }
         tel += "</table>"
     }
@@ -1168,13 +1224,20 @@ async function setup() {
 }
 
 // -- Debugging --
-async function Talk2Server(remurl, scmd, accessToken, mac, filename, data) { // ATTENTION: Fetch only via HTTPS/localhos possible
+async function Talk2Server(remurl, scmd, accessToken, mac, filename, dbdata) { // ATTENTION: Fetch only via HTTPS/localhos possible
     try {
+
+        let fileDataByteArray = new Uint8Array(dbdata.bytebuf)
+        let decoder = new TextDecoder()
+        let binstr = decoder.decode(fileDataByteArray)
+
         const v = {
             mac: mac,
             filename: filename,
-            data: data,
+            /* OtherData*/
+            data: binstr,
         }
+
         const response = await fetch(remurl + "?k=" + accessToken + "&cmd=" + scmd, {
             method: "POST",
             mode: "cors",
@@ -1184,7 +1247,6 @@ async function Talk2Server(remurl, scmd, accessToken, mac, filename, data) { // 
             },
             body: JSON.stringify(v)
         })
-
         if (response.status === 200) {
             let result
             try {
@@ -1192,9 +1254,8 @@ async function Talk2Server(remurl, scmd, accessToken, mac, filename, data) { // 
             } catch (ierr) {
                 result = { status: `ERROR: Server replies '${ierr}'` }
             }
-            const ts = result.timestamp
-            if (ts !== undefined) result.date = new Date(ts * 1000)
-            console.log("ServerReply: ", result)
+            result.tssync =  Date.now() // ms Timestamp
+            //console.log("ServerReply: ", result)
             return result;
         } else throw "'" + response.status + ": " + response.statusText + "'"
     } catch (err) { // Catch e.g. CORS Errors
