@@ -22,7 +22,7 @@
 <div class="w3-container">
 <?php
 	// A small file browser for a given subdirectory
-	// (C)2020-2023 JoEmbedded.de - save as "index.php" (see '$me')
+	// (C)2020-2024 - 19.02.2024 JoEmbedded.de - save as "index.php" (see '$me')
 	error_reporting(E_ALL);
 
 	$me="index.php";
@@ -114,18 +114,19 @@
 
 			// don't show PHP and HTML and CSS
 			$sym="&#128190;";
-			if(stripos($file,'.php')) continue;
-			if(stripos($file,'.html')) continue;
-			if(stripos($file,'.css')) continue;
-			if(stripos($file,'.log')) continue;
-			if(stripos($file,'.js')) continue;
-			if(stripos($file,'.ico')) continue; // Icon erzeugen: z.B. https://favicon.io/
+			$ext=strtolower(substr(strrchr($file, '.'), 1));
+			if($ext=='.php') continue;
+			if($ext=='.html') continue;
+			if($ext=='.css') continue;
+			if($ext=='.log') continue;
+			if($ext=='.js') continue; 
+			if($ext=='.ico') continue; // Icon erzeugen: z.B. https://favicon.io/
 			
 			// Source: z.B. https://emojiguide.org  und https://unicode.org/emoji/charts
-			if(stripos($file,'.txt')) $sym="&#128203;";
-			else if(stripos($file,'.sec')) $sym="&#128271;";
-			else if(stripos($file,'.pdf')) $sym="&#128209;";
-			else if(stripos($file,'.mp4') || stripos($file,'.mov') ) $sym="&#127910;";
+			if($ext=='.txt') $sym="&#128203;";
+			else if($ext=='.sec') $sym="&#128271;";
+			else if($ext=='.pdf') $sym="&#128209;";
+			else if($ext=='.mp4' || $ext=='.mov' ) $sym="&#127910;";
 
 
 			if(is_dir("$dir/$file")) continue;

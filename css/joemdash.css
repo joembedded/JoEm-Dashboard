@@ -302,7 +302,8 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
 /* Allgemeines */
 button {
     font-size: calc(1rem * var(--fontrel));
-    padding: 8px;
+    margin: 2px;
+    padding: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-align: left;

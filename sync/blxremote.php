@@ -66,16 +66,20 @@
 		$filename = @$args['filename'];
 		if (!isset($filename) || !strlen($filename) ) throw new Exception("No Filename");
 		if (!isset($args['data'])) throw new Exception ("No 'data'");
-		if(!file_exists("./$mac/")){
-			mkdir("./$mac");
-			$xlog .= "(Gen Dir '$mac')";
+		if(!file_exists("./syncdata/")){
+			mkdir("./syncdata");
+			$xlog .= "(Gen Dir 'syncdata')";
 		}
-		$data = json_encode($args['data']);
-		file_put_contents("./$mac/$filename",$data);
+		if(!file_exists("./syncdata/$mac/")){
+			mkdir("./syncdata/$mac");
+			$xlog .= "(Gen Dir '...$mac')";
+		}
+	$data = json_encode(/*$args['data']*/ $args); // ALternative: ALL
+		file_put_contents("./syncdata/$mac/$filename.json",$data); // Store in JSON Format
 		$olen = strlen($data);
 		if( $olen >10240) $dlen = round($olen/1024,3)."kB";
 		else $dlen = $olen."kB";
-		$xlog .= "($mac/$filename => $dlen)";
+		$xlog .= "($mac/$filename.json => $dlen)";
 		$reply['status'] = "OK";
 	} catch(Exception $e) {
 		$xmsg = 'ERROR: '.$e->getMessage();

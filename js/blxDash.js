@@ -336,10 +336,12 @@ async function show_details() {
 async function blxConnect() {
     blxCmdRes.textContent = '-'
     disabler(true)
-    spinnerShow('Connect', 300)
+
+    await spinnerShow((connectionLevel >= 3)?  'Disconnect':'Connect', 300)
     try {
-        if (connectionLevel >= 3) await _blxCmdSend(".d") // disconnect
-        else {
+        if (connectionLevel >= 3) {
+            await _blxCmdSend(".d") // disconnect
+        } else {
             await _blxCmdSend(".c") // connect
             await show_details()
         }
@@ -371,7 +373,7 @@ async function blxSetPin() { // CMD used to enable PIN
     blxCmdRes.textContent = '-'
     const pin = blxPIN.value
     disabler(true)
-    spinnerShow('Set PIN', 300)
+    await spinnerShow('Set PIN', 300)
     try {
         if (pin.length < 1) throw "ERROR: PIN EMPTY"
         await _blxCmdSend(".i " + pin)
@@ -386,7 +388,7 @@ async function blxSetPin() { // CMD used to enable PIN
 
 async function blxSyncTime() {
     disabler(true)
-    spinnerShow('Sync Device Time', 30)
+    await spinnerShow('Sync Device Time', 30)
     try {
         await _blxCmdSend(".t set")
         blxSync.textContent = 0
@@ -399,7 +401,7 @@ async function blxSyncTime() {
 
 async function blxUpload() {
     disabler(true)
-    spinnerShow('Upload Data', 600)
+    await spinnerShow('Upload Data', 600)
     try {
         await _blxCmdSend(".u") // Upload
         await calculateMemory(false) // no 'New'
@@ -418,7 +420,7 @@ let measureData = "???"
 // add separate '.m' command in API
 async function blxMeasure() {
     disabler(true)
-    spinnerShow('Measure', 30)
+    await spinnerShow('Measure', 30)
     blxMeasureData.innerHTML = "Wait..."
     try {
         await _blxCmdSend("e 1") // With HK
@@ -526,7 +528,7 @@ function blxEditedParamGet(typ) {
 // Then retry! In any case: Last known Parameters are stored as '..#BAK#_iparam.lxp'
 async function blxParSend(typ) {
     let result
-    spinnerShow('Send Parameters', 120)
+    await spinnerShow('Send Parameters', 120)
     if (!typ) { // iparam
         try {
             blxEditedParamGet(0)
@@ -654,9 +656,7 @@ async function blxParSend(typ) {
 var spinnerShowLevel = 0
 var spinnerMaxSec = 0
 let wakeLock = null
-async function spinnerShow(text, maxsec) {
-    // WakeLock - Screen Dimming disablen
-    if ("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen")
+async function spinnerShow(text, maxsec) { // Achung: Async!
 
     footerInfo.textContent = ''
     /* Anzeig eim Spinner und Footer */
@@ -665,16 +665,22 @@ async function spinnerShow(text, maxsec) {
     spinnerMaxSec = maxsec
     if (!spinnerShowLevel) spinnerDLG.showModal()
     spinnerShowLevel++
+
+    // WakeLock - Screen Dimming disablen
+    if ("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen")
 }
 function spinnerClose() {
-    if (spinnerShowLevel) spinnerShowLevel--
-    if (!spinnerShowLevel) spinnerDLG.close()
+    if (spinnerShowLevel) {
+        spinnerShowLevel--
+        if (!spinnerShowLevel) spinnerDLG.close()
+    }        
+    
 }
 // Called all sec
 let lastOnlineState
 function _blxBusyMonitor() {
+    blxStateSpinner.textContent = _blxCmdFreeCnt
     const info = `[F.cnt:${_blxCmdFreeCnt++} ${_blxCmdBusyFlag ? '(Busy)' : ''}]`
-    blxStateSpinner.textContent = _blxCmdFreeCnt++
     footerInfo.textContent = info
     // Automatisch schliessen 
     if (_blxCmdFreeCnt > spinnerMaxSec && spinnerShowLevel) spinnerClose()
@@ -687,8 +693,6 @@ function _blxBusyMonitor() {
         lastOnlineState = ns
     }
 }
-
-
 
 function blxParCancel(typ) {
     if (!typ) blxDevice.iparam = original_par
@@ -791,7 +795,7 @@ async function blxEditSysparam() {
 
 async function blxMemoryInfo() {
     disabler(true)
-    spinnerShow('Memory Info', 60)
+    await spinnerShow('Memory Info', 60)
     try {
         await _blxCmdSend("v") // Scan vdir first
         await calculateMemory(true)
@@ -804,7 +808,7 @@ async function blxMemoryInfo() {
 async function blxClearDevice() {
     disabler(true)
     if (await okDialogDo('<b>Clear Device</b><br><br><br>OK to clear Device Memory?', true)) {
-        spinnerShow("Clear Device",250)
+        await spinnerShow("Clear Device",250)
         try {
             if (blxDevice.diskCheckOK !== undefined && blxDevice.diskCheckOK == true) {
                 document.getElementById("blxInfoLine").textContent = "Start new Measure, Clear all Data"
@@ -829,7 +833,7 @@ async function blxClearDevice() {
 let deviceListDB = []
 async function blxServerDataSync() {
     disabler(true)
-    spinnerShow("Synchronise with Server",300)
+    await spinnerShow("Synchronise with Server",300)
     try {
         const remurl = setupOptions.server
         const accessToken = setupOptions.accesstoken
@@ -898,7 +902,7 @@ async function updateDeviceList() {
             }
             // Spezielle Files filtern
             const fname = value.k.substr(17)
-            // console.log(storemac,fname)
+            // console.log(storemac,fname);  console.log(value)
             if (value.k === storemac + '_#BlxIDs') { // others: mac_#xxx: internal
                 deviceListDB[idx].advname = value.v.advertisingName
             } else if (value.k === storemac + '_#PIN') { // others: mac_#xxx: internal
@@ -908,11 +912,19 @@ async function updateDeviceList() {
                     lenTotal += value.v.akt_len
                 }
                 let sflag = false
-                if (fname === 'data.edt' || fname === 'data.edt.old') sflag = true // **** TEST ***
+                switch(fname){  // Select Known Data
+                case 'data.edt':
+                case 'data.edt.old':
+                case 'iparam.lxp':
+                case 'sys_param.lxp':
+                    sflag = true 
+                }
+
                 deviceListDB[idx].files.push({
                     fname: fname,
                     aktlen: value.v.akt_len,
-                    syncflag: sflag
+                    syncflag: sflag,
+                    tssync: value.v.tssync // Timestamp of last sync
                 })
                 if (sflag) {
                     deviceListDB[idx].synccnt++
@@ -1133,17 +1145,33 @@ async function deviceDialogDo(idx) {
     tel += `<br>PIN: ${dev.pin > 0 ? dev.pin : '-'}`
     tel += `<br><br>`
     // Was ist bekannt
-    console.log(dev)
+    console.log("DEV: ",dev)
 
     const anzf = dev.files.length
     if (!anzf) tel += 'No Files!'
     else {
-        tel += '<table style="text-align: left;"><tr><th>File</th><th>Bytes</th><th>&orarr;</th></tr>'
+        tel += '<table style="text-align: left;"><tr><th>File</th><th>Bytes</th><th>&orarr;</th><th>Age</th></tr>'
         for (let i = 0; i < anzf; i++) {
             const defi = dev.files[i]
             tel += `<td>'${defi.fname}'</td><td>${defi.aktlen}</td>`
-            // disabled *todo*
-            tel += `<td> <input disabled type="checkbox" ${defi.syncflag ? 'checked' : ''}></td></tr>`
+
+            tel += `<td> <input type="checkbox" ${defi.syncflag ? 'checked' : ''}></td><td>`
+
+
+            console.log("DEFI: ",defi)
+            if(defi.tssync !== undefined){
+                let ages = (Date.now() - defi.tssync)/1000
+                const ds = Math.floor(ages/86400)
+                ages -= ds *86400
+                const hs = Math.floor(ages/3600)
+                ages -= hs *3600
+                const ms = Math.floor(ages/60)
+                ages -= ms * 60
+                tel += `${ds}d ${hs}h ${ms}min ${Math.floor(ages)}sec` // Never
+            }else{
+                tel += `-` // Never
+            }
+            tel += `</td></tr>`
         }
         tel += "</table>"
     }
