@@ -79,6 +79,7 @@ const jdFooteroffline = document.getElementById("jd-footeroffline")
 const jdServertest = document.getElementById("jd-servertest")
 const footerReason = document.getElementById("footerReason")
 const footerInfo = document.getElementById("footerInfo")
+const footerSubInfo = document.getElementById("footerSubInfo")
 
 //================ TESTSACHEN ANFANG ============
 //================ TESTSACHEN ENDE ============
@@ -337,7 +338,7 @@ async function blxConnect() {
     blxCmdRes.textContent = '-'
     disabler(true)
 
-    await spinnerShow((connectionLevel >= 3)?  'Disconnect':'Connect', 300)
+    await spinnerShow((connectionLevel >= 3) ? 'Disconnect' : 'Connect', 300)
     try {
         if (connectionLevel >= 3) {
             await _blxCmdSend(".d") // disconnect
@@ -410,9 +411,9 @@ async function blxUpload() {
     } catch (error) {
         blxCmdRes.textContent = error
     }
+    await updateDeviceList()
     spinnerClose()
     disabler(false)
-    await updateDeviceList()
 }
 
 let measureData = "???"
@@ -570,6 +571,7 @@ async function blxParSend(typ) {
             store_iparam.v.akt_len = store_iparam.v.total_len
             store_iparam.v.ctime = new Date(blxDevice.iparam[4] * 1000)
             store_iparam.v.esync_flag = true // Not set by Server->Device!
+            store_iparam.v.tssync = undefined
 
             await blStore.set(blxDevice.deviceMAC + '_iparam.lxp', store_iparam.v) // First Store
             await _blxCmdSend(".fput " + blxDevice.deviceMAC + '_iparam.lxp') // Then Upload 
@@ -627,6 +629,7 @@ async function blxParSend(typ) {
             store_sysParam.v.akt_len = store_sysParam.v.total_len
             store_sysParam.v.ctime = new Date(blxDevice.sys_param[4] * 1000)
             store_sysParam.v.esync_flag = true // Not set by Server->Device!
+            store_sysParam.v.tssync = undefined
 
             await blStore.set(blxDevice.deviceMAC + '_sys_param.lxp', store_sysParam.v) // First Store
             await _blxCmdSend(".fput " + blxDevice.deviceMAC + '_sys_param.lxp') // Then Upload 
@@ -647,7 +650,9 @@ async function blxParSend(typ) {
             blxCmdRes.textContent = err
             result = err
         }
+
     }
+    await updateDeviceList()
     spinnerClose()
     return result
 } // blxParSend
@@ -662,6 +667,10 @@ async function spinnerShow(text, maxsec) { // Achung: Async!
     /* Anzeig eim Spinner und Footer */
     footerReason.textContent = text
     spinnerReason.textContent = text
+
+    footerInfo.textContent = ''
+    footerSubInfo.textContent = '' // Fuer eigene AUsgaben, z.B. Prozent etc..
+
     spinnerMaxSec = maxsec
     if (!spinnerShowLevel) spinnerDLG.showModal()
     spinnerShowLevel++
@@ -673,8 +682,8 @@ function spinnerClose() {
     if (spinnerShowLevel) {
         spinnerShowLevel--
         if (!spinnerShowLevel) spinnerDLG.close()
-    }        
-    
+    }
+
 }
 // Called all sec
 let lastOnlineState
@@ -808,7 +817,7 @@ async function blxMemoryInfo() {
 async function blxClearDevice() {
     disabler(true)
     if (await okDialogDo('<b>Clear Device</b><br><br><br>OK to clear Device Memory?', true)) {
-        await spinnerShow("Clear Device",250)
+        await spinnerShow("Clear Device", 250)
         try {
             if (blxDevice.diskCheckOK !== undefined && blxDevice.diskCheckOK == true) {
                 document.getElementById("blxInfoLine").textContent = "Start new Measure, Clear all Data"
@@ -833,28 +842,28 @@ async function blxClearDevice() {
 let deviceListDB = []
 async function blxServerDataSync() {
     disabler(true)
-    await spinnerShow("Synchronise with Server",300)
+    await spinnerShow("Server-Synchronize", 300)
     try {
         const remurl = setupOptions.server
         const accessToken = setupOptions.accesstoken
         for (let i = 0; i < deviceListDB.length; i++) { // For each known Device
             const dev = deviceListDB[i]
             const vf = dev.files
-            
+
             if (vf !== undefined && vf.length > 0) {
                 for (let fi = 0; fi < vf.length; fi++) {
-                    if (vf[fi].syncflag) {
-                        //console.log("Name/MAC:",dev.advname,dev.mac,"File:",vf[fi].fname)
-
+                    if (vf[fi].nowsyncflag /* || 1 */) {
+                        // console.log("Name/MAC:",dev.advname,dev.mac,"File:",vf[fi].fname)
+                        footerSubInfo.textContent = `Device: '${dev.advname}' File: '${vf[fi].fname}'` 
                         const key = `${dev.mac}_${vf[fi].fname}`
                         await blStore.get(key)
                         const KeyVal = blStore.result() // undefined opt.
-                        if (KeyVal !== undefined) { 
+                        if (KeyVal !== undefined) {
                             const data = KeyVal.v
-                            const res = await Talk2Server(remurl, 'upsync', accessToken,  dev.mac, vf[fi].fname, data)
-                            if(typeof res == 'object' && res.status == 'OK'){
+                            const res = await SendFile2Server(remurl, 'upsync', accessToken, dev.mac, vf[fi].fname, data)
+                            if (typeof res == 'object' && res.status == 'OK') {
                                 data.tssync = res.tssync // Add Sync-TS
-                                await blStore.set(key, data) 
+                                await blStore.set(key, data)
                             }
                         }
                     }
@@ -874,6 +883,7 @@ async function updateDeviceList() {
     await blStore.count()
     let lenTotal = 0
     let total2sync = 0
+    let now2sync = 0
     navDevicelist.innerHTML = ''
     await blStore.iterate(function (value) {
         const storemac = value.k.substr(0, 16)
@@ -912,23 +922,29 @@ async function updateDeviceList() {
                     lenTotal += value.v.akt_len
                 }
                 let sflag = false
-                switch(fname){  // Select Known Data
-                case 'data.edt':
-                case 'data.edt.old':
-                case 'iparam.lxp':
-                case 'sys_param.lxp':
-                    sflag = true 
+                let nsflag = false
+                switch (fname) {  // Select Known Data
+                    case 'data.edt':
+                    case 'data.edt.old':
+                    case 'iparam.lxp':
+                    case 'sys_param.lxp':
+                        sflag = true
+                        if (value.v.tssync === undefined) nsflag = true
                 }
 
                 deviceListDB[idx].files.push({
                     fname: fname,
                     aktlen: value.v.akt_len,
-                    syncflag: sflag,
+                    syncflag: sflag,    // Allgemein Diese Date Syncen
+                    nowsyncflag: nsflag, // Diese Date im naechsten Transfer Syncrn
                     tssync: value.v.tssync // Timestamp of last sync
                 })
                 if (sflag) {
-                    deviceListDB[idx].synccnt++
                     total2sync++
+                }
+                if (nsflag) {
+                    deviceListDB[idx].synccnt++
+                    now2sync++
                 }
             }
         }
@@ -939,7 +955,7 @@ async function updateDeviceList() {
         return a.advname.localeCompare(b.advname)
     })
 
-    console.log("Devs:", deviceListDB.length, " Total kB:", (lenTotal / 1024).toFixed(3))
+    //console.log("Devs:", deviceListDB.length, " Total kB:", (lenTotal / 1024).toFixed(3))
     let ndl = '';
     for (let i = 0; i < deviceListDB.length; i++) { // For each known Device
         const dev = deviceListDB[i]
@@ -966,11 +982,11 @@ async function updateDeviceList() {
 
     const bsicl = button4ServerSync.querySelector('i').classList
     const bspo = button4ServerSync.querySelector('.navitem-pointout')
-    if (total2sync) {
+    if (now2sync) {
         bsicl.add('fa-shake')
         bspo.hidden = false
         bspo.style.backgroundColor = 'chocolate'
-        bspo.innerHTML = `&utrif;${total2sync}`
+        bspo.innerHTML = `&utrif;${now2sync}/${total2sync}`
     } else {
         bsicl.remove('fa-shake')
         bspo.hidden = true
@@ -1145,7 +1161,7 @@ async function deviceDialogDo(idx) {
     tel += `<br>PIN: ${dev.pin > 0 ? dev.pin : '-'}`
     tel += `<br><br>`
     // Was ist bekannt
-    console.log("DEV: ",dev)
+    console.log("DEV: ", dev)
 
     const anzf = dev.files.length
     if (!anzf) tel += 'No Files!'
@@ -1153,22 +1169,24 @@ async function deviceDialogDo(idx) {
         tel += '<table style="text-align: left;"><tr><th>File</th><th>Bytes</th><th>&orarr;</th><th>Age</th></tr>'
         for (let i = 0; i < anzf; i++) {
             const defi = dev.files[i]
+            if (defi.nowsyncflag) tel += '<tr style="background-color:chocolate;")>'
+            else tel += '<tr>'
+
             tel += `<td>'${defi.fname}'</td><td>${defi.aktlen}</td>`
 
-            tel += `<td> <input type="checkbox" ${defi.syncflag ? 'checked' : ''}></td><td>`
+            tel += `<td> ${defi.syncflag ? '&#10004;' : '-'}</td><td>`
 
-
-            console.log("DEFI: ",defi)
-            if(defi.tssync !== undefined){
-                let ages = (Date.now() - defi.tssync)/1000
-                const ds = Math.floor(ages/86400)
-                ages -= ds *86400
-                const hs = Math.floor(ages/3600)
-                ages -= hs *3600
-                const ms = Math.floor(ages/60)
+            //console.log("DEFI: ",defi)
+            if (defi.tssync !== undefined) {
+                let ages = (Date.now() - defi.tssync) / 1000
+                const ds = Math.floor(ages / 86400)
+                ages -= ds * 86400
+                const hs = Math.floor(ages / 3600)
+                ages -= hs * 3600
+                const ms = Math.floor(ages / 60)
                 ages -= ms * 60
                 tel += `${ds}d ${hs}h ${ms}min ${Math.floor(ages)}sec` // Never
-            }else{
+            } else {
                 tel += `-` // Never
             }
             tel += `</td></tr>`
@@ -1252,7 +1270,7 @@ async function setup() {
 }
 
 // -- Debugging --
-async function Talk2Server(remurl, scmd, accessToken, mac, filename, dbdata) { // ATTENTION: Fetch only via HTTPS/localhos possible
+async function SendFile2Server(remurl, scmd, accessToken, mac, filename, dbdata) { // ATTENTION: Fetch only via HTTPS/localhos possible
     try {
 
         let fileDataByteArray = new Uint8Array(dbdata.bytebuf)
@@ -1282,7 +1300,7 @@ async function Talk2Server(remurl, scmd, accessToken, mac, filename, dbdata) { /
             } catch (ierr) {
                 result = { status: `ERROR: Server replies '${ierr}'` }
             }
-            result.tssync =  Date.now() // ms Timestamp
+            result.tssync = Date.now() // ms Timestamp
             //console.log("ServerReply: ", result)
             return result;
         } else throw "'" + response.status + ": " + response.statusText + "'"

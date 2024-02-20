@@ -31,7 +31,7 @@ Messages (Large XINFO add. Par.)
 const blx = (() => { // Import as 'Revealing Module Pattern'
   'use strict'
   // private 'globals'
-  const VERSION = 'V1.17 / 09.02.2024'
+  const VERSION = 'V1.18 / 20.02.2024'
   const COPYRIGHT = '(C)JoEmbedded.de'
   const HELP = 'BLX.JS and BlueShell are "living products". Questions and requests are always welcome.'
 
@@ -918,6 +918,8 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
           KeyVal.v.bytebuf = hbuf
           KeyVal.v.total_len += missing
           KeyVal.v.akt_len += missing
+          KeyVal.v.tssync = undefined
+
           // Write Back to Store
           //console.log("NewL: ", KeyVal.v.bytebuf.length)
           try {
@@ -1090,6 +1092,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
           // Zeiten sind gleich, also shiften, mgl. fehlt ein Teil von old, neu in jedem Fall dann ganz
           KeyVal_data_old = KeyVal_data
           KeyVal_data_old.k = blxIDs.deviceMAC + '_data.edt.old'
+          KeyVal_data_old.v.tssync = undefined
           KeyVal_data = undefined
           console.log("Shift 'data.edt'->'data.edt.old'")
           if (saveflag === true) { // Merken der geshifteten Werte in DB
@@ -1352,6 +1355,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
                   KeyVal.v.pos0 = 0
                   KeyVal.v.total_len = nlen
                   KeyVal.v.ucl_flag = false
+                  KeyVal.v.tssync = undefined
                   // Noch Modification Date etc...
                   await blStore.set(key, KeyVal.v)
                 } catch (err) {
@@ -1958,6 +1962,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
     storeValue.ucl_flag = infile_file_ucl_flag
     storeValue.esync_flag = infile_file_esync_flag
     storeValue.bytebuf = infile_bytebuf
+    storeValue.tssync = undefined
 
     try {
       await blStore.set(storeKey, storeValue)
