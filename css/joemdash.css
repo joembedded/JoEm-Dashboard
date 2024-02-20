@@ -158,6 +158,8 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         display: block;
         width: 100%;
         text-align: left;
+        margin: 0;
+
     }
 
     &.navhidden {

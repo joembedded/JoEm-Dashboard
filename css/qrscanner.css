@@ -13,6 +13,7 @@
   }
 
   #qrscanner-btnClose {
+	margin: 0;
 	position: absolute;
 	border: none;
 	background-color: lightgray;
@@ -28,6 +29,7 @@
   }
 
   #qrscanner-btnTorch {
+	margin: 0;
 	display: none;
 	position: absolute;
 	border: none;

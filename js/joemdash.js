@@ -1,6 +1,6 @@
 /* joemdash.js - Sidebar state machine 21.01.2024 (C) Joembedded */
 
-export let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
+let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
 function sidebar_hint() {
     // BLACK LEFT-/RIGHT POINTING POINTER
     const sbh = ['&ltrif;', '&ltrif;', '&rtrif;', '', '', '&rtrif;']

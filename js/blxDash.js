@@ -62,7 +62,7 @@ const button1Terminal = document.getElementById("button1-terminal")
 const button2MainMenu = document.getElementById("button2-maincontent")
 const button3Setup = document.getElementById("button3-setup")
 const button4ServerSync = document.getElementById("button4-sync")
-
+const button5Adddevice = document.getElementById('button5-adddevice')
 // Dialoge
 //const qrscannerDialog = document.getElementById("qrscanner-dialog") - via openSelectedCamera()
 const spinnerDLG = document.getElementById("spinner")
@@ -700,6 +700,7 @@ function _blxBusyMonitor() {
         jdFooteroffline.hidden = ns
         jdServertest.disabled = !ns
         lastOnlineState = ns
+        button4ServerSync.disabled = !ns
     }
 }
 
@@ -853,17 +854,23 @@ async function blxServerDataSync() {
             if (vf !== undefined && vf.length > 0) {
                 for (let fi = 0; fi < vf.length; fi++) {
                     if (vf[fi].nowsyncflag /* || 1 */) {
-                        // console.log("Name/MAC:",dev.advname,dev.mac,"File:",vf[fi].fname)
+                        const action = `SendFile Device/MAC: '${dev.advname}'/${dev.mac}, File: '${vf[fi].fname}'`
+                        // console.log(action)
+                        blx.terminalPrint(action)
                         footerSubInfo.textContent = `Device: '${dev.advname}' File: '${vf[fi].fname}'` 
                         const key = `${dev.mac}_${vf[fi].fname}`
                         await blStore.get(key)
                         const KeyVal = blStore.result() // undefined opt.
                         if (KeyVal !== undefined) {
                             const data = KeyVal.v
-                            const res = await SendFile2Server(remurl, 'upsync', accessToken, dev.mac, vf[fi].fname, data)
+                            const res = await SendTextFile2Server(remurl, 'upsync', accessToken, dev.mac, vf[fi].fname, data)
                             if (typeof res == 'object' && res.status == 'OK') {
                                 data.tssync = res.tssync // Add Sync-TS
                                 await blStore.set(key, data)
+                            }else{
+                                const sendResult = res
+                                blx.terminalPrint(sendResult)
+                                //console.log(sendResult)
                             }
                         }
                     }
@@ -993,6 +1000,25 @@ async function updateDeviceList() {
     }
 }
 
+// --- QR Code Scanner starten
+function scanFound(nd) {
+    blx.frq_ping(1000, 0.2, 0.5)
+    return -1 // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt
+}
+
+async function blxQRAdddevice(){
+    QRS.setQrLogPrint(blx.terminalPrint)     // Scanner-printf via Terminal-printf
+    QRS.setScanCallback(scanFound)
+    QRS.clearScannedResults()
+    await QRS.openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
+    console.log("SCAN...")
+    await QRS.scannerBusy()
+    console.log("ERGEBNIS: " + QRS.scannedResults.length + " gefunden")
+    QRS.scannedResults.forEach(e => {
+        console.log(`Found: '${e.qrValue}'`)
+    })
+}
+
 //---- helpers----
 async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
     let np = new Promise(resolve => setTimeout(resolve, ms))
@@ -1080,7 +1106,7 @@ async function editParamDialogDo(typ) {
 let setupDialogInit = false
 let setupDialogResult
 let setupDialogOpenFlag
-let setupOptions = { dtheme: false, font: 100, lang: 'EN', server: './sync/blxremote.php', accesstoken: '123456' } // in 2 Gross-Buchstaben
+let setupOptions = { dtheme: false, font: 100, lang: 'EN - English', server: './sync/blxremote.php', accesstoken: '123456' } // in 2 Gross-Buchstaben
 async function blxSetup() {
     setupDialogResult = undefined
     if (!setupDialogInit) {
@@ -1252,10 +1278,7 @@ async function setup() {
     blxSysParButton.addEventListener('click', blxEditSysparam)
     button3Setup.addEventListener('click', blxSetup)
     button4ServerSync.addEventListener('click', blxServerDataSync)
-
-
-    // Scanner-printf via Terminal-printf
-    QRS.setQrLogPrint(blx.terminalPrint)
+    button5Adddevice.addEventListener('click',blxQRAdddevice)
 
     await blStore.get('#blxDash_#SETUP')
     const so = blStore.result()
@@ -1270,7 +1293,7 @@ async function setup() {
 }
 
 // -- Debugging --
-async function SendFile2Server(remurl, scmd, accessToken, mac, filename, dbdata) { // ATTENTION: Fetch only via HTTPS/localhos possible
+async function SendTextFile2Server(remurl, scmd, accessToken, mac, filename, dbdata) { // ATTENTION: Fetch only via HTTPS/localhos possible
     try {
 
         let fileDataByteArray = new Uint8Array(dbdata.bytebuf)
