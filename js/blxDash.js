@@ -286,12 +286,12 @@ async function calculateMemory(gflag) { // get flag (= with new) if true: disabl
                 mmode = "RING"
         }
         memstr = "[Total:" + m.total + "(" + mperc + "%," + mmode + ")"
-        if (gflag) memstr += " New:" + m.incnew
+        if (gflag) memstr += " <br class='mobile-br'>New:" + m.incnew
         memstr += "] Bytes"
     } catch (error) {
         blxCmdRes.textContent = error
     }
-    blxMemory.textContent = memstr
+    blxMemory.innerHTML = memstr
 }
 
 async function showLink() { // Check if (old) Graf Data is already in Store
@@ -301,7 +301,7 @@ async function showLink() { // Check if (old) Graf Data is already in Store
         const KeyVal = blStore.result() // undefined opt.
         if (KeyVal !== undefined) {
             link = "<a target='_blank' href='../gdraw.html?st=" + blxDevice.deviceMAC + "_xtract.edt&sn=" +
-                advertisingName + "'>Show Graph</a> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
+                advertisingName + "'>Show Graph</a><br class='mobile-br'> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
                     .toLocaleString() + ")"
         }
     } catch (error) {
@@ -1338,26 +1338,10 @@ async function dbg_action() {
     //await editParamDialogDo(1, "<b>Edit Parameter</b>")
     //await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false)
     await updateDeviceList()
-
-
-    //const remurl = './sync/blxremote.php'
-    //const remurl = 'https://joembedded.de/wrk/fetch/blxremote.php'
-    /*
-        const remurl = setupOptions.server
-        const accessToken = setupOptions.accesstoken
-    
-        const mac = '0011223344556677'
-        const filename = 'testfile.dat'
-        const scmd = 'upsync'
-        const data = {
-            name: 'Jürgen & Ute Wickenhäuser',
-                    alter: 59,
-                    kids: ['Laura', 'Jan'] 
-        }
-        await Talk2Server(remurl, scmd, accessToken, mac, filename, data)
-    */
 }
+
 document.getElementById('dbg-action').addEventListener('click', dbg_action)
 
-setup()
+window.addEventListener('load',setup) // Ganz am Schluss
+
 //***
