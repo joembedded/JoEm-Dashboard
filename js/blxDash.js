@@ -16,7 +16,9 @@ let connectionLevel = 0
 let advertisingName
 let blxDevice
 
-var urlpar = {} // Aufruf-Parameter, z.B. urlpar.test = abc fuer ?test=abc
+let urlpar = {} // Aufruf-Parameter, z.B. urlpar.test = abc fuer ?test=abc
+
+let deviceListDB = [] // Liste der vorhandenen Devices in IndexDB
 
 // ----- UI-Elemente -------------
 const blxStateText = document.getElementById("blxStateText")
@@ -161,7 +163,7 @@ function bleCallback(m, v, xinfo) {
             break
         case 'RSSI':
             let bars = (v * 0.273) + 28; // Farben wie Blueshell
-            var nc = 'limegreen'
+            let nc = 'limegreen'
             if (bars >= 0) {
                 if (bars < 4) nc = 'gray'
                 else if (bars < 8) nc = 'orange'  // (Sig. < -70 dBm) Weak
@@ -658,8 +660,8 @@ async function blxParSend(typ) {
 } // blxParSend
 
 // Kaskadierbar
-var spinnerShowLevel = 0
-var spinnerMaxSec = 0
+let spinnerShowLevel = 0
+let spinnerMaxSec = 0
 let wakeLock = null
 async function spinnerShow(text, maxsec) { // Achung: Async!
 
@@ -840,7 +842,6 @@ async function blxClearDevice() {
     disabler(false)
 }
 
-let deviceListDB = []
 async function blxServerDataSync() {
     disabler(true)
     await spinnerShow("Server-Synchronize", 300)
@@ -857,7 +858,7 @@ async function blxServerDataSync() {
                         const action = `SendFile Device/MAC: '${dev.advname}'/${dev.mac}, File: '${vf[fi].fname}'`
                         // console.log(action)
                         blx.terminalPrint(action)
-                        footerSubInfo.textContent = `Device: '${dev.advname}' File: '${vf[fi].fname}'` 
+                        footerSubInfo.textContent = `Device: '${dev.advname}' File: '${vf[fi].fname}'`
                         const key = `${dev.mac}_${vf[fi].fname}`
                         await blStore.get(key)
                         const KeyVal = blStore.result() // undefined opt.
@@ -867,7 +868,7 @@ async function blxServerDataSync() {
                             if (typeof res == 'object' && res.status == 'OK') {
                                 data.tssync = res.tssync // Add Sync-TS
                                 await blStore.set(key, data)
-                            }else{
+                            } else {
                                 const sendResult = res
                                 blx.terminalPrint(sendResult)
                                 //console.log(sendResult)
@@ -1001,12 +1002,17 @@ async function updateDeviceList() {
 }
 
 // --- QR Code Scanner starten
-function scanFound(nd) {
-    blx.frq_ping(1000, 0.2, 0.5)
-    return -1 // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt
+async function scanFound(nd) {
+    blx.frq_ping(1000, 0.1, 0.5)
+
+    console.log("Scanner:",nd)
+    sagmal(nd)
+
+
+    return 1 // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt
 }
 
-async function blxQRAdddevice(){
+async function blxQRAdddevice() {
     QRS.setQrLogPrint(blx.terminalPrint)     // Scanner-printf via Terminal-printf
     QRS.setScanCallback(scanFound)
     QRS.clearScannedResults()
@@ -1024,11 +1030,37 @@ async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
     let np = new Promise(resolve => setTimeout(resolve, ms))
     return np
 }
+
+// --------- Say ---------------
+let voices = []
+
+async function sagmal(txt2say) {
+    if (window.speechSynthesis === undefined) {
+        blx.frq_ping(30, 0.3, 0.5)
+        return // Nicht vorhanden
+    }
+
+    window.speechSynthesis.cancel()
+    for(;;){ // Laden der Sprachen etwas ungewohnt
+        if (voices.length !== 0) break
+        voices = window.speechSynthesis.getVoices()
+        await dashSleepMs(10)
+    }
+    let sprichDas = new SpeechSynthesisUtterance(txt2say)
+    let slang = I18.i18_currentLang // Wenn nicht gefunden: Default verwenden
+    let myvoice = voices.find(v => v.lang.indexOf(slang) >= 0)
+    sprichDas.voice = myvoice;
+    speechSynthesis.speak(sprichDas);
+}
+
+
+
+
 // ---------- okDialog -------------
 let okDialoginit = false
 let okDialogOpenFlag
 let okDialogResult
-async function okDialogDo(question, xconfirm = false) {
+async function okDialogDo(question, xconfirm = false, timeout_sec = 0) {
     blx.frq_ping(880, 0.3, 0.3)
     // addEventListener only one instance added
     okDialogDOM.querySelector('#ok-content').innerHTML = question
@@ -1060,6 +1092,10 @@ async function okDialogDo(question, xconfirm = false) {
     okDialogDOM.showModal()
     for (; ;) {
         await dashSleepMs(50)
+        if (timeout_sec > 0) {
+            timeout_sec -= 0.05
+            if (timeout_sec <= 0) break;
+        }
         if (!okDialogOpenFlag) break
     }
     okDialogDOM.close()
@@ -1241,7 +1277,7 @@ async function deviceDialogDo(idx) {
 async function setup() {
     // Isolate URL Parameters
     const qs = location.search.substr(1).split('&')
-    var urlpar = {}
+    urlpar = {}
     for (let x = 0; x < qs.length; x++) {
         let kv = qs[x].split('=')
         if (kv[1] === undefined) kv[1] = ''
@@ -1278,7 +1314,7 @@ async function setup() {
     blxSysParButton.addEventListener('click', blxEditSysparam)
     button3Setup.addEventListener('click', blxSetup)
     button4ServerSync.addEventListener('click', blxServerDataSync)
-    button5Adddevice.addEventListener('click',blxQRAdddevice)
+    button5Adddevice.addEventListener('click', blxQRAdddevice)
 
     await blStore.get('#blxDash_#SETUP')
     const so = blStore.result()
@@ -1336,12 +1372,13 @@ async function SendTextFile2Server(remurl, scmd, accessToken, mac, filename, dbd
 
 async function dbg_action() {
     //await editParamDialogDo(1, "<b>Edit Parameter</b>")
-    //await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false)
-    await updateDeviceList()
+    // await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false,10)
+    //await updateDeviceList()
+    sagmal("This is not a Lovesong. OiOiOi! Lies dieses Lied leise Elise")    
 }
 
 document.getElementById('dbg-action').addEventListener('click', dbg_action)
 
-window.addEventListener('load',setup) // Ganz am Schluss
+window.addEventListener('load', setup) // Ganz am Schluss
 
 //***
