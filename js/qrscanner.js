@@ -256,16 +256,16 @@ async function camWorker() {
             if (barcode.length > 0) { // 1. Barcode analysieren. Kann mehrere finden!
                 //console.log(barcode.length)
                 ctxCam.lineWidth = 5
-                barcode.every((b) => {
+                barcode.every(async (b) => {
                     if (b.rawValue !== '') { // only for readable codes!
                         scaledVideoCanvas.style.borderColor = 'darkgreen' // Found something
                         const fn = scannedResults.find((e) => { return e.qrValue === b.rawValue })
                         let qcol = 'lime' // Assume NEW:lime
                         if (!fn) {
                             // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt
-                            const nqacc = scanCallback(b.rawValue)
+                            const nqacc = await scanCallback(b.rawValue)
                             if (nqacc >= 0) {
-                                if (qrLogPrint) qrLogPrint(`Scanned[${scannedResults.length}]: '${b.rawValue}'`)
+                                if (qrLogPrint) qrLogPrint(`Scanned: '${b.rawValue}'`) 
                                 qcol = 'lime' // OK
                             } else qcol = 'red' // Ignored Code
                             scannedResults.push({ qrValue: b.rawValue, t0: performance.now(), scnt: 0, accepted: nqacc });

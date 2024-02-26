@@ -8,7 +8,7 @@ import './blx.js' // *todo* './js/blx.min.js'
 import './blStore.min.js'
 
 //--------- globals ------ 
-const VERSION = 'V0.10 / 08.02.2024'
+const VERSION = 'V0.20 / 26.02.2024'
 const COPYRIGHT = '(C)JoEmbedded.de'
 const HELP = 'This is a "living product". Questions and requests are always welcome.'
 
@@ -18,7 +18,7 @@ let blxDevice
 
 let urlpar = {} // Aufruf-Parameter, z.B. urlpar.test = abc fuer ?test=abc
 
-let deviceListDB = [] // Liste der vorhandenen Devices in IndexDB
+let deviceListDB = [] // GLOBALE Liste der vorhandenen Devices in IndexDB
 
 // ----- UI-Elemente -------------
 const blxStateText = document.getElementById("blxStateText")
@@ -888,7 +888,7 @@ async function blxServerDataSync() {
 
 async function updateDeviceList() {
     deviceListDB = []
-    await blStore.count()
+    // await blStore.count()
     let lenTotal = 0
     let total2sync = 0
     let now2sync = 0
@@ -909,12 +909,13 @@ async function updateDeviceList() {
             }
             // Optionally add to array of MACs
             if (idx === undefined) {
+                let defAdvName = `(...${storemac.slice(-8)})`
                 idx = deviceListDB.length
                 deviceListDB.push({
                     mac: storemac, // 16 Digits
                     files: [], // List of Files
                     synccnt: 0,
-                    advname: '(unknown)', // Advertising Name
+                    advname: defAdvName, // Advertising Name
                     pin: 0
                 })
             }
@@ -1001,29 +1002,121 @@ async function updateDeviceList() {
     }
 }
 
+// Remove Device with MAC (and update UI)
+async function removeDevice(mac) {
+    if (mac.length != 16) return false // Illegal formats    
+    const delList = []
+    await blStore.iterate(function (value) {
+        const storemac = value.k.substr(0, 16)
+        // Search only MACs
+        if (storemac === mac && value.k.charAt(16) === '_') delList.push(value.k)
+    })
+    if (!delList.length) return false // Nothing found
+    for (let idx = 0; idx < delList.length; idx++) {
+        await blStore.remove(delList[idx])
+    }
+    await updateDeviceList()
+}
+
+// AddDevice (and Update UI)
+async function addDevice(mac, ownertoken) {
+    if (mac.length != 16 || ownertoken.length != 16) return false // Illegal formats
+    if (deviceListDB.find(e => { return e.mac == mac }) !== undefined) return false // Already there
+    let pin = ((parseInt(ownertoken.substring(0, 8), 16)) % 899800) + 100100
+    await blStore.set(mac + '_#PIN', pin.toString())
+    await updateDeviceList()
+    return true // Sucessfully added
+}
+
 // --- QR Code Scanner starten
-async function scanFound(nd) {
-    blx.frq_ping(1000, 0.1, 0.5)
-
-    console.log("Scanner:",nd)
-    sagmal(nd)
-
-
-    return 1 // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt
+async function scanFoundAddDevice(scanresult) {
+    const lcscan = scanresult.toLowerCase()
+    // Fall 1: Link. Erstmal noch ignorieren!
+    if(lcscan.startsWith('http')){
+        /*
+        const qrlink = scanresult
+        if(await okDialogDo(`<b>Open Link?</b><br><br><br>'${qrlink}'<br>`,false, 10) == true){
+            window.open(qrlink)
+        }
+        return 1
+        */
+        return -1
+    }
+    // Fall 2: MAC/OWNERTOKEN: EInbuchen!
+    const scantoks = scanresult.split(' ')
+    // Is it MAC: OT: ?
+    if(scantoks.length == 2 && scantoks[0].startsWith('MAC:') && scantoks[1].startsWith('OT:')){
+        const mac = scantoks[0].substring(4)
+        const ownertoken = scantoks[1].substring(3)
+        if (mac.length == 16 && ownertoken.length == 16){
+            if(deviceListDB.find(e => { return e.mac == mac }) === undefined){
+                blx.chordsound(750) // NEU
+                addDevice(mac,ownertoken)
+            } else blx.frq_ping(750, 0.1, 0.5) // Bereits da
+            return 1 // OK, More
+        }
+    }
+    // Alles andere: Erstmal Vorlesen
+    sagmal(scanresult)
+    return -1 // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt
 }
 
 async function blxQRAdddevice() {
     QRS.setQrLogPrint(blx.terminalPrint)     // Scanner-printf via Terminal-printf
-    QRS.setScanCallback(scanFound)
+    QRS.setScanCallback(scanFoundAddDevice)
     QRS.clearScannedResults()
     await QRS.openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
-    console.log("SCAN...")
+    //console.log("SCAN...")
     await QRS.scannerBusy()
+    /*
     console.log("ERGEBNIS: " + QRS.scannedResults.length + " gefunden")
     QRS.scannedResults.forEach(e => {
         console.log(`Found: '${e.qrValue}'`)
-    })
+    }) 
+    */
 }
+
+// ---- Server ----
+async function SendTextFile2Server(remurl, scmd, accessToken, mac, filename, dbdata) { // ATTENTION: Fetch only via HTTPS/localhos possible
+    try {
+
+        let fileDataByteArray = new Uint8Array(dbdata.bytebuf)
+        let decoder = new TextDecoder()
+        let binstr = decoder.decode(fileDataByteArray)
+
+        const v = {
+            mac: mac,
+            filename: filename,
+            /* OtherData*/
+            data: binstr,
+        }
+
+        const response = await fetch(remurl + "?k=" + accessToken + "&cmd=" + scmd, {
+            method: "POST",
+            mode: "cors",
+            //credentials: "include", // nur wenn kein Mit Wildcard Access 
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(v)
+        })
+        if (response.status === 200) {
+            let result
+            try {
+                result = await response.json()
+            } catch (ierr) {
+                result = { status: `ERROR: Server replies '${ierr}'` }
+            }
+            result.tssync = Date.now() // ms Timestamp
+            //console.log("ServerReply: ", result)
+            return result;
+        } else throw "'" + response.status + ": " + response.statusText + "'"
+    } catch (err) { // Catch e.g. CORS Errors
+        console.log("ERROR:", err)
+        return "ERROR: " + err // 'ERROR: Magic first word
+    }
+}
+
 
 //---- helpers----
 async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
@@ -1032,8 +1125,7 @@ async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
 }
 
 // --------- Say ---------------
-let voices = []
-
+let voices = [] // Wird erst on Demand gefuellt
 async function sagmal(txt2say) {
     if (window.speechSynthesis === undefined) {
         blx.frq_ping(30, 0.3, 0.5)
@@ -1041,19 +1133,21 @@ async function sagmal(txt2say) {
     }
 
     window.speechSynthesis.cancel()
-    for(;;){ // Laden der Sprachen etwas ungewohnt
+    for (let w = 0; w < 100; w++) { // Laden der Sprachen etwas ungewohnt, max. 1 sec warten
         if (voices.length !== 0) break
         voices = window.speechSynthesis.getVoices()
         await dashSleepMs(10)
     }
+    //voices.forEach(e=>console.log(`Available: '${e.name}':'${e.lang}', Local:${e.localService}`))
     let sprichDas = new SpeechSynthesisUtterance(txt2say)
     let slang = I18.i18_currentLang // Wenn nicht gefunden: Default verwenden
     let myvoice = voices.find(v => v.lang.indexOf(slang) >= 0)
-    sprichDas.voice = myvoice;
-    speechSynthesis.speak(sprichDas);
+    sprichDas.default = false
+    sprichDas.voice = myvoice
+    sprichDas.lang = slang
+    //console.log(`Selected('${slang}'): '${myvoice.name}':'${myvoice.lang}'`)
+    window.speechSynthesis.speak(sprichDas);
 }
-
-
 
 
 // ---------- okDialog -------------
@@ -1078,16 +1172,17 @@ async function okDialogDo(question, xconfirm = false, timeout_sec = 0) {
             okbut.disabled = !okchk.checked
         })
         okDialoginit = true
-        okDialogResult = false
     }
-    if (!xconfirm) {  // Extra Confirm required
+    if (!xconfirm) {  // (no) Extra Confirm required
         okbut.disabled = false
         okchk.hidden = true
     } else {
+        okchk.checked = false
         okbut.disabled = true
         okchk.hidden = false
     }
 
+    okDialogResult = false
     okDialogOpenFlag = true
     okDialogDOM.showModal()
     for (; ;) {
@@ -1169,7 +1264,8 @@ async function blxSetup() {
             I18.i18localize(lng)
         })
         setupDLG.querySelector('#jd-servertest').addEventListener('click', (e) => {
-            window.open(setupDLG.querySelector('#jd-server').value);
+            // Open WITH token, but no cmd
+            window.open(setupDLG.querySelector('#jd-server').value + '?k=' + setupDLG.querySelector('#jd-accesstoken').value);
         })
 
 
@@ -1212,8 +1308,12 @@ async function deviceDialogDo(idx) {
             deviceDialogOpenFlag = false
         })
         deviceDialog.querySelector('#deviceDialogBtnOK').addEventListener('click', () => {
-            deviceDialogResult = 'ok' // SEND
+            deviceDialogResult = 'ok' // OK
             deviceDialogOpenFlag = false
+        })
+        deviceDialog.querySelector('#deviceDialogBtnRemoveDevice').addEventListener('click', () => {
+            deviceDialogResult = 'remove' // Remove Device
+            // deviceDialogOpenFlag = false
         })
         deviceDialogInit = true
     }
@@ -1222,8 +1322,9 @@ async function deviceDialogDo(idx) {
     let tel = `<b>Name: '${dev.advname}'</b><br>MAC: ${dev.mac}<br>`
     tel += `<br>PIN: ${dev.pin > 0 ? dev.pin : '-'}`
     tel += `<br><br>`
+
     // Was ist bekannt
-    console.log("DEV: ", dev)
+    // console.log("DEV: ", dev)
 
     const anzf = dev.files.length
     if (!anzf) tel += 'No Files!'
@@ -1264,14 +1365,20 @@ async function deviceDialogDo(idx) {
     deviceDialog.showModal()
     for (; ;) {
         await dashSleepMs(50)
+        if (deviceDialogResult == 'remove') {
+            let okres = await okDialogDo(`Remove Device (from Local Storage)?<br><br><b>Name: '${dev.advname}'</b><br>MAC: ${dev.mac}<br>`, true)
+            if (okres === true) {
+                await removeDevice(dev.mac)
+                break
+            }
+            deviceDialogResult = '?'
+        }
         if (!deviceDialogOpenFlag) break
     }
     deviceDialog.close()
     devdiacont.innerHTML = ''
     return deviceDialogResult
 }
-
-
 
 //---------------- setup ------------
 async function setup() {
@@ -1326,55 +1433,16 @@ async function setup() {
     }
 
     await updateDeviceList()
+
 }
 
 // -- Debugging --
-async function SendTextFile2Server(remurl, scmd, accessToken, mac, filename, dbdata) { // ATTENTION: Fetch only via HTTPS/localhos possible
-    try {
-
-        let fileDataByteArray = new Uint8Array(dbdata.bytebuf)
-        let decoder = new TextDecoder()
-        let binstr = decoder.decode(fileDataByteArray)
-
-        const v = {
-            mac: mac,
-            filename: filename,
-            /* OtherData*/
-            data: binstr,
-        }
-
-        const response = await fetch(remurl + "?k=" + accessToken + "&cmd=" + scmd, {
-            method: "POST",
-            mode: "cors",
-            //credentials: "include", // nur wenn kein Mit Wildcard Access 
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(v)
-        })
-        if (response.status === 200) {
-            let result
-            try {
-                result = await response.json()
-            } catch (ierr) {
-                result = { status: `ERROR: Server replies '${ierr}'` }
-            }
-            result.tssync = Date.now() // ms Timestamp
-            //console.log("ServerReply: ", result)
-            return result;
-        } else throw "'" + response.status + ": " + response.statusText + "'"
-    } catch (err) { // Catch e.g. CORS Errors
-        console.log("ERROR:", err)
-        return "ERROR: " + err // 'ERROR: Magic first word
-    }
-}
-
-
 async function dbg_action() {
     //await editParamDialogDo(1, "<b>Edit Parameter</b>")
     // await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false,10)
     //await updateDeviceList()
-    sagmal("This is not a Lovesong. OiOiOi! Lies dieses Lied leise Elise")    
+    // sagmal("This is not a Lovesong. OiOiOi! Lies dieses Lied leise Elise")   
+    await addDevice('0011223344556677', '0011223344556677')
 }
 
 document.getElementById('dbg-action').addEventListener('click', dbg_action)
