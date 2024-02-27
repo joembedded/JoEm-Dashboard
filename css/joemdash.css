@@ -352,6 +352,7 @@ dialog {
         right: 0;
         font-size: calc(1.5rem * var(--fontrel));
         padding: 8px;
+        margin: 0;
 
         &:hover {
             background-color: var(--hovergray);

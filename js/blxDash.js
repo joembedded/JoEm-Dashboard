@@ -37,6 +37,7 @@ const blxDeviceName = document.getElementById("blxDeviceName")
 const blxMAC = document.getElementById("blxMAC")
 const blxType = document.getElementById("blxType")
 const blxFW = document.getElementById("blxFW")
+const blxPIN = document.getElementById("blxPIN")
 
 const navDevicelist = document.getElementById('nav-devicelist')
 
@@ -57,6 +58,7 @@ const blxInfoButtonSpan = document.getElementById("blxInfoButtonSpan")
 const blxClearButtonSpan = document.getElementById("blxClearButtonSpan")
 const blxParametersSpan = document.getElementById("blxParametersSpan")
 const blxSetPinButton = document.getElementById("blxSetPinButton")
+const blxScanPinButton = document.getElementById("blxScanPinButton")
 const blxParameterEdit = document.getElementById("blxParameterEdit")
 // Menue Buttons
 const button0Link = document.getElementById("button0-link")
@@ -329,6 +331,7 @@ async function show_details() {
         blxInfoLine.textContent = "Connected"
         blxMeasureData.innerHTML = '-'
         blxParameterEdit.innerHTML = ""
+        updateDeviceList()
     }
 }
 
@@ -387,6 +390,10 @@ async function blxSetPin() { // CMD used to enable PIN
     }
     spinnerClose()
     disabler(false)
+}
+
+async function blxScanPin() { // Pin Scannen
+    await blxQRAdddevice(blxDevice.deviceMAC) // Suche nach spezieller MAC
 }
 
 async function blxSyncTime() {
@@ -1018,50 +1025,93 @@ async function removeDevice(mac) {
     await updateDeviceList()
 }
 
-// AddDevice (and Update UI)
-async function addDevice(mac, ownertoken) {
-    if (mac.length != 16 || ownertoken.length != 16) return false // Illegal formats
-    if (deviceListDB.find(e => { return e.mac == mac }) !== undefined) return false // Already there
-    let pin = ((parseInt(ownertoken.substring(0, 8), 16)) % 899800) + 100100
+// Helper
+function ownertoken2pin(ownertoken) {
+    return ((parseInt(ownertoken.substring(0, 8), 16)) % 899800) + 100100
+}
+// AddDevice (and Update UI) Set/Update either ownertoken or pin
+async function addDevice(mac, ownertoken, opin) {
+    if (mac.length != 16) return false
+    let pin
+    if (ownertoken !== undefined && opin === undefined) {
+        if (ownertoken.length != 16) return false // Illegal formats
+        pin = ownertoken2pin(ownertoken)
+    } else if (ownertoken === undefined && opin !== undefined) {
+        if (opin.length != 6) return false // Illegal formats
+        pin = opin
+    } else return false
+
     await blStore.set(mac + '_#PIN', pin.toString())
     await updateDeviceList()
     return true // Sucessfully added
 }
 
 // --- QR Code Scanner starten
+// Returns (siehe qrscanner.js): -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt undefined:diesenScanignorieren
+let qrlink = undefined
+let cnt = 0
+let searchmac = ''
 async function scanFoundAddDevice(scanresult) {
+    // console.log("SCAN ", cnt++, ":", scanresult)
     const lcscan = scanresult.toLowerCase()
     // Fall 1: Link. Erstmal noch ignorieren!
-    if(lcscan.startsWith('http')){
-        /*
-        const qrlink = scanresult
-        if(await okDialogDo(`<b>Open Link?</b><br><br><br>'${qrlink}'<br>`,false, 10) == true){
+    if (lcscan.startsWith('http')) {
+        if (qrlink !== undefined) return
+        qrlink = scanresult
+        blx.terminalPrint(`Scanned: '${qrlink}'`)
+        if (await okDialogDo(`<b>Open Link?</b><br><br><br>'${qrlink}'<br>`) == true) {
             window.open(qrlink)
         }
+        qrlink = undefined
         return 1
-        */
-        return -1
     }
-    // Fall 2: MAC/OWNERTOKEN: EInbuchen!
+
+    // Fall 2: MAC/OWNERTOKEN/PIN: Einbuchen! oder bei search MAC
     const scantoks = scanresult.split(' ')
     // Is it MAC: OT: ?
-    if(scantoks.length == 2 && scantoks[0].startsWith('MAC:') && scantoks[1].startsWith('OT:')){
+    if (scantoks.length == 2 && scantoks[0].startsWith('MAC:')) {
         const mac = scantoks[0].substring(4)
-        const ownertoken = scantoks[1].substring(3)
-        if (mac.length == 16 && ownertoken.length == 16){
-            if(deviceListDB.find(e => { return e.mac == mac }) === undefined){
-                blx.chordsound(750) // NEU
-                addDevice(mac,ownertoken)
+        if (mac.length == 16) {
+            const fres = deviceListDB.find(e => { return e.mac == mac }) 
+            if (fres === undefined || fres.pin == 0) {
+                let fnd = false
+                let pin
+                blx.chordsound(750, 0.5, 0.5) // NEU: Chord
+                if (scantoks[1].startsWith('OT:')) {
+                    const ownertoken = scantoks[1].substring(3)
+                    if (ownertoken.length == 16) {
+                        pin = ownertoken2pin(ownertoken)
+                        fnd = await addDevice(mac, ownertoken, undefined)
+                    }
+                } else if (scantoks[1].startsWith('PIN:')) {
+                    pin = scantoks[1].substring(4)
+                    if (pin.length == 6) {
+                        fnd = await addDevice(mac, undefined, pin)
+                    }
+                }
+                if (fnd === true && mac == searchmac) {
+                    blxPIN.value = pin
+                    return 0    // Ende
+                }
             } else blx.frq_ping(750, 0.1, 0.5) // Bereits da
             return 1 // OK, More
         }
     }
-    // Alles andere: Erstmal Vorlesen
-    sagmal(scanresult)
-    return -1 // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt
+    // Fall 3: Texte TXT-DE:Blabla
+    if (scanresult.startsWith('TXT-') && scanresult[6] == ':') {
+        const lang = scanresult.substring(4, 6)
+        const saythis = scanresult.substring(7)
+        blx.terminalPrint(`Text(${lang}): '${saythis}'`)
+        blx.frq_ping(1500, 0.1, 0.5) // Bereits da
+        sagmal(saythis, lang.toLowerCase())
+        return 2 // Orange, - Text selbst angezeigt.
+    }
+    blx.frq_ping(30, 0.1, 0.5)
+    return -1
 }
 
-async function blxQRAdddevice() {
+async function blxQRAdddevice(smac = '') {
+    searchmac = smac // Empty oder MAC fuer PIN
     QRS.setQrLogPrint(blx.terminalPrint)     // Scanner-printf via Terminal-printf
     QRS.setScanCallback(scanFoundAddDevice)
     QRS.clearScannedResults()
@@ -1126,13 +1176,13 @@ async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
 
 // --------- Say ---------------
 let voices = [] // Wird erst on Demand gefuellt
-async function sagmal(txt2say) {
+async function sagmal(txt2say, zlang) {
     if (window.speechSynthesis === undefined) {
         blx.frq_ping(30, 0.3, 0.5)
         return // Nicht vorhanden
     }
 
-    window.speechSynthesis.cancel()
+    //window.speechSynthesis.cancel()
     for (let w = 0; w < 100; w++) { // Laden der Sprachen etwas ungewohnt, max. 1 sec warten
         if (voices.length !== 0) break
         voices = window.speechSynthesis.getVoices()
@@ -1140,11 +1190,13 @@ async function sagmal(txt2say) {
     }
     //voices.forEach(e=>console.log(`Available: '${e.name}':'${e.lang}', Local:${e.localService}`))
     let sprichDas = new SpeechSynthesisUtterance(txt2say)
-    let slang = I18.i18_currentLang // Wenn nicht gefunden: Default verwenden
+    let slang = zlang // I18.i18_currentLang // Wenn nicht gefunden: Default verwenden
     let myvoice = voices.find(v => v.lang.indexOf(slang) >= 0)
-    sprichDas.default = false
-    sprichDas.voice = myvoice
-    sprichDas.lang = slang
+    if (myvoice !== undefined) {
+        sprichDas.default = false
+        sprichDas.voice = myvoice
+        sprichDas.lang = slang
+    }
     //console.log(`Selected('${slang}'): '${myvoice.name}':'${myvoice.lang}'`)
     window.speechSynthesis.speak(sprichDas);
 }
@@ -1411,6 +1463,7 @@ async function setup() {
 
     blxBadgeButton.addEventListener('click', blxPrintBadge)
     blxSetPinButton.addEventListener('click', blxSetPin)
+    blxScanPinButton.addEventListener('click', blxScanPin)
     blxInfoButton.addEventListener('click', blxMemoryInfo)
     blxSyncButton.addEventListener('click', blxSyncTime)
     blxUploadButton.addEventListener('click', blxUpload)

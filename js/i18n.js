@@ -2,7 +2,7 @@
   // Locale translations. Sucht alle Elemente mit Attribut ll='ident' mit "ident":"Inhalt" , auch in Bloecken
   export const i18_availLang = ['en', 'de']   // List of available locales
   export const i18_defaultLang = 'en'   // Fallback/Default
-  export let i18_currentLang = '??'
+  export let i18_currentLang = 'en'
 
   export const translations = {
     // EN

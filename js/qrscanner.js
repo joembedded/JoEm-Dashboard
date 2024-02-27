@@ -46,22 +46,22 @@ class cozmoQR {
 } // Ende class cozmoQR
 
 // DOMs
-let scanDialog 
+let scanDialog
 let videoQuelle
-let scaledVideoCanvas 
-let camSelector 
+let scaledVideoCanvas
+let camSelector
 let btnTorch
 
-function initQrCodeDOM(){
-    try{
-    scanDialog = document.getElementById("qrscanner-dialog")
-    videoQuelle = document.getElementById("qroriginal-video")
-    scaledVideoCanvas = document.getElementById("qrscaled-videocanvas")
-    camSelector = document.getElementById("qrcam-selector")
-    document.getElementById("qrscanner-btnClose").addEventListener("click", closeCam)
-    btnTorch = document.getElementById("qrscanner-btnTorch")
-    btnTorch.addEventListener("click", torchOnOff)
-    } catch(err){
+function initQrCodeDOM() {
+    try {
+        scanDialog = document.getElementById("qrscanner-dialog")
+        videoQuelle = document.getElementById("qroriginal-video")
+        scaledVideoCanvas = document.getElementById("qrscaled-videocanvas")
+        camSelector = document.getElementById("qrcam-selector")
+        document.getElementById("qrscanner-btnClose").addEventListener("click", closeCam)
+        btnTorch = document.getElementById("qrscanner-btnTorch")
+        btnTorch.addEventListener("click", torchOnOff)
+    } catch (err) {
         if (qrLogPrint) qrLogPrint(`ERROR(initCameras): ${err}`)
     }
 }
@@ -77,7 +77,7 @@ let barcodeScannerInit = false // Wenn true; verwendbar
 // Setup
 const camUpdateInterval = 50 // ms
 let qrLogPrint = console.log //  z.B. print() oder console.log(), null, ...
-export function setQrLogPrint(f){
+export function setQrLogPrint(f) {
     qrLogPrint = f
 }
 let wakeLock = null
@@ -91,13 +91,13 @@ let scaleVideo2Canvas = 0
 // Results - Array of Objects (auch ignorierte)
 let qrScanDialogOpen = false
 export let scannedResults = []
-export function clearScannedResults(){
+export function clearScannedResults() {
     scannedResults = []
 }
 
 // Wertet Scanned Result aus - Return -1:Ignore,0:OkUndEnd,1:OkUndMehr
 let scanCallback = function () { return 1 }
-export function setScanCallback(f){
+export function setScanCallback(f) {
     scanCallback = f
 }
 
@@ -109,7 +109,7 @@ async function initCameras() {
         initQrCodeDOM()
 
         // Barcode-Teil
-        if (!('BarcodeDetector' in window)   /* || 1 */)  {
+        if (!('BarcodeDetector' in window)   /* || 1 */) {
             if (qrLogPrint) qrLogPrint("ERROR: No Barcode API available, Use Polyfill!")
             window.BarcodeDetector = cozmoQR
         } else {
@@ -140,12 +140,12 @@ async function initCameras() {
                 selectedCameraIdx = idx
                 camname = 'Back'
                 backcnt++
-                if(backcnt>1) camname += `(${backcnt})`
+                if (backcnt > 1) camname += `(${backcnt})`
             }
             if (e.label.toLowerCase().includes('front')) {
                 camname = 'Front'
                 facecnt++
-                if(facecnt>1) camname += `(${facecnt})`
+                if (facecnt > 1) camname += `(${facecnt})`
             }
             newoption.text = camname
 
@@ -190,8 +190,8 @@ export async function openSelectedCamera() {
                 width: { min: 640  }, 
                 height: { min: 480 },
                 */
-                width: { min: 640 , ideal: 1920 }, 
-                height: { min: 480 , ideal: 1080 },
+                width: { min: 640, ideal: 1920 },
+                height: { min: 480, ideal: 1080 },
             }
         })
         // console.log(camStream)
@@ -257,24 +257,32 @@ async function camWorker() {
                 //console.log(barcode.length)
                 ctxCam.lineWidth = 5
                 barcode.every(async (b) => {
-                    if (b.rawValue !== '') { // only for readable codes!
+                    const rawstring = b.rawValue.replace(/(\r\n|\n|\r)/gm, " ");
+                    if (rawstring !== '') { // only for readable codes!
                         scaledVideoCanvas.style.borderColor = 'darkgreen' // Found something
-                        const fn = scannedResults.find((e) => { return e.qrValue === b.rawValue })
-                        let qcol = 'lime' // Assume NEW:lime
+                        const fn = scannedResults.find((e) => { return e.qrValue === rawstring })
+                        let qcol = 'red' // Assume Ignored
                         if (!fn) {
-                            // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt
-                            const nqacc = await scanCallback(b.rawValue)
-                            if (nqacc >= 0) {
-                                if (qrLogPrint) qrLogPrint(`Scanned: '${b.rawValue}'`) 
+                            // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt 2:OrangeUndNochMehr undefined:diesenScanignorieren
+                            let nqacc = await scanCallback(rawstring)
+                            if (nqacc === undefined) return cntflag
+                            if( nqacc == 2) {
+                                qcol = 'orange' 
+                            } else  if (nqacc >= 0) {
+                                if (qrLogPrint) qrLogPrint(`Scanned: '${rawstring}'`) // Nur 0,1 anzeigen
                                 qcol = 'lime' // OK
-                            } else qcol = 'red' // Ignored Code
-                            scannedResults.push({ qrValue: b.rawValue, t0: performance.now(), scnt: 0, accepted: nqacc });
+                            } 
+                            scannedResults.push({ qrValue: rawstring, t0: performance.now(), scnt: 0, accepted: nqacc, qcolor: qcol });
                             if (nqacc == 0) cntflag = false // Sofort raus
-                        } else if (fn.accepted >= 0) { // Code already accepted: Keep GREEN for 1 sec
+                        } else { // Code already accepted: Keep GREEN for 1 sec
                             const age = performance.now() - fn.t0;
                             fn.scnt++;
-                            if (age > 1000) qcol = 'darkgreen' // Only New for 1 sec
-                        } else qcol = 'red'
+                            qcol = fn.qcolor
+                            if (age > 1000){ // Only New for 1 sec
+                                if(fn.accepted == 2) qcol = 'chocolate'
+                                else if(fn.accepted >= 0) qcol = 'darkgreen' 
+                            }
+                        } 
                         ctxCam.strokeStyle = qcol
                         const dbarcp = b.cornerPoints
                         // console.log(dbarcp)

@@ -1,5 +1,6 @@
 /* joemdash.js - Sidebar state machine 21.01.2024 (C) Joembedded */
 
+
 let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
 function sidebar_hint() {
     // BLACK LEFT-/RIGHT POINTING POINTER
@@ -71,6 +72,7 @@ function dashInit() {
         sidebar()   // initial Shrinked on small screens
         sidebarState = 5; // Next CLick: Shrink 
     }
+
     document.getElementById("sidebar_menue").addEventListener("click", sidebar)
 }
 
