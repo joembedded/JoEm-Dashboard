@@ -8,10 +8,15 @@
     Kontakt: joembedded@gmail.com
 
     Tests: 
-    http://localhost/wrk/joemdash/index.html oder http://localhost/wrk/joemdash/?badge
+    http://localhost/wrk/joemdash /index.html oder http://localhost/wrk/joemdash/?badge
     https://joembedded.github.io/JoEm-Dashboard/
 
+    Mobile: 7*Tap auf "Buildnummer" im Setup-SW->Softwareinformationen, 
+    dann Entwickleroptionen: USB-Debugging ON, 
+    dann load auf Mobile via localhost
+    dann chrome://inspect/#devices
 -->
+
 <html lang="en">
 
 <head>
@@ -25,15 +30,29 @@
     <!-- Pfad zeigt auf volle URL (nur dann als Link immer korrekt darstellbar) -->
     <meta property="og:image" content="https://joembedded.github.io/JoEm-Dashboard/static/preview.png" />
 
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#A0A0A0">
     <!-- - App Icon entweder als Icon or SVG: -->
     <link rel="icon" type="image/svg+xml" href="./static/favicon.svg">
-    <!-- <link rel="icon" type="image/x-icon" href="./static/favicon.ico">  -->
+    <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
 
     <link rel="stylesheet" href="./fontawesome/css/all.min.css">
     <!-- Basis-Funktionalitaet des Dashbords: -->
     <link rel="stylesheet" href="./css/joemdash.css">
     <!-- BarcodeDetector - Scanner-Dialog -->
     <link rel="stylesheet" href="./css/qrscanner.css">
+
+    <!--
+    <script>
+        if('serviceWorker' in navigator){
+            navigator.serviceWorker.register('sw.js').then(function(reg){
+                console.log("ServiceWorker registered")
+            }).catch(function(error){
+                console.log("ERROR: ServiceWorker: "+error)
+            })
+        }
+    </script>
+    -->
 
     <title>BLX Dash</title>
 
@@ -336,5 +355,4 @@
 </body> <!-- BODY END -->
 
 <script src="./js/blxDash.js" type="module"></script>
-
 </html>

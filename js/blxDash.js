@@ -1,10 +1,10 @@
 // *** blxDash.js  - Dashboard Funktionalitaet- Muss NACH load aufgerufen werden
 
-import * as JD from './joemdash.js'
-import * as QRS from './qrscanner.js'
+import * as JD from './joemdash.js' // *todo* './joemdash.min.js'
+import * as QRS from './qrscanner.js' // *todo* './qrscanner.min.js'
 import './jsQR.min.js' // Polyfill for Desktop
-import * as I18 from './i18n.js'
-import './blx.js' // *todo* './js/blx.min.js'
+import * as I18 from './i18n.js' 
+import './blx.js' // *todo* './blx.min.js'
 import './blStore.min.js'
 
 //--------- globals ------ 
@@ -851,6 +851,7 @@ async function blxClearDevice() {
 
 async function blxServerDataSync() {
     disabler(true)
+    blx.terminalPrint("Server-Synchronize")
     await spinnerShow("Server-Synchronize", 300)
     try {
         const remurl = setupOptions.server
@@ -1049,10 +1050,9 @@ async function addDevice(mac, ownertoken, opin) {
 // --- QR Code Scanner starten
 // Returns (siehe qrscanner.js): -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt undefined:diesenScanignorieren
 let qrlink = undefined
-let cnt = 0
 let searchmac = ''
 async function scanFoundAddDevice(scanresult) {
-    // console.log("SCAN ", cnt++, ":", scanresult)
+    //blx.terminalPrint("SCAN: '"+ scanresult+"'")
     const lcscan = scanresult.toLowerCase()
     // Fall 1: Link. Erstmal noch ignorieren!
     if (lcscan.startsWith('http')) {
@@ -1076,7 +1076,7 @@ async function scanFoundAddDevice(scanresult) {
             if (fres === undefined || fres.pin == 0) {
                 let fnd = false
                 let pin
-                blx.chordsound(750, 0.5, 0.5) // NEU: Chord
+                blx.chordsound(750, 0.2, 0.2) // NEU: Chord
                 if (scantoks[1].startsWith('OT:')) {
                     const ownertoken = scantoks[1].substring(3)
                     if (ownertoken.length == 16) {
@@ -1091,9 +1091,10 @@ async function scanFoundAddDevice(scanresult) {
                 }
                 if (fnd === true && mac == searchmac) {
                     blxPIN.value = pin
+                    blxSetPin()
                     return 0    // Ende
                 }
-            } else blx.frq_ping(750, 0.1, 0.5) // Bereits da
+            } else blx.frq_ping(750, 0.1, 0.3) // Bereits da
             return 1 // OK, More
         }
     }
@@ -1103,12 +1104,13 @@ async function scanFoundAddDevice(scanresult) {
         const saythis = scanresult.substring(7)
         blx.terminalPrint(`Text(${lang}): '${saythis}'`)
         blx.frq_ping(1500, 0.1, 0.5) // Bereits da
-        sagmal(saythis, lang.toLowerCase())
+        setTimeout(() => sagmal(saythis, lang.toLowerCase()),300)
         return 2 // Orange, - Text selbst angezeigt.
     }
     blx.frq_ping(30, 0.1, 0.5)
     return -1
 }
+
 
 async function blxQRAdddevice(smac = '') {
     searchmac = smac // Empty oder MAC fuer PIN

@@ -238,6 +238,7 @@ export async function openSelectedCamera() {
 
         ctxCam = scaledVideoCanvas.getContext("2d", { willReadFrequently: true })
 
+        camWorkerCont = true
         camWorker()
 
         // WakeLock - Screen Dimming disablen
@@ -246,10 +247,11 @@ export async function openSelectedCamera() {
         if (qrLogPrint) qrLogPrint(`ERROR(openSelectedCamera): ${err}`)
     }
 }
+
+let camWorkerCont = false
 async function camWorker() {
     try {
         if (videoQuelle.videoWidth && videoQuelle.videoHeight) {
-            let cntflag = true
             const run_t0 = performance.now();
             const barcode = await barcodeDetector.detect(videoQuelle)
             ctxCam.drawImage(videoQuelle, 0, 0, scaleWidth, scaleHeight)
@@ -265,7 +267,7 @@ async function camWorker() {
                         if (!fn) {
                             // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt 2:OrangeUndNochMehr undefined:diesenScanignorieren
                             let nqacc = await scanCallback(rawstring)
-                            if (nqacc === undefined) return cntflag
+                            if (nqacc === undefined) return camWorkerCont
                             if( nqacc == 2) {
                                 qcol = 'orange' 
                             } else  if (nqacc >= 0) {
@@ -273,7 +275,7 @@ async function camWorker() {
                                 qcol = 'lime' // OK
                             } 
                             scannedResults.push({ qrValue: rawstring, t0: performance.now(), scnt: 0, accepted: nqacc, qcolor: qcol });
-                            if (nqacc == 0) cntflag = false // Sofort raus
+                            if (nqacc == 0) camWorkerCont = false // Sofort raus
                         } else { // Code already accepted: Keep GREEN for 1 sec
                             const age = performance.now() - fn.t0;
                             fn.scnt++;
@@ -296,18 +298,20 @@ async function camWorker() {
                         ctxCam.closePath()
                         ctxCam.stroke()
                     }
-                    return cntflag
+                    return camWorkerCont
                 })
             } else scaledVideoCanvas.style.borderColor = 'darkgray'
             const runtime = performance.now() - run_t0
             // if (qrLogPrint) qrLogPrint(`Runtime: ${runtime.toFixed(1)} ms`)
-            if (!cntflag) { // AutoStop
+            if (!camWorkerCont) { // AutoStop
                 closeCam()
+                return
             }
         }
     } catch (err) {
         if (qrLogPrint) qrLogPrint(`ERROR(camWorker): ${err}`)
         closeCam()
+        return
     }
     setTimeout(camWorker, camUpdateInterval)
 }

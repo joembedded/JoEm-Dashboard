@@ -1,0 +1,26 @@
+{
+	"lang": "en-EN",
+	"name": "JoEmDash - Dashboard",
+	"short-name": "JoEmDash",
+	"description": "JoEmDash",
+	"background_color": "#0000FF",
+	"theme_color": "#A0A0A0",
+	"display": "standalone",
+	"orientation": "any",
+	"scope": "/",
+	"start_url": ".",
+	"icons": [
+		{
+			"src": "./static/preview.png",
+			"type": "image/png",
+			"sizes": "256x256",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "./static/preview512.png",
+			"type": "image/png",
+			"sizes": "512x512",
+			"purpose": "any maskable"
+		}
+	]
+}
