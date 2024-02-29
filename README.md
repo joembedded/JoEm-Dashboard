@@ -1,7 +1,7 @@
 # Dashboard-Fragment #
 **Fragment**
 
-Fragment for a Desktop/Mobile Dashboard
+Fragment for a Desktop/Mobile Dashboard (as PWA)
 
 Features:
 - Responsive
@@ -17,6 +17,14 @@ Note: Chrome-Entwickleroption:
 - Aktivieren USB-Debugging in den Entwickleroptionen.
 - chrome://inspect/#devices
 ---
+
+## Service Worker (PWA)
+Service Worker besteht aus 4 Dateien: sw.js / workbox_xx.jsm beide mit .map
+Der Service Worker caached die APP-Daten, so dass sie Offline verfügbar ist.
+Fuer die Entwicklung allerdings eher hinderlich... Daher (in debug) deinstallierbar
+- Entwicklung: SW-Dateien loeschen, SW-Registrierung auskommentieren und evtl. unregister-Script() manuell in Konsole starten
+- Deploy: SW-Dateien erzeugen 'workbox generateSW workbox-config.js' im Root, SW-Registrierung einkommentieren
+
 
 ## 3.rd Party Software ##
 - FontAwesome https://fontawesome.com/license/free License: MIT, SIL-OFL, CC-BY-4.0

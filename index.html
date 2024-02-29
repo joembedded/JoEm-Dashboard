@@ -42,7 +42,7 @@
     <!-- BarcodeDetector - Scanner-Dialog -->
     <link rel="stylesheet" href="./css/qrscanner.css">
 
-    <!--
+    <!-- 
     <script>
         if('serviceWorker' in navigator){
             navigator.serviceWorker.register('sw.js').then(function(reg){
@@ -282,13 +282,16 @@
     <!-- Setup Dialog  -->
     <dialog id='setup-dialog'>
         <button class="dlgBtnClose" id='setupBtnClose'>&#10006;</button>
-        <b>Setup</b><br><br><br>
+        <b>Setup</b><br><br>
         <div id="setup-content">
+            <div id="jd-info">
+                <!-- optionally filled -->
+            </div>
+            <br>
 
             <label ll="set.lang" for="jd-lang">Language</label>:
-            <select id="jd-lang">
-                <option>EN - English</option>
-                <option>DE - Deutsch</option>
+            <select id="jd-lang">   
+                <!-- dynamically filled -->
             </select>
             <br>
             <br>

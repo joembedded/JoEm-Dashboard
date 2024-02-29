@@ -1098,16 +1098,17 @@ async function scanFoundAddDevice(scanresult) {
             return 1 // OK, More
         }
     }
-    // Fall 3: Texte TXT-DE:Blabla
+    // Fall 3: Texte TXT-DE:Blabla. Erstellen z.B. mit 
+    // http://localhost/ltx/sw/php_qr/ oder https://joembedded.de/ltx/sw/php_qr/
     if (scanresult.startsWith('TXT-') && scanresult[6] == ':') {
         const lang = scanresult.substring(4, 6)
         const saythis = scanresult.substring(7)
         blx.terminalPrint(`Text(${lang}): '${saythis}'`)
-        blx.frq_ping(1500, 0.1, 0.5) // Bereits da
+        blx.frq_ping(1500, 0.1, 0.3) // Bereits da
         setTimeout(() => sagmal(saythis, lang.toLowerCase()),300)
         return 2 // Orange, - Text selbst angezeigt.
     }
-    blx.frq_ping(30, 0.1, 0.5)
+    blx.frq_ping(30, 0.1, 0.3)
     return -1
 }
 
@@ -1291,8 +1292,18 @@ async function editParamDialogDo(typ) {
 let setupDialogInit = false
 let setupDialogResult
 let setupDialogOpenFlag
-let setupOptions = { dtheme: false, font: 100, lang: 'EN - English', server: './sync/blxremote.php', accesstoken: '123456' } // in 2 Gross-Buchstaben
+const defLang = I18.i18_availLang[0]
+let setupOptions = { dtheme: false, font: 100, lang: defLang, server: './sync/blxremote.php', accesstoken: '123456' } // in 2 Gross-Buchstaben
+
 async function blxSetup() {
+    function showSetupInfo(){
+        setupDLG.querySelector('#jd-info').innerHTML = `<b>${I18.ll('set.driverversions')}</b>:<br> 
+        Dashboard: ${VERSION}<br>
+        Bluetooth: ${blx.version}<br>
+        Storage: ${blStore.version}<br>
+        Languages: ${I18.version}<br>`
+    }
+
     setupDialogResult = undefined
     if (!setupDialogInit) {
         // Close und OK erstmal identisch! - Handler fuer 'Sofort'-Felder:
@@ -1312,19 +1323,26 @@ async function blxSetup() {
             setupOptions.font = parseInt(fs)
             JD.dashSetFont(setupOptions.font / 100)
         })
-        setupDLG.querySelector('#jd-lang').addEventListener('change', (e) => {
+   
+        const jdlang = setupDLG.querySelector('#jd-lang')
+        let lango = ''
+        I18.i18_availLang.forEach((e)=> {lango += `<option>${e}</option>`})
+        jdlang.innerHTML = lango
+        jdlang.addEventListener('change', (e) => {
             const lng = setupDLG.querySelector('#jd-lang').value
             setupOptions.lang = lng
             I18.i18localize(lng)
+            showSetupInfo()
         })
         setupDLG.querySelector('#jd-servertest').addEventListener('click', (e) => {
             // Open WITH token, but no cmd
             window.open(setupDLG.querySelector('#jd-server').value + '?k=' + setupDLG.querySelector('#jd-accesstoken').value);
         })
 
-
         setupDialogInit = true
     }
+
+    showSetupInfo()
 
     setupDLG.querySelector('#jd-theme').checked = setupOptions.dtheme
     setupDLG.querySelector('#jd-fontsize').value = setupOptions.font + '%'
@@ -1497,7 +1515,13 @@ async function dbg_action() {
     // await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false,10)
     //await updateDeviceList()
     // sagmal("This is not a Lovesong. OiOiOi! Lies dieses Lied leise Elise")   
-    await addDevice('0011223344556677', '0011223344556677')
+    //await addDevice('0011223344556677', '0011223344556677')
+    // Unregister Service Workers (run manually in Console)
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+            registration.unregister();
+        } 
+    });
 }
 
 document.getElementById('dbg-action').addEventListener('click', dbg_action)
