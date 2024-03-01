@@ -10,12 +10,13 @@ Features:
 - Interner QR-Code-Scanner
 - ...
 
-Live-Demo: https://joembedded.github.io/JoEm-Dashboard/
+Live-Demo: https://joembedded.github.io/JoEm-Dashboard/app
 
-Note: Chrome-Entwickleroption: 
-- Aktiviere Entwicklermodus, indem Einstellungen > Über das Telefon und dann 7 Mal auf die Build-Nummer tippen.
-- Aktivieren USB-Debugging in den Entwickleroptionen.
-- chrome://inspect/#devices
+Note: Aktivieren der Chrome-Entwickleroption: 
+- Aktiviere Entwicklermodus auf Mobile in den Einstellungen 'Über das Telefon' und dann 7 Mal auf die 'Build-Nummer' tippen. Dann USB-Debugging in den Entwickleroptionen aktivieren
+- 'index.html' von einem localhost auf Mobile laden
+- In Chrome: chrome://inspect/#devices -> Scannt alle offen Webseiten, 'insepct' öffnet eine remote Konsole dazu.
+
 ---
 
 ## Service Worker (PWA)

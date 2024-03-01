@@ -8,8 +8,8 @@
     Kontakt: joembedded@gmail.com
 
     Tests: 
-    http://localhost/wrk/joemdash /index.html oder http://localhost/wrk/joemdash/?badge
-    https://joembedded.github.io/JoEm-Dashboard/
+    http://localhost/wrk/joemdash/app /index.html oder http://localhost/wrk/joemdash//app?badge
+    https://joembedded.github.io/JoEm-Dashboard/app
 
     Mobile: 7*Tap auf "Buildnummer" im Setup-SW->Softwareinformationen, 
     dann Entwickleroptionen: USB-Debugging ON, 
@@ -31,7 +31,7 @@
     <meta property="og:image" content="https://joembedded.github.io/JoEm-Dashboard/static/preview.png" />
 
     <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#A0A0A0">
+    <meta name="theme-color" content="#0000FF">
     <!-- - App Icon entweder als Icon or SVG: -->
     <link rel="icon" type="image/svg+xml" href="./static/favicon.svg">
     <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
@@ -43,7 +43,7 @@
     <link rel="stylesheet" href="./css/qrscanner.css">
 
     <script>
-        window.jdDebug = 1 // global DebugLevel
+        window.jdDebug = 1 // global DebugLevel: 0:Run, 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
         function installServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').then(function (reg) {
@@ -251,11 +251,12 @@
     </div>
 
     <footer class="cfooter">
-        <span id="jd-footeronline" style="color: limegreen;"><i class="fa-solid fa-fw fa-link fa-lg"></i></span>
-        <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-fw fa-link-slash fa-lg"></i></span>
+        <span id="jd-footeronline" style="color: limegreen;"><i class="fa-solid fa-fw fa-link fa-lg"></i> Online</span>
+        <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-fw fa-link-slash fa-lg"></i> Offline</span>
+        &nbsp;
         &nbsp;
         <!-- Enable fuer Debug, else hidden -->
-        <button id="dbg-action">(Debug)</button>
+        <button hidden id="dbg-action">(Debug)</button>
 
         <div id="footerReason">Reason</div>&nbsp;
         <div id="footerInfo">Info</div>&nbsp;

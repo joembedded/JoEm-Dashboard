@@ -102,6 +102,7 @@ export function setScanCallback(f) {
 }
 
 //--- init --- Muss nicht explizit aufgerufen werden, fordert aber ggfs. Permissions an
+// Returns Error-String or undefined(=OK)
 async function initCameras() {
     if (qrLogPrint) qrLogPrint("INFO: InitCamera")
     try {
@@ -109,9 +110,15 @@ async function initCameras() {
         initQrCodeDOM()
 
         // Barcode-Teil
-        if (!('BarcodeDetector' in window)   /* || 1 */) {
-            if (qrLogPrint) qrLogPrint("ERROR: No Barcode API available, Use Polyfill!")
-            window.BarcodeDetector = cozmoQR
+        if (!('BarcodeDetector' in window) ) {
+            if(window.jdDebug !== undefined && window.jdDebug >1){
+                if (qrLogPrint) qrLogPrint("ERROR: No Barcode API available, Use Polyfill!")
+                window.BarcodeDetector = cozmoQR
+            }else{
+                const sres = "ERROR: No Barcode API available"
+                if (qrLogPrint) qrLogPrint(sres)
+                return sres
+            }
         } else {
             if (qrLogPrint) qrLogPrint("Barcode API available!")
         }
@@ -119,7 +126,7 @@ async function initCameras() {
 
         // Kamera-Teil
         const permissionStatus = await navigator.permissions.query({ name: "camera" })
-        if (permissionStatus.state == 'denied') throw ("Camera Access not allowed")
+        if (permissionStatus.state == 'denied') throw ("Camera Access denied")
         if (permissionStatus.state !== 'granted') { // Testweise auf- und gleich wieder zumachen
             const hcam = await navigator.mediaDevices.getUserMedia({ 'video': true, 'audio': false })
             hcam.getTracks().forEach((track) => { track.stop(); }); // getVideoTracks()/getTracks()
@@ -160,11 +167,16 @@ async function initCameras() {
         barcodeScannerInit = true
     } catch (err) {
         if (qrLogPrint) qrLogPrint(`ERROR(initCameras): ${err}`)
+        return err
     }
 }
 
+// Returns Error-String or undefined(=OK)
 export async function openSelectedCamera() {
-    if (!barcodeScannerInit) await initCameras()
+    if (!barcodeScannerInit) {
+        const sres = await initCameras()
+        if(typeof sres === 'string') return sres
+    }
     if (qrLogPrint) qrLogPrint("INFO: OpenCamera")
     try {
         if (!availableCameras.length) throw ("No Camera(s) available on this device")
@@ -245,6 +257,7 @@ export async function openSelectedCamera() {
         if ("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen")
     } catch (err) {
         if (qrLogPrint) qrLogPrint(`ERROR(openSelectedCamera): ${err}`)
+        return err
     }
 }
 

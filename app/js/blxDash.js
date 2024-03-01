@@ -3,7 +3,7 @@
 import * as JD from './joemdash.js' // *todo* './joemdash.min.js'
 import * as QRS from './qrscanner.js' // *todo* './qrscanner.min.js'
 import './jsQR.min.js' // Polyfill for Desktop
-import * as I18 from './i18n.js' 
+import * as I18 from './i18n.js'
 import './blx.js' // *todo* './blx.min.js'
 import './blStore.min.js'
 
@@ -157,12 +157,18 @@ function bleCallback(m, v, xinfo) {
                     break
             }
             break
+
+        case 'UPLOAD': // totalsize, 'FULL'/'INC'
+            break
+        case 'GET': // filesize, filename
+            break
         case 'PROG': // *todo* 2 passes possible due to data.edt / data.edt.old
             blxInfoLine.textContent = v + "%"
             break
         case 'GET_OK':
             blxInfoLine.textContent = "OK (" + v + " " + xinfo + ")"
             break
+
         case 'RSSI':
             let bars = (v * 0.273) + 28; // Farben wie Blueshell
             let nc = 'limegreen'
@@ -1072,7 +1078,7 @@ async function scanFoundAddDevice(scanresult) {
     if (scantoks.length == 2 && scantoks[0].startsWith('MAC:')) {
         const mac = scantoks[0].substring(4)
         if (mac.length == 16) {
-            const fres = deviceListDB.find(e => { return e.mac == mac }) 
+            const fres = deviceListDB.find(e => { return e.mac == mac })
             if (fres === undefined || fres.pin == 0) {
                 let fnd = false
                 let pin
@@ -1105,7 +1111,7 @@ async function scanFoundAddDevice(scanresult) {
         const saythis = scanresult.substring(7)
         blx.terminalPrint(`Text(${lang}): '${saythis}'`)
         blx.frq_ping(1500, 0.1, 0.3) // Bereits da
-        setTimeout(() => sagmal(saythis, lang.toLowerCase()),300)
+        setTimeout(() => sagmal(saythis, lang.toLowerCase()), 300)
         return 2 // Orange, - Text selbst angezeigt.
     }
     blx.frq_ping(30, 0.1, 0.3)
@@ -1118,7 +1124,11 @@ async function blxQRAdddevice(smac = '') {
     QRS.setQrLogPrint(blx.terminalPrint)     // Scanner-printf via Terminal-printf
     QRS.setScanCallback(scanFoundAddDevice)
     QRS.clearScannedResults()
-    await QRS.openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
+    const sres = await QRS.openSelectedCamera() // Implizit initCameras falls noetig, nicht aber beide!
+    if (typeof sres == 'string') {
+        await okDialogDo("<b>ERROR</b><br><br>" + sres)
+        return
+    }
     //console.log("SCAN...")
     await QRS.scannerBusy()
     /*
@@ -1293,10 +1303,10 @@ let setupDialogInit = false
 let setupDialogResult
 let setupDialogOpenFlag
 const defLang = I18.i18_availLang[0]
-let setupOptions = { dtheme: false, font: 100, lang: defLang, server: './sync/blxremote.php', accesstoken: '123456' } // in 2 Gross-Buchstaben
+let setupOptions = { dtheme: false, font: 100, lang: defLang, server: '../sync/blxremote.php', accesstoken: '123456' } // in 2 Gross-Buchstaben
 
 async function blxSetup() {
-    function showSetupInfo(){
+    function showSetupInfo() {
         setupDLG.querySelector('#jd-info').innerHTML = `<b>${I18.ll('set.driverversions')}</b>:<br> 
         Dashboard: ${VERSION}<br>
         Bluetooth: ${blx.version}<br>
@@ -1323,10 +1333,10 @@ async function blxSetup() {
             setupOptions.font = parseInt(fs)
             JD.dashSetFont(setupOptions.font / 100)
         })
-   
+
         const jdlang = setupDLG.querySelector('#jd-lang')
         let lango = ''
-        I18.i18_availLang.forEach((e)=> {lango += `<option>${e}</option>`})
+        I18.i18_availLang.forEach((e) => { lango += `<option>${e}</option>` })
         jdlang.innerHTML = lango
         jdlang.addEventListener('change', (e) => {
             const lng = setupDLG.querySelector('#jd-lang').value
@@ -1516,10 +1526,14 @@ async function dbg_action() {
     //await updateDeviceList()
     // sagmal("This is not a Lovesong. OiOiOi! Lies dieses Lied leise Elise")   
     //await addDevice('0011223344556677', '0011223344556677')
-    
+
 }
 
-document.getElementById('dbg-action').addEventListener('click', dbg_action)
+if (window.jdDebug > 1) {
+    const dbut = document.getElementById('dbg-action')
+    dbut.hidden = false
+    dbut.addEventListener('click', dbg_action)
+}
 
 window.addEventListener('load', setup) // Ganz am Schluss
 
