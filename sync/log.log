@@ -5,3 +5,10 @@
 29.02.24 12:57:54 ::1 blxremote.php: (CMD:'upsync')(Gen Dir '...B421A86B9ADFCAC2')(B421A86B9ADFCAC2/iparam.lxp.json => 269kB)(Run:1.1952 msec)
 29.02.24 12:57:54 ::1 blxremote.php: (CMD:'upsync')(B421A86B9ADFCAC2/sys_param.lxp.json => 214kB)(Run:0.6471 msec)
 01.03.24 14:05:26 ::1 .
+01.03.24 15:07:35 ::1 blxremote.php: (CMD:'upsync')(Gen Dir '...B421A86B9ADFCAC2')(B421A86B9ADFCAC2/data.edt.json => 1953.674kB)(Run:14.9262 msec)
+01.03.24 15:08:54 ::1 .
+01.03.24 15:08:56 ::1 ./syncdata
+01.03.24 15:08:57 ::1 ./syncdata/B421A86B9ADFCAC2
+01.03.24 15:24:48 ::1 blxremote.php: (CMD:'upsync')(Gen Dir '...DDC2FB99207A7E7E')(DDC2FB99207A7E7E/data.edt.json => 41.294kB)(Run:1.776 msec)
+01.03.24 15:24:48 ::1 blxremote.php: (CMD:'upsync')(DDC2FB99207A7E7E/iparam.lxp.json => 725kB)(Run:0.7558 msec)
+01.03.24 15:24:48 ::1 blxremote.php: (CMD:'upsync')(DDC2FB99207A7E7E/sys_param.lxp.json => 209kB)(Run:1.4241 msec)

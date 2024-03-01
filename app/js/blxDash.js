@@ -16,6 +16,10 @@ let connectionLevel = 0
 let advertisingName
 let blxDevice
 
+/* totalsize:AllDownload, mode:'FULL'/'INC', sumsize:summOfAll
+filsize:localFile, filename:localFilenem, fproc:localPercent ndata:flagForNewData */
+let uplStatus = { totalsize: 0, mode: '', sumsize:0, filesize: 0, filename: '', fproc: 0, ndata: false }
+
 let urlpar = {} // Aufruf-Parameter, z.B. urlpar.test = abc fuer ?test=abc
 
 let deviceListDB = [] // GLOBALE Liste der vorhandenen Devices in IndexDB
@@ -158,14 +162,21 @@ function bleCallback(m, v, xinfo) {
             }
             break
 
-        case 'UPLOAD': // totalsize, 'FULL'/'INC'
+        case 'UPLOAD': // v:totalsize, xinfo:'FULL'/'INC'
+            uplStatus = { totalsize: v, mode: xinfo, sumsize:0, filesize: 0, filename: '', fproc: 0, ndata: true }
             break
-        case 'GET': // filesize, filename
+        case 'GET': // v:filesize, xinfo:filename
+            uplStatus.filesize = v
+            uplStatus.filename = xinfo
+            uplStatus.ndata = true
             break
-        case 'PROG': // *todo* 2 passes possible due to data.edt / data.edt.old
+        case 'PROG': // 2 passes possible due to data.edt / data.edt.old
+            uplStatus.fproc = v
+            uplStatus.ndata = true
             blxInfoLine.textContent = v + "%"
             break
-        case 'GET_OK':
+        case 'GET_OK': // v:speed, xinfo:'Bytes/sec'
+            uplStatus.sumsize + = uplStatus.filesize
             blxInfoLine.textContent = "OK (" + v + " " + xinfo + ")"
             break
 
@@ -703,9 +714,13 @@ function spinnerClose() {
 // Called all sec
 let lastOnlineState
 function _blxBusyMonitor() {
-    blxStateSpinner.textContent = _blxCmdFreeCnt
-    const info = `[F.cnt:${_blxCmdFreeCnt++} ${_blxCmdBusyFlag ? '(Busy)' : ''}]`
+    
+    
+    if(_blxCmdBusyFlag) blxStateText.textContent = "Busy"
+    else blxStateText.textContent = "Ready"
+    blxStateSpinner.textContent = `(${_blxCmdFreeCnt++})`
     footerInfo.textContent = info
+
     // Automatisch schliessen 
     if (_blxCmdFreeCnt > spinnerMaxSec && spinnerShowLevel) spinnerClose()
 
@@ -857,7 +872,7 @@ async function blxClearDevice() {
 
 async function blxServerDataSync() {
     disabler(true)
-    blx.terminalPrint("Server-Synchronize")
+    blx.terminalPrint("Server-Synchronize...")
     await spinnerShow("Server-Synchronize", 300)
     try {
         const remurl = setupOptions.server
@@ -897,6 +912,7 @@ async function blxServerDataSync() {
     }
     await updateDeviceList()
     spinnerClose()
+    blx.terminalPrint("Server-Synchronize OK")
     disabler(false)
 }
 
