@@ -1,7 +1,19 @@
-/** Minimalistische Internationalisierung, aehnlich i18n **/
+/* Minimalistische Internationalisierung, aehnlich i18n - (C) JoEmbedded.de
+
+Es gibt 2 Moeglichkeiten Texte zu uebersetzen:
+1.) Eintrag 'll' in div setzen, z.Bsp (XX = 'en' => "Language: English"):
+  <span ll="lang">HierSprache</span>  => durch  translations.XX.lang ersetzt  ersetzt
+  <label ll="set.fontsize" for="jd-fontsize">Fontsize</label> => durch translations.XX.set.fontsize 
+
+2.) Per Funktion I18.ll(), z.B.  I18.ll('set.driverversions') 
+
+Die Anzahl der extern verfuegbaren Sprachen in i18_availLang = [] eintraen
+*/
+
   // Locale translations. Sucht alle Elemente mit Attribut ll='ident' mit "ident":"Inhalt" , auch in Bloecken
-  export const version = 'V0.10 / 29.02.2024'
-  export const i18_availLang = ['EN - English', 'DE - Deutsch', 'CN - Chinese/中文']   // List of available locales CaseIndepeandt
+  export const version = 'V0.15 / 01.03.2024'
+  // List of available Languages (CaseIndependent):
+  export const i18_availLang = ['EN - English', 'DE - Deutsch', 'CN - Chinese/中文']   
   export const i18_defaultLang = 'en'   // Fallback/Default (Lowercase)
   export let i18_currentLang = 'en' // (Lowercase)
 

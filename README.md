@@ -21,9 +21,13 @@ Note: Chrome-Entwickleroption:
 ## Service Worker (PWA)
 Service Worker besteht aus 4 Dateien: sw.js / workbox_xx.jsm beide mit .map
 Der Service Worker caached die APP-Daten, so dass sie Offline verfügbar ist.
-Fuer die Entwicklung allerdings eher hinderlich... Daher (in debug) deinstallierbar
-- Entwicklung: SW-Dateien loeschen, SW-Registrierung auskommentieren und evtl. unregister-Script() manuell in Konsole starten
-- Deploy: SW-Dateien erzeugen 'workbox generateSW workbox-config.js' im Root, SW-Registrierung einkommentieren
+Fuer die Entwicklung allerdings eher hinderlich... Daher deinstallierbar.
+- Entwicklung: ServiceWorker-Dateien evtl. loeschen. <br>
+    Gegebenenfalls laufenden Servicewerker manuell per Konsole löschen: removeServiceWorker() (global in 'index.html')<br>
+    und 'window.jdDebug' auf > 0 setzen
+
+- Deploy: ServiceWorker-Dateien erzeugen 'workbox generateSW workbox-config.js' im Root des Projekts<br>
+    SW-Registrierung automatisch wenn 'window.jdDebug = 0' setzen
 
 
 ## 3.rd Party Software ##

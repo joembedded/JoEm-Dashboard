@@ -42,17 +42,29 @@
     <!-- BarcodeDetector - Scanner-Dialog -->
     <link rel="stylesheet" href="./css/qrscanner.css">
 
-    <!-- 
     <script>
-        if('serviceWorker' in navigator){
-            navigator.serviceWorker.register('sw.js').then(function(reg){
-                console.log("ServiceWorker registered")
-            }).catch(function(error){
-                console.log("ERROR: ServiceWorker: "+error)
-            })
+        window.jdDebug = 1 // global DebugLevel
+        function installServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').then(function (reg) {
+                    console.log("ServiceWorker installed")
+                }).catch(function (error) {
+                    console.log("ERROR: ServiceWorker: " + error)
+                })
+            }
         }
+        // Unregister Service Workers (run manually in Console)
+        function removeServiceWorker() {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.unregister()
+                }
+            })
+            console.log("ServiceWorker removed")
+        }
+        if (!window.jdDebug) installServiceWorker()
+        else removeServiceWorker() 
     </script>
-    -->
 
     <title>BLX Dash</title>
 
@@ -108,7 +120,7 @@
                 <!-- class="navhidden" for Weg-Hidden.. disabled fuer halbhell, hidden fuer unsichtbar  -->
                 <button id="button5-adddevice" class="navitem" style="color: darkgreen">
                     <i class="fa-solid fa-fw fa-circle-plus"></i>
-                    <span class="navitem-txt">   [QR] Add Device / Info      </span>
+                    <span class="navitem-txt"> [QR] Add Device / Info </span>
                 </button>
 
                 <div class="thin-hr"></div>
@@ -167,14 +179,14 @@
                                 <button id="blxSetPinButton">Set PIN</button>
                                 <button id="blxScanPinButton" style="color: darkgreen"> [QR] </button>
                                 <br class="mobile-br">
-                                PIN: <input type="text" id="blxPIN" size = "9">
+                                PIN: <input type="text" id="blxPIN" size="9">
                                 <br>
                                 <br>
                             </span>
 
                             <span id="blxInfoButtonSpan" style="display:none">
                                 <button disabled id="blxInfoButton">Memory Info</button>
-                                Memory: 
+                                Memory:
                                 <br class="mobile-br">
                                 <span id="blxMemory">-</span>
                                 <br>
@@ -243,8 +255,8 @@
         <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-fw fa-link-slash fa-lg"></i></span>
         &nbsp;
         <!-- Enable fuer Debug, else hidden -->
-        <button  id="dbg-action">(Debug)</button>
-        
+        <button id="dbg-action">(Debug)</button>
+
         <div id="footerReason">Reason</div>&nbsp;
         <div id="footerInfo">Info</div>&nbsp;
         <div id="footerSubInfo">SubInfo</div>
@@ -290,7 +302,7 @@
             <br>
 
             <label ll="set.lang" for="jd-lang">Language</label>:
-            <select id="jd-lang">   
+            <select id="jd-lang">
                 <!-- dynamically filled -->
             </select>
             <br>
@@ -341,7 +353,8 @@
         <br>
         <div style='text-align: center;'>
             <button class="dlgBtnStandard" id='deviceDialogBtnOK'>&#10004; OK</button>
-            <button class="dlgBtnStandard" id='deviceDialogBtnRemoveDevice'><i class="fa-regular fa-trash-can"></i> Remove Device</button>
+            <button class="dlgBtnStandard" id='deviceDialogBtnRemoveDevice'><i class="fa-regular fa-trash-can"></i>
+                Remove Device</button>
         </div>
     </dialog>
 
@@ -358,4 +371,5 @@
 </body> <!-- BODY END -->
 
 <script src="./js/blxDash.js" type="module"></script>
+
 </html>

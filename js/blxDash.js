@@ -1516,12 +1516,7 @@ async function dbg_action() {
     //await updateDeviceList()
     // sagmal("This is not a Lovesong. OiOiOi! Lies dieses Lied leise Elise")   
     //await addDevice('0011223344556677', '0011223344556677')
-    // Unregister Service Workers (run manually in Console)
-    navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for(let registration of registrations) {
-            registration.unregister();
-        } 
-    });
+    
 }
 
 document.getElementById('dbg-action').addEventListener('click', dbg_action)
