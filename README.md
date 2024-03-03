@@ -12,7 +12,7 @@ Die PWA ist in reinem Vanilla-JS geschrieben.</i>
 
 Features:
 - Echte PWA - Läuft Online und Offline
-- Daten Synchronisierung mit Server (wenn Internet vorhanden)
+- Daten Synchronisierung mit Server (wenn Internet vorhanden (geht nicht von GitHub aus!))
 - Responsive: läuft auf Android und Desktop (Chrome, Edge, ...)
 - Skalierbare Fonts für maximale Baustellen-Tauglichkeit
 - Internationalisierung (i18-aehnlich)
