@@ -18,15 +18,13 @@ let blxDevice
 
 /* totalsize:AllDownload, mode:'FULL'/'INC', sumsize:summOfAll
 filsize:localFile, filename:localFilenem, fproc:localPercent ndata:flagForNewData */
-let uplStatus = { totalsize: 0, mode: '', sumsize:0, filesize: 0, filename: '', fproc: 0, ndata: false }
+let uplStatus = { totalsize: 0, mode: '', sumsize: 0, filesize: 0, filename: '', fproc: 0, ndata: false }
 
 let urlpar = {} // Aufruf-Parameter, z.B. urlpar.test = abc fuer ?test=abc
 
 let deviceListDB = [] // GLOBALE Liste der vorhandenen Devices in IndexDB
 
 // ----- UI-Elemente -------------
-const blxStateText = document.getElementById("blxStateText")
-const blxStateSpinner = document.getElementById("blxStateSpinner")
 const blxInfoLine = document.getElementById("blxInfoLine")
 const blxGraph = document.getElementById("blxGraph")
 const blxCmdRes = document.getElementById("blxCmdRes")
@@ -163,21 +161,22 @@ function bleCallback(m, v, xinfo) {
             break
 
         case 'UPLOAD': // v:totalsize, xinfo:'FULL'/'INC'
-            uplStatus = { totalsize: v, mode: xinfo, sumsize:0, filesize: 0, filename: '', fproc: 0, ndata: true }
+            uplStatus = { totalsize: v, mode: xinfo, sumsize: 0, filesize: 0, filename: '', fproc: 0, ndata: true }
             break
         case 'GET': // v:filesize, xinfo:filename
             uplStatus.filesize = v
             uplStatus.filename = xinfo
             uplStatus.ndata = true
+            blxInfoLine.textContent = `File:'${xinfo}' ${v} Bytes`
             break
         case 'PROG': // 2 passes possible due to data.edt / data.edt.old
             uplStatus.fproc = v
             uplStatus.ndata = true
-            blxInfoLine.textContent = v + "%"
             break
         case 'GET_OK': // v:speed, xinfo:'Bytes/sec'
-            uplStatus.sumsize + = uplStatus.filesize
-            blxInfoLine.textContent = "OK (" + v + " " + xinfo + ")"
+            uplStatus.sumsize += v
+            uplStatus.ndata = true
+            blxInfoLine.textContent = `OK (${v} ${xinfo} )`
             break
 
         case 'RSSI':
@@ -260,24 +259,21 @@ function bleCallback(m, v, xinfo) {
 
 let _blxCmdResult // Report Result here (OK: 0, else String)
 let _blxCmdBusyFlag = false
-let _blxCmdFreeCnt = 0
+let _blxCmdRBCnt = 0
 
 // --- Kommando an Logger --
 async function _blxCmdSend(cmd, cmdtimeout) {
-    blxStateText.textContent = "Busy"
     _blxCmdResult = 0
     _blxCmdBusyFlag = true
-    _blxCmdFreeCnt = 0
+    _blxCmdRBCnt = 0
     try {
         await blx.userSendCmd(cmd, cmdtimeout);
         console.log("CMD->", cmd)
         _blxCmdBusyFlag = false
-        _blxCmdFreeCnt = 0
-        blxStateText.textContent = "Ready"
+        _blxCmdRBCnt = 0
     } catch (error) {
         _blxCmdBusyFlag = false
-        _blxCmdFreeCnt = 0
-        blxStateText.textContent = "ERROR: " + error
+        _blxCmdRBCnt = 0
         _blxCmdResult = error
         if (connectionLevel <= 2) bleCallback('CON', 0) // Reset Connection
     }
@@ -689,12 +685,11 @@ let spinnerMaxSec = 0
 let wakeLock = null
 async function spinnerShow(text, maxsec) { // Achung: Async!
 
-    footerInfo.textContent = ''
-    /* Anzeig eim Spinner und Footer */
-    footerReason.textContent = text
-    spinnerReason.textContent = text
 
-    footerInfo.textContent = ''
+    /* Anzeig eim Spinner und Footer */
+    spinnerReason.textContent = text
+    footerReason.textContent = text
+    footerInfo.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>` // Busy startet leer
     footerSubInfo.textContent = '' // Fuer eigene AUsgaben, z.B. Prozent etc..
 
     spinnerMaxSec = maxsec
@@ -711,18 +706,30 @@ function spinnerClose() {
     }
 
 }
-// Called all sec
+// Called all 1000 msec
 let lastOnlineState
 function _blxBusyMonitor() {
-    
-    
-    if(_blxCmdBusyFlag) blxStateText.textContent = "Busy"
-    else blxStateText.textContent = "Ready"
-    blxStateSpinner.textContent = `(${_blxCmdFreeCnt++})`
-    footerInfo.textContent = info
+
+    if (_blxCmdBusyFlag) {
+        footerInfo.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>(${_blxCmdRBCnt++} sec)`
+
+        // Bei Multifile Upload % aur Realtive Menge beziegen
+        if (uplStatus.ndata) {
+            let alrup = uplStatus.sumsize/uplStatus.totalsize *100 // alredy uploaded %
+            let thup = uplStatus.filesize/uplStatus.totalsize * uplStatus.fproc // this upload %
+            let sinfo = `${(alrup + thup).toFixed(0)}%`
+            footerSubInfo.textContent = sinfo
+            uplStatus.ndata = false
+        }
+    } else { // Alles OK
+        footerReason.textContent = ''
+        footerInfo.innerHTML = '' 
+        footerSubInfo.textContent = ''
+    }
+
 
     // Automatisch schliessen 
-    if (_blxCmdFreeCnt > spinnerMaxSec && spinnerShowLevel) spinnerClose()
+    if (_blxCmdRBCnt > spinnerMaxSec && spinnerShowLevel) spinnerClose()
 
     const ns = navigator.onLine
     if (lastOnlineState !== ns) {
