@@ -1,13 +1,24 @@
 # Dashboard-Fragment #
 **Fragment**
 
-Fragment for a Desktop/Mobile Dashboard (as PWA)
+Fragment für ein Desktop/Mobile Dashboard (als PWA)
+
+
+<i>Wichtig: Dieses Repo ist nur ein Fragment! Das Dashboard ist zwar voll
+funktionabel (ersetzt 'BLX.JS'), es fehlen aber z.B. noch die vollständige Sprachumsetzung, 
+diverse Spezial-Dialoge (z.B. Tarierung), diese können aber problemlos eingebaut werden.
+Die PWA ist in reinem Vanilla-JS geschrieben.</i>
+
 
 Features:
-- Responsive
-- Skalierbare Fonts
-- Internationalisierung
-- Interner QR-Code-Scanner
+- Echte PWA - Läuft Online und Offline
+- Daten Synchronisierung mit Server (wenn Internet vorhanden)
+- Responsive: läuft auf Android und Desktop (Chrome, Edge, ...)
+- Skalierbare Fonts für maximale Baustellen-Tauglichkeit
+- Internationalisierung (i18-aehnlich)
+- Interner QR-Code-Scanner mit Geräte-Onboading per QR
+- PWA updated sich selbst jeweils auf den neueseten Stand
+- Leicht erweiterbar
 - ...
 
 Live-Demo: https://joembedded.github.io/JoEm-Dashboard/app
@@ -24,8 +35,8 @@ Service Worker besteht aus 4 Dateien: sw.js / workbox_xx.jsm beide mit .map
 Der Service Worker caached die APP-Daten, so dass sie Offline verfügbar ist.
 Fuer die Entwicklung allerdings eher hinderlich... Daher deinstallierbar.
 - Entwicklung: ServiceWorker-Dateien evtl. loeschen. <br>
-    Gegebenenfalls laufenden Servicewerker manuell per Konsole löschen: removeServiceWorker() (global in 'index.html')<br>
-    und 'window.jdDebug' auf > 0 setzen
+    Gegebenenfalls laufenden Servicewerker manuell per Konsole löschen: removeServiceWorker() (global in 'index.html', ca. Zeile 40)<br>
+    und 'window.jdDebug' auf > 0 setzen 
 
 - Deploy: ServiceWorker-Dateien erzeugen 'workbox generateSW workbox-config.js' im Root des Projekts<br>
     SW-Registrierung automatisch wenn 'window.jdDebug = 0' setzen
@@ -39,4 +50,4 @@ Fuer die Entwicklung allerdings eher hinderlich... Daher deinstallierbar.
 ---
 
 ## Changelog ##
-- V0.11 05.02.2024 First Fragment
+- V0.10 03.03.2024 First Fragment

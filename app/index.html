@@ -43,7 +43,7 @@
     <link rel="stylesheet" href="./css/qrscanner.css">
 
     <script>
-        window.jdDebug = 1 // global DebugLevel: 0:Run, 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
+        window.jdDebug = 0 // global DebugLevel: 0:Run, 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
         function installServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').then(function (reg) {
@@ -251,7 +251,8 @@
 
     <footer class="cfooter">
         <span id="jd-footeronline" style="color: limegreen;"><i class="fa-solid fa-fw fa-link fa-lg"></i> Online</span>
-        <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-fw fa-link-slash fa-lg"></i> Offline</span>
+        <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-fw fa-link-slash fa-lg"></i>
+            Offline</span>
         &nbsp;
         &nbsp;
         <!-- Enable fuer Debug, else hidden -->
@@ -295,6 +296,9 @@
     <dialog id='setup-dialog'>
         <button class="dlgBtnClose" id='setupBtnClose'>&#10006;</button>
         <b>Setup</b><br><br>
+        <i><b>BLX Dashboard</b> - PWA Fragment - (C)JoEmbedded.de</i> -
+        <a href="https://github.com/joembedded/JoEm-Dashboard">GitHub...</a>
+        <br> <br>
         <div id="setup-content">
             <div id="jd-info">
                 <!-- optionally filled -->
