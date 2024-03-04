@@ -50,4 +50,4 @@ Fuer die Entwicklung allerdings eher hinderlich... Daher deinstallierbar.
 ---
 
 ## Changelog ##
-- V0.10 03.03.2024 First Fragment
+- V0.10 04.03.2024 First Fragment

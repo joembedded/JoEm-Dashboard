@@ -8,12 +8,12 @@ import './blx.js' // *todo* './blx.min.js'
 import './blStore.min.js'
 
 //--------- globals ------ 
-const VERSION = 'V0.20 / 26.02.2024'
+const VERSION = 'V0.10 / 04.03.2024'
 const COPYRIGHT = '(C)JoEmbedded.de'
 const HELP = 'This is a "living product". Questions and requests are always welcome.'
 
 let connectionLevel = 0
-let advertisingName
+let lastAdvertisingName // If not undefined: Reconnect possible
 let blxDevice
 
 /* totalsize:AllDownload, mode:'FULL'/'INC', sumsize:summOfAll
@@ -138,20 +138,20 @@ function bleCallback(m, v, xinfo) {
                     disabler(false)
                     break
                 case 2: // only advertsing Name known, no MAC etc..
-                    advertisingName = blx.getDevice().advertisingName
-                    blxDeviceName.textContent = advertisingName
+                    lastAdvertisingName = blx.getDevice().advertisingName
+                    blxDeviceName.textContent = lastAdvertisingName
                     blxMAC.textContent = '-'
                     blxType.textContent = '-'
                     blxFW.textContent = '-'
                     button0Link.querySelector('i').classList.add('fa-beat')
                     blxSignal.textContent = '... dBm'
                     blxSignal.style.backgroundColor = 'gray' // 
-                    blxConnectButtonText.textContent = blxInfoLine.textContent = `Connecting '${advertisingName}'...`
+                    blxConnectButtonText.textContent = blxInfoLine.textContent = `Connecting '${lastAdvertisingName}'...`
                     blxGraph.innerHTML = "" // During Advertising no Link...
                     break
                 case 3: // 
                     blxInfoLine.textContent = "Reading IDs..."
-                    blxConnectButtonText.textContent = `'${advertisingName}'` // Disconnect
+                    blxConnectButtonText.textContent = `'${lastAdvertisingName}'` // Disconnect
 
                     break
                 case 4: // Full Connected
@@ -302,8 +302,8 @@ async function calculateMemory(gflag) { // get flag (= with new) if true: disabl
             case 3:
                 mmode = "RING"
         }
-        memstr = "[Total:" + m.total + "(" + mperc + "%," + mmode + ")"
-        if (gflag) memstr += " <br class='mobile-br'>New:" + m.incnew
+        memstr = "[Total: " + m.total + "(" + mperc + "%," + mmode + ")"
+        if (gflag) memstr += " <br class='mobile-br'>New: " + m.incnew
         memstr += "] Bytes"
     } catch (error) {
         blxCmdRes.textContent = error
@@ -318,7 +318,7 @@ async function showLink() { // Check if (old) Graf Data is already in Store
         const KeyVal = blStore.result() // undefined opt.
         if (KeyVal !== undefined) {
             link = "<a target='_blank' href='../gdraw.html?st=" + blxDevice.deviceMAC + "_xtract.edt&sn=" +
-                advertisingName + "'>Show Graph</a><br class='mobile-br'> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
+                lastAdvertisingName + "'>Show Graph</a><br class='mobile-br'> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
                     .toLocaleString() + ")"
         }
     } catch (error) {
@@ -355,13 +355,19 @@ async function show_details() {
 async function blxConnect() {
     blxCmdRes.textContent = '-'
     disabler(true)
+    let reconFlag = false
+    if (connectionLevel <2 &&  lastAdvertisingName!== undefined) {
+        reconFlag = await okDialogDo(`<b>Reconnect?</b><br><br><br>Reconnect to Device?<br>
+        <b>Name: '${lastAdvertisingName}'</b><br><br>OK to Reconnect (or close)`)
+    }
 
     await spinnerShow((connectionLevel >= 3) ? 'Disconnect' : 'Connect', 300)
     try {
-        if (connectionLevel >= 3) {
+        if (connectionLevel >= 2) {
             await _blxCmdSend(".d") // disconnect
         } else {
-            await _blxCmdSend(".c") // connect
+            if(reconFlag) await _blxCmdSend(".r") // reconnect
+            else await _blxCmdSend(".c") // connect
             await show_details()
         }
     } catch (error) {
