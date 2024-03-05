@@ -21,6 +21,7 @@ filsize:localFile, filename:localFilenem, fproc:localPercent ndata:flagForNewDat
 let uplStatus = { totalsize: 0, mode: '', sumsize: 0, filesize: 0, filename: '', fproc: 0, ndata: false }
 
 let urlpar = {} // Aufruf-Parameter, z.B. urlpar.test = abc fuer ?test=abc
+let isUrlGit = false // Reduced Functionality on GIT (no PHP)
 
 let deviceListDB = [] // GLOBALE Liste der vorhandenen Devices in IndexDB
 
@@ -1374,8 +1375,9 @@ async function blxSetup() {
             showSetupInfo()
         })
         setupDLG.querySelector('#jd-servertest').addEventListener('click', (e) => {
+            if(isUrlGit) await okDialogDo(`<b>ERROR</b><br><br><br>Can't Open Server on GITs<br>`)
             // Open WITH token, but no cmd
-            window.open(setupDLG.querySelector('#jd-server').value + '?k=' + setupDLG.querySelector('#jd-accesstoken').value);
+            else   window.open(setupDLG.querySelector('#jd-server').value + '?k=' + setupDLG.querySelector('#jd-accesstoken').value);
         })
 
         setupDialogInit = true
@@ -1494,7 +1496,10 @@ async function deviceDialogDo(idx) {
 //---------------- setup ------------
 async function setup() {
     // Isolate URL Parameters
-    const qs = location.search.substr(1).split('&')
+console.log(location)
+    isUrlGit = (localhost.hostname.toLowerCase().indexOf('github')>=0) // reduced Funct. on Gits (No PHP)
+ console.log(isUrlGit)
+    const qs = location.search.substring(1).split('&')
     urlpar = {}
     for (let x = 0; x < qs.length; x++) {
         let kv = qs[x].split('=')

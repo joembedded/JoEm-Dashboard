@@ -36,7 +36,9 @@ Der Service Worker caached die APP-Daten, so dass sie Offline verfügbar ist.
 Fuer die Entwicklung allerdings eher hinderlich... Daher deinstallierbar.
 - Entwicklung: ServiceWorker-Dateien evtl. loeschen. <br>
     Gegebenenfalls laufenden Servicewerker manuell per Konsole löschen: removeServiceWorker() (global in 'index.html', ca. Zeile 40)<br>
-    und 'window.jdDebug' auf > 0 setzen 
+    und 'window.jdDebug' auf > 0 setzen, bzw. bei host 'localhost' wird automatisch 'window.jdDebug' gesetzt.<br>
+    Anmerkung: Beim der Live-Version auf GitHub ist Server-Sync blockiert, da dort kein PHP.
+
 
 - Deploy: ServiceWorker-Dateien erzeugen 'workbox generateSW workbox-config.js' im Root des Projekts<br>
     SW-Registrierung automatisch wenn 'window.jdDebug = 0' setzen
