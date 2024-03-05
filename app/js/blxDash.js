@@ -1375,7 +1375,7 @@ async function blxSetup() {
             showSetupInfo()
         })
         setupDLG.querySelector('#jd-servertest').addEventListener('click', (e) => {
-            if(isUrlGit) await okDialogDo(`<b>ERROR</b><br><br><br>Can't Open Server on GITs<br>`)
+            if(isUrlGit) okDialogDo(`<b>ERROR</b><br><br><br>Can't Open Server on GITs<br>`)
             // Open WITH token, but no cmd
             else   window.open(setupDLG.querySelector('#jd-server').value + '?k=' + setupDLG.querySelector('#jd-accesstoken').value);
         })
