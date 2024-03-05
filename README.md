@@ -41,6 +41,12 @@ Fuer die Entwicklung allerdings eher hinderlich... Daher deinstallierbar.
 - Deploy: ServiceWorker-Dateien erzeugen 'workbox generateSW workbox-config.js' im Root des Projekts<br>
     SW-Registrierung automatisch wenn 'window.jdDebug = 0' setzen
 
+## Test QR-Codes
+
+Einige QR-Codes (MACs, gesprochene Texte, Link) zum Testen:
+
+![QR_DEMO](./docu/img/qr_collection.png)
+
 
 ## 3.rd Party Software ##
 - FontAwesome https://fontawesome.com/license/free License: MIT, SIL-OFL, CC-BY-4.0
