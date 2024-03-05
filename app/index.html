@@ -44,7 +44,7 @@
 
     <script>
         window.jdDebug = 1 // PWA - global DebugLevel: 0:Run
-        if(localhost.hostname == 'localhost') window.jdDebug = 1 // DEBUG -  global DebugLevel: 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
+        if(location.hostname == 'localhost') window.jdDebug = 1 // DEBUG -  global DebugLevel: 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
         function installServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').then(function (reg) {

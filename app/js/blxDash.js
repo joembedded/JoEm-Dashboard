@@ -1497,7 +1497,7 @@ async function deviceDialogDo(idx) {
 async function setup() {
     // Isolate URL Parameters
 console.log(location)
-    isUrlGit = (localhost.hostname.toLowerCase().indexOf('github')>=0) // reduced Funct. on Gits (No PHP)
+    isUrlGit = (location.hostname.toLowerCase().indexOf('github')>=0) // reduced Funct. on Gits (No PHP)
  console.log(isUrlGit)
     const qs = location.search.substring(1).split('&')
     urlpar = {}
