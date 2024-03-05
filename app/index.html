@@ -43,7 +43,7 @@
     <link rel="stylesheet" href="./css/qrscanner.css">
 
     <script>
-        window.jdDebug = 0 // PWA - global DebugLevel: 0:Run
+        window.jdDebug = 1 // PWA - global DebugLevel: 0:Run
         if(localhost.hostname == 'localhost') window.jdDebug = 1 // DEBUG -  global DebugLevel: 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
         function installServiceWorker() {
             if ('serviceWorker' in navigator) {
