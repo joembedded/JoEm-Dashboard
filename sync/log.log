@@ -13,3 +13,6 @@
 01.03.24 15:24:48 ::1 blxremote.php: (CMD:'upsync')(DDC2FB99207A7E7E/iparam.lxp.json => 725kB)(Run:0.7558 msec)
 01.03.24 15:24:48 ::1 blxremote.php: (CMD:'upsync')(DDC2FB99207A7E7E/sys_param.lxp.json => 209kB)(Run:1.4241 msec)
 05.03.24 11:45:57 ::1 .
+08.03.24 14:26:14 ::1 .
+08.03.24 14:26:17 ::1 ./syncdata
+08.03.24 14:26:19 ::1 ./syncdata/B421A86B9ADFCAC2
