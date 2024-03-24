@@ -110,11 +110,11 @@ async function initCameras() {
         initQrCodeDOM()
 
         // Barcode-Teil
-        if (!('BarcodeDetector' in window) ) {
-            if(window.jdDebug !== undefined && window.jdDebug >1){
+        if (!('BarcodeDetector' in window)) {
+            if (window.jdDebug !== undefined && window.jdDebug > 1) {
                 if (qrLogPrint) qrLogPrint("ERROR: No Barcode API available, Use Polyfill!")
                 window.BarcodeDetector = cozmoQR
-            }else{
+            } else {
                 const sres = "ERROR: No Barcode API available"
                 if (qrLogPrint) qrLogPrint(sres)
                 return sres
@@ -175,7 +175,7 @@ async function initCameras() {
 export async function openSelectedCamera() {
     if (!barcodeScannerInit) {
         const sres = await initCameras()
-        if(typeof sres === 'string') return sres
+        if (typeof sres === 'string') return sres
     }
     if (qrLogPrint) qrLogPrint("INFO: OpenCamera")
     try {
@@ -281,23 +281,23 @@ async function camWorker() {
                             // Results: -1:Ignored, 0:AcceptedUndENde, 1:AcceptedAberNochMehrErlaubt 2:OrangeUndNochMehr undefined:diesenScanignorieren
                             let nqacc = await scanCallback(rawstring)
                             if (nqacc === undefined) return camWorkerCont
-                            if( nqacc == 2) {
-                                qcol = 'orange' 
-                            } else  if (nqacc >= 0) {
+                            if (nqacc == 2) {
+                                qcol = 'orange'
+                            } else if (nqacc >= 0) {
                                 if (qrLogPrint) qrLogPrint(`Scanned: '${rawstring}'`) // Nur 0,1 anzeigen
                                 qcol = 'lime' // OK
-                            } 
+                            }
                             scannedResults.push({ qrValue: rawstring, t0: performance.now(), scnt: 0, accepted: nqacc, qcolor: qcol });
                             if (nqacc == 0) camWorkerCont = false // Sofort raus
                         } else { // Code already accepted: Keep GREEN for 1 sec
                             const age = performance.now() - fn.t0;
                             fn.scnt++;
                             qcol = fn.qcolor
-                            if (age > 1000){ // Only New for 1 sec
-                                if(fn.accepted == 2) qcol = 'chocolate'
-                                else if(fn.accepted >= 0) qcol = 'darkgreen' 
+                            if (age > 1000) { // Only New for 1 sec
+                                if (fn.accepted == 2) qcol = 'chocolate'
+                                else if (fn.accepted >= 0) qcol = 'darkgreen'
                             }
-                        } 
+                        }
                         ctxCam.strokeStyle = qcol
                         const dbarcp = b.cornerPoints
                         // console.log(dbarcp)
@@ -351,8 +351,11 @@ function closeCam() {
     qrScanDialogOpen = false
 }
 
-async function torchOnOff() {
-    torchFlag = !torchFlag
+export async function torchOnOff(forceoff = false) {
+    if (forceoff) {
+        if (!torchFlag) return // Was not on
+        torchFlag = false   // force off
+    } else torchFlag = !torchFlag // Else normal toggle
     const videoTrack = camStream.getVideoTracks()[0]; // getVideoTracks()/getTracks()
     await videoTrack.applyConstraints({ torch: torchFlag });
     if (qrLogPrint) qrLogPrint("Torch: " + torchFlag + ": " + videoTrack.getSettings().torch)

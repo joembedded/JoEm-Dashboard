@@ -1095,12 +1095,13 @@ let searchmac = ''
 async function scanFoundAddDevice(scanresult) {
     //blx.terminalPrint("SCAN: '"+ scanresult+"'")
     const lcscan = scanresult.toLowerCase()
-    // Fall 1: Link. Erstmal noch ignorieren!
+    // Fall 1: Link. 
     if (lcscan.startsWith('http')) {
         if (qrlink !== undefined) return
         qrlink = scanresult
         blx.terminalPrint(`Scanned: '${qrlink}'`)
         if (await okDialogDo(`<b>Open Link?</b><br><br><br>'${qrlink}'<br>`) == true) {
+            QRS.torchOnOff(true)
             window.open(qrlink)
         }
         qrlink = undefined
