@@ -1584,7 +1584,7 @@ const blx = (() => { // Import as 'Revealing Module Pattern'
 
       case 'firmware': // Firmwareupdate
         terminalPrint('Firmware Update')
-        if (blxDevice.deviceType >= 1000 || (blxDevice.disk !== undefined && blxDevice.disk.diskSize > 0)) { // Nur fuer Logger 
+        if (blxIDs.deviceType >= 1000 || (blxIDs.disk !== undefined && blxIDs.disk.diskSize > 0)) { // Nur fuer Logger 
           await blxSelectAndPutFile(0, '.sec') // Danach sofort return
           break;
         }

@@ -76,6 +76,7 @@
 		}
 	$data = json_encode(/*$args['data']*/ $args); // ALternative: ALL
 		file_put_contents("./syncdata/$mac/$filename.json",$data); // Store in JSON Format
+		file_put_contents("./syncdata/$mac/$filename",$args['data']); // Plus Raw
 		$olen = strlen($data);
 		if( $olen >10240) $dlen = round($olen/1024,3)."kB";
 		else $dlen = $olen."kB";

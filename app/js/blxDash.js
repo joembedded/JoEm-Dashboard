@@ -8,7 +8,7 @@ import './blx.js' // *todo* './blx.min.js'
 import './blStore.min.js'
 
 //--------- globals ------ 
-const VERSION = 'V0.10 / 04.03.2024'
+const VERSION = 'V0.13 / 16.05.2024'
 const COPYRIGHT = '(C)JoEmbedded.de'
 const HELP = 'This is a "living product". Questions and requests are always welcome.'
 
@@ -126,6 +126,7 @@ function bleCallback(m, v, xinfo) {
     switch (m) {
         case 'CON':
             connectionLevel = v
+console.log("CON-Level: "+v)
             switch (v) {
                 case 0: // norm. never sent
                 case 1:
@@ -157,6 +158,7 @@ function bleCallback(m, v, xinfo) {
                     break
                 case 4: // Full Connected
                     blxSignal.hidden = false
+                    disabler(false) // 2.nd (maybe re-connect)
                     break
             }
             break
@@ -916,22 +918,26 @@ async function blxServerDataSync() {
                             if (typeof res == 'object' && res.status == 'OK') {
                                 data.tssync = res.tssync // Add Sync-TS
                                 await blStore.set(key, data)
+                                blx.frq_ping(2000, 0.1, 0.1)
                             } else {
-                                const sendResult = res
-                                blx.terminalPrint(sendResult)
-                                //console.log(sendResult)
+                                //console.log(sendResult) // Control
+                                let sendResult = res
+                                if(typeof res == 'object') sendResult = res.status
+                                throw sendResult
                             }
                         }
                     }
                 }
             }
         }
+        blx.terminalPrint("Server-Synchronize OK")
     } catch (err) {
-        alert(`Problem: '${err}'`)
+        blx.frq_ping(30, 0.3, 0.5)
+        okDialogDo(`<b>ERROR:</b><br><br><br>Server-Synchronize: '${err}'<br>`)
+        blx.terminalPrint(`Server-Synchronize: '${err}'`)
     }
     await updateDeviceList()
     spinnerClose()
-    blx.terminalPrint("Server-Synchronize OK")
     disabler(false)
 }
 
@@ -1256,7 +1262,7 @@ let okDialoginit = false
 let okDialogOpenFlag
 let okDialogResult
 async function okDialogDo(question, xconfirm = false, timeout_sec = 0) {
-    blx.frq_ping(880, 0.3, 0.3)
+    blx.frq_ping(880, 0.1, 0.3)
     // addEventListener only one instance added
     okDialogDOM.querySelector('#ok-content').innerHTML = question
     const okbut = okDialogDOM.querySelector('#okdlgBtnOK')

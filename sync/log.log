@@ -16,3 +16,49 @@
 08.03.24 14:26:14 ::1 .
 08.03.24 14:26:17 ::1 ./syncdata
 08.03.24 14:26:19 ::1 ./syncdata/B421A86B9ADFCAC2
+10.05.24 19:00:56 ::1 blxremote.php: (CMD:'upsync')(Gen Dir '...A0534D8E8DB6F418')(A0534D8E8DB6F418/iparam.lxp.json => 365kB)(Run:5.419 msec)
+10.05.24 19:00:56 ::1 blxremote.php: (CMD:'upsync')(A0534D8E8DB6F418/sys_param.lxp.json => 214kB)(Run:0.5519 msec)
+10.05.24 19:00:56 ::1 blxremote.php: (CMD:'upsync')(DDC2FB99207A7E7E/iparam.lxp.json => 725kB)(Run:0.7651 msec)
+10.05.24 19:00:56 ::1 blxremote.php: (CMD:'upsync')(DDC2FB99207A7E7E/sys_param.lxp.json => 209kB)(Run:0.561 msec)
+10.05.24 19:00:56 ::1 blxremote.php: (CMD:'upsync')(Gen Dir '...2E9AF97C94A639DA')(2E9AF97C94A639DA/iparam.lxp.json => 349kB)(Run:1.801 msec)
+10.05.24 19:00:56 ::1 blxremote.php: (CMD:'upsync')(2E9AF97C94A639DA/sys_param.lxp.json => 209kB)(Run:0.6239 msec)
+10.05.24 19:00:56 ::1 blxremote.php: (CMD:'upsync')(B421A86B9ADFCAC2/data.edt.json => 2415.384kB)(Run:16.2151 msec)
+10.05.24 19:00:57 ::1 blxremote.php: (CMD:'upsync')(B421A86B9ADFCAC2/data.edt.old.json => 4114.457kB)(Run:30.4749 msec)
+10.05.24 19:00:57 ::1 blxremote.php: (CMD:'upsync')(B421A86B9ADFCAC2/iparam.lxp.json => 269kB)(Run:1.2488 msec)
+10.05.24 19:00:57 ::1 blxremote.php: (CMD:'upsync')(B421A86B9ADFCAC2/sys_param.lxp.json => 214kB)(Run:0.5982 msec)
+12.05.24 15:49:25 ::1 blxremote.php: (CMD:'upsync')(2E9AF97C94A639DA/iparam.lxp.json => 349kB)(Run:4.4248 msec)
+13.05.24 18:25:18 ::1 .
+16.05.24 10:45:53 ::1 blxremote.php: (CMD:'upsync')(Gen Dir '...262E218DD4A68F5D')(262E218DD4A68F5D/iparam.lxp.json => 267kB)(Run:6.5808 msec)
+16.05.24 10:45:53 ::1 blxremote.php: (CMD:'upsync')(262E218DD4A68F5D/sys_param.lxp.json => 239kB)(Run:0.658 msec)
+16.05.24 10:45:53 ::1 blxremote.php: (CMD:'upsync')(2E9AF97C94A639DA/data.edt.json => 46.522kB)(Run:1.168 msec)
+16.05.24 10:45:53 ::1 blxremote.php: (CMD:'upsync')(2E9AF97C94A639DA/iparam.lxp.json => 348kB)(Run:0.6769 msec)
+16.05.24 10:50:31 ::1 blxremote.php: (CMD:'upsync')(2E9AF97C94A639DA/data.edt.json => 46.751kB)(Run:9.836 msec)
+16.05.24 10:52:29 ::1 blxremote.php: (CMD:'upsync')(2E9AF97C94A639DA/data.edt.json => 46.821kB)(Run:1.4641 msec)
+16.05.24 11:25:35 ::1 .
+16.05.24 11:25:37 ::1 ./syncdata
+16.05.24 11:25:50 ::1 ./syncdata/262E218DD4A68F5D
+16.05.24 11:26:41 ::1 ./syncdata/262E218DD4A68F5D
+16.05.24 11:28:19 ::1 ./syncdata/262E218DD4A68F5D
+16.05.24 11:28:25 ::1 ./syncdata
+16.05.24 11:30:30 ::1 ./syncdata
+16.05.24 11:38:12 ::1 blxremote.php: (CMD:'upsync')(2E9AF97C94A639DA/iparam.lxp.json => 336kB)(Run:2.702 msec)
+16.05.24 11:40:08 ::1 ./syncdata
+16.05.24 11:40:53 ::1 ./syncdata
+16.05.24 11:41:02 ::1 ./syncdata
+16.05.24 11:42:18 ::1 ./syncdata
+16.05.24 11:44:01 ::1 ./syncdata
+16.05.24 11:45:56 ::1 ./syncdata
+16.05.24 11:46:52 ::1 ./syncdata
+16.05.24 11:47:02 ::1 ./syncdata
+16.05.24 11:47:05 ::1 ./syncdata/2E9AF97C94A639DA
+16.05.24 12:34:30 ::1 .
+16.05.24 12:39:40 ::1 blxremote.php: (CMD:'upsync')(Run:0.8922 msec)
+16.05.24 12:40:40 ::1 blxremote.php: (CMD:'upsync')(Run:0.0279 msec)
+16.05.24 12:40:52 ::1 blxremote.php: (CMD:'upsync')(Run:0.025 msec)
+16.05.24 12:41:57 ::1 blxremote.php: (CMD:'upsync')(Run:0.041 msec)
+16.05.24 12:45:10 ::1 blxremote.php: (CMD:'upsync')(Run:0.025 msec)
+16.05.24 12:47:04 ::1 blxremote.php: (CMD:'upsync')(Run:0.0331 msec)
+16.05.24 12:49:15 ::1 blxremote.php: (CMD:'upsync')(Run:0.031 msec)
+16.05.24 12:54:02 ::1 blxremote.php: (CMD:'upsync')(Run:0.0229 msec)
+16.05.24 12:54:31 ::1 blxremote.php: (CMD:'upsync')(Run:0.0229 msec)
+16.05.24 12:55:20 ::1 blxremote.php: (CMD:'upsync')(Run:0.0231 msec)

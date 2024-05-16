@@ -1,4 +1,5 @@
 <?php
+	// Modifiziert fuer iparam 16.05.2024
 	// Optionally redirect to secure site with same script - No Output allowed!
 	$script=$_SERVER['PHP_SELF'];	// /xxx.php
 	$server=$_SERVER['HTTP_HOST'];  // Immer klein
@@ -22,7 +23,7 @@
 <div class="w3-container">
 <?php
 	// A small file browser for a given subdirectory
-	// (C)2020-2024 - 19.02.2024 JoEmbedded.de - save as "index.php" (see '$me')
+	// (C)2020-2024 - 18.05.2024 JoEmbedded.de - save as "index.php" (see '$me')
 	error_reporting(E_ALL);
 
 	$me="index.php";
@@ -61,7 +62,7 @@
 
 	addlog($dir);	// What is displayed?
 	
-	echo "<div class='w3-panel w3-indigo'><h3><img style=\"vertical-align:middle\" src=\"MediaIcon.ico\">&nbsp;&nbsp;&nbsp;<b>Media-Browser - Directory '$dir'</b></h3></div>";
+	echo "<div class='w3-panel w3-indigo'><h3><img style=\"vertical-align:middle\" src=\"favicon.ico\">&nbsp;&nbsp;&nbsp;<b>BLX Dashboard-Browser - Directory '$dir'</b></h3></div>";
 	
 	echo "<ul class='w3-ul w3-leftbar w3-border-green w3-hoverable w3-light-gray'>";
 	echo "<li><big>&#127968;</big>  <a href=\"index.php\">Home</a><br></li>";
@@ -98,7 +99,10 @@
 					continue;
 				}
 				if(is_dir("$dir/$file")){
-						echo "<li><big>&#128193;</big> <a href=\"$me?dir=$dir/$file\">/$file</a></li>";
+						echo "<li><big>&#128193;</big> <a href=\"$me?dir=$dir/$file\">/$file";
+						$devname = @file("$dir/$file/iparam.lxp",FILE_IGNORE_NEW_LINES);
+						if($devname !== false && count($devname)>5 && $devname[0]=='@100') echo " - '".$devname[5]."'";
+						echo "</a></li>";
 						$dircnt++;
 				}
 			}
