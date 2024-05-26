@@ -8,7 +8,7 @@ import './blx.js' // *todo* './blx.min.js'
 import './blStore.min.js'
 
 //--------- globals ------ 
-const VERSION = 'V0.13 / 16.05.2024'
+const VERSION = 'V0.14 / 27.05.2024'
 const COPYRIGHT = '(C)JoEmbedded.de'
 const HELP = 'This is a "living product". Questions and requests are always welcome.'
 
@@ -1107,7 +1107,7 @@ async function scanFoundAddDevice(scanresult) {
         qrlink = scanresult
         blx.terminalPrint(`Scanned: '${qrlink}'`)
         if (await okDialogDo(`<b>Open Link?</b><br><br><br>'${qrlink}'<br>`) == true) {
-            QRS.torchOnOff(true)
+            QRS.torchOff()
             window.open(qrlink)
         }
         qrlink = undefined

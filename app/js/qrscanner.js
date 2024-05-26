@@ -1,7 +1,7 @@
-// qrscanner.js - V1.0 (C)JoEmbedded.de 
+// qrscanner.js - V1.1 (C)JoEmbedded.de 
 
 /*
-    qrscanner verwendet die BarcodeDetector API, ist aber Stand Anf. 2024 nur aauf Android vorhanden
+    qrscanner verwendet die BarcodeDetector API, ist aber Stand Anf. 2024 nur auf Android vorhanden
     Ansonsten  Barcode Polyfill: - https://github.com/cozmo/jsQR  V1.4.0
     Cozmo QR: works so lala, but only for Text
     Distribute: uglifyjs --warn ./js/jsQR.js -m -c -o ./js/jsQR.min.js
@@ -350,15 +350,17 @@ function closeCam() {
     scanDialog.close()
     qrScanDialogOpen = false
 }
-
-export async function torchOnOff(forceoff = false) {
-    if (forceoff) {
-        if (!torchFlag) return // Was not on
-        torchFlag = false   // force off
-    } else torchFlag = !torchFlag // Else normal toggle
+async function setTorch(newState){
+    torchFlag = newState
     const videoTrack = camStream.getVideoTracks()[0]; // getVideoTracks()/getTracks()
     await videoTrack.applyConstraints({ torch: torchFlag });
     if (qrLogPrint) qrLogPrint("Torch: " + torchFlag + ": " + videoTrack.getSettings().torch)
+}
+async function torchOnOff() { // ToggleCallback
+    setTorch(!torchFlag)
+}
+export async function torchOff() { // external  only off allowed (e.g. before Links)
+    setTorch(false)
 }
 
 async function qrSleepMs(ms = 1) { // use: await qrSleepMs()
