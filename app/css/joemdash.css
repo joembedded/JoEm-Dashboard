@@ -301,6 +301,13 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
     padding: 8px;
 }
 
+.qrimg { /* QR-Code Imgage */
+    vertical-align: middle;
+    padding: 0 4px;
+    width: calc(20px * var(--fontrel)) !important;
+    height: calc(20px * var(--fontrel)) !important;
+}
+
 /* Allgemeines */
 button {
     font-size: calc(1rem * var(--fontrel));

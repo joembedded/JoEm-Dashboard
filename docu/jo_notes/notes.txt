@@ -1,0 +1,60 @@
+Notes.txt - Allg. Memo - Alles was nicht APP: in joemdash_data!
+------------------------
+
+Installation Workbox:
+======================
+
+(Info: https://youtu.be/LPTO3FriEIY?si=PQIzBhB_zIaYOMSP )
+
+npm install workbox-cli --global
+
+Nur benoetigte File-Endungen rauslesen (also kein Bak oder so..)
+
+workbox wizard
+  Path: . (Manual)
+  
+(Weiter mit Enter, Ende: N N)
+workbox generateSW workbox-config.js    erstellt (4) Files
+
+	C:\html\wrk\joemdash>workbox generateSW workbox-config.js
+	Using configuration from C:/html/wrk/joemdash/workbox-config.js.
+	The service worker files were written to:
+	  • C:/html/wrk/joemdash/sw.js
+	  • C:/html/wrk/joemdash/sw.js.map
+	  • C:/html/wrk/joemdash/workbox-2e7151d3.js
+	  • C:/html/wrk/joemdash/workbox-2e7151d3.js.map
+	The service worker will precache 96 URLs, totaling 16.5 MB.
+
+
+Danach noch SW registrieren wie registersw.png
+
+
+// Test: Geht anscheinend mit SW nur im Hauptverzeichnis???
+cd C:\html\wrk\joemdash
+
+C:\html\wrk\joemdash>workbox wizard
+? What is the root of your web app (i.e. which directory do you deploy)? Manually enter path
+? Please enter the path to the root of your web app: .
+? Which file types would you like to precache? css, txt, ttf, woff2, html, js, md, ico, svg, png
+? Where would you like your service worker file to be saved? sw.js
+? Where would you like to save these configuration options? workbox-config.js
+? Does your web app manifest include search parameter(s) in the 'start_url', other than 'utm_' or 'fbclid' (like '?sourc
+e=pwa')? No
+To build your service worker, run
+
+  workbox generateSW workbox-config.js
+
+as part of a build process. See https://goo.gl/fdTQBf for details.
+You can further customize your service worker by making changes to workbox-config.js. See https://goo.gl/gVo87N for details.
+
+C:\html\wrk\joemdash> workbox generateSW workbox-config.js
+Using configuration from C:/html/wrk/joemdash/workbox-config.js.
+The service worker files were written to:
+  • C:/html/wrk/joemdash/sw.js
+  • C:/html/wrk/joemdash/sw.js.map
+  • C:/html/wrk/joemdash/workbox-2e7151d3.js
+  • C:/html/wrk/joemdash/workbox-2e7151d3.js.map
+The service worker will precache 32 URLs, totaling 1.93 MB.
+
+C:\html\wrk\joemdash>
+
