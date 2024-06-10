@@ -8,7 +8,7 @@ import './blx.js' // *todo* './blx.min.js'
 import './blStore.min.js'
 
 //--------- globals ------ 
-const VERSION = 'V0.14 / 27.05.2024'
+const VERSION = 'V0.15 / 10.06.2024'
 const COPYRIGHT = '(C)JoEmbedded.de'
 const HELP = 'This is a "living product". Questions and requests are always welcome.'
 
@@ -320,7 +320,7 @@ async function showLink() { // Check if (old) Graf Data is already in Store
         await blStore.get(blxDevice.deviceMAC + '_xtract.edt')
         const KeyVal = blStore.result() // undefined opt.
         if (KeyVal !== undefined) {
-            link = "<a target='_blank' href='../gdraw.html?st=" + blxDevice.deviceMAC + "_xtract.edt&sn=" +
+            link = "<a target='_blank' href='../gdraw/gdraw.html?st=" + blxDevice.deviceMAC + "_xtract.edt&sn=" +
                 lastAdvertisingName + "'>Show Graph</a><br class='mobile-br'> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
                     .toLocaleString() + ")"
         }
