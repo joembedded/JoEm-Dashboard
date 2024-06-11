@@ -6,7 +6,7 @@ Installation Workbox:
 
 (Info: https://youtu.be/LPTO3FriEIY?si=PQIzBhB_zIaYOMSP )
 
-npm install workbox-cli --global
+npm install workbox-cli --global           (auch fuer gelegentliche Updates der Workbox)
 
 Nur benoetigte File-Endungen rauslesen (also kein Bak oder so..)
 
@@ -14,9 +14,10 @@ workbox wizard
   Path: . (Manual)
   
 (Weiter mit Enter, Ende: N N)
-workbox generateSW workbox-config.js    erstellt (4) Files
 
-	C:\html\wrk\joemdash>workbox generateSW workbox-config.js
+workbox generateSW workbox-config.js      erstellt (4) Files. !!Diesen Schritt bei Aenderungen wiederholen!!
+
+	npm aditC:\html\wrk\joemdash>workbox generateSW workbox-config.js
 	Using configuration from C:/html/wrk/joemdash/workbox-config.js.
 	The service worker files were written to:
 	  • C:/html/wrk/joemdash/sw.js
