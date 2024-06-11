@@ -49,6 +49,8 @@ Einige QR-Codes (MACs, gesprochene Texte, Link) zum Testen:
 
 ![QR_DEMO](./docu/img/qr_collection.png)
 
+Ein kleiner Generator für eigene QR-Codes mit Sprach-Infos: https://joembedded.de/ltx/sw/php_qr/
+
 
 ## 3.rd Party Software ##
 - FontAwesome https://fontawesome.com/license/free License: MIT, SIL-OFL, CC-BY-4.0
