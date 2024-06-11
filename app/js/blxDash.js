@@ -8,7 +8,7 @@ import './blx.js' // *todo* './blx.min.js'
 import './blStore.min.js'
 
 //--------- globals ------ 
-const VERSION = 'V0.15 / 10.06.2024'
+const VERSION = 'V0.16 / 11.06.2024'
 const COPYRIGHT = '(C)JoEmbedded.de'
 const HELP = 'This is a "living product". Questions and requests are always welcome.'
 
@@ -321,7 +321,7 @@ async function showLink() { // Check if (old) Graf Data is already in Store
         const KeyVal = blStore.result() // undefined opt.
         if (KeyVal !== undefined) {
             link = "<a target='_blank' href='../gdraw/gdraw.html?st=" + blxDevice.deviceMAC + "_xtract.edt&sn=" +
-                lastAdvertisingName + "'>Show Graph</a><br class='mobile-br'> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
+                lastAdvertisingName + "'> Show Graph </a><br class='mobile-br'> (" + KeyVal.v.akt_len + " Bytes, " + KeyVal.v.ctime
                     .toLocaleString() + ")"
         }
     } catch (error) {
@@ -1459,9 +1459,12 @@ async function deviceDialogDo(idx) {
             const defi = dev.files[i]
             if (defi.nowsyncflag) tel += '<tr style="background-color:chocolate;")>'
             else tel += '<tr>'
+            if(defi.fname == 'xtract.edt'){
+                let link = "<a target='_blank' href='../gdraw/gdraw.html?st=" + dev.mac + "_xtract.edt&sn=" +   dev.advname + "'> Show Graph </a>"
+                tel += `<td>${link}</td>`
+            }else tel += `<td>'${defi.fname}'</td>`
 
-            tel += `<td>'${defi.fname}'</td><td>${defi.aktlen}</td>`
-
+            tel += `<td>${defi.aktlen}</td>`
             tel += `<td> ${defi.syncflag ? '&#10004;' : '-'}</td><td>`
 
             //console.log("DEFI: ",defi)

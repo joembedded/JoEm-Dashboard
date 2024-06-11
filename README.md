@@ -40,7 +40,7 @@ Fuer die Entwicklung allerdings eher hinderlich... Daher deinstallierbar.
     Anmerkung: Beim der Live-Version auf GitHub ist Server-Sync blockiert, da dort kein PHP.
 
 
-- Deploy: ServiceWorker-Dateien erzeugen 'workbox generateSW workbox-config.js' im Root des Projekts<br>
+- Deploy: ServiceWorker-Dateien erzeugen 'workbox generateSW workbox-config.js' im Root des Projekts (siehe './docu/jo_notes/notes.txt')<br>
     SW-Registrierung automatisch wenn 'window.jdDebug = 0' setzen
 
 ## Test QR-Codes
@@ -57,5 +57,5 @@ Einige QR-Codes (MACs, gesprochene Texte, Link) zum Testen:
 
 ---
 
-## Changelog ##
-- V0.10 04.03.2024 First Fragment
+## Changelog (wie 'blxDash.js') ##
+- V0.16 11.06.2024

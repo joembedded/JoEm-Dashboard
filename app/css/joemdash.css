@@ -351,6 +351,10 @@ dialog {
         text-align: center;
     }
 
+    &.smallDialog {
+        min-width: 60%;
+    }
+
     .dlgBtnClose {
         position: absolute;
         border: none;
