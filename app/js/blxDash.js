@@ -1223,12 +1223,6 @@ async function SendTextFile2Server(remurl, scmd, accessToken, mac, filename, dbd
 }
 
 
-//---- helpers----
-async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
-    let np = new Promise(resolve => setTimeout(resolve, ms))
-    return np
-}
-
 // --------- Say ---------------
 let voices = [] // Wird erst on Demand gefuellt
 async function sagmal(txt2say, zlang) {
@@ -1241,7 +1235,7 @@ async function sagmal(txt2say, zlang) {
     for (let w = 0; w < 100; w++) { // Laden der Sprachen etwas ungewohnt, max. 1 sec warten
         if (voices.length !== 0) break
         voices = window.speechSynthesis.getVoices()
-        await dashSleepMs(10)
+        await JD.dashSleepMs(10)
     }
     //voices.forEach(e=>console.log(`Available: '${e.name}':'${e.lang}', Local:${e.localService}`))
     let sprichDas = new SpeechSynthesisUtterance(txt2say)
@@ -1293,7 +1287,7 @@ async function okDialogDo(question, xconfirm = false, timeout_sec = 0) {
     okDialogOpenFlag = true
     okDialogDOM.showModal()
     for (; ;) {
-        await dashSleepMs(50)
+        await JD.dashSleepMs(50)
         if (timeout_sec > 0) {
             timeout_sec -= 0.05
             if (timeout_sec <= 0) break;
@@ -1333,7 +1327,7 @@ async function editParamDialogDo(typ) {
     editParamDialogResult = '?' // Unknown
     editParamDLG.showModal()
     for (; ;) {
-        await dashSleepMs(50)
+        await JD.dashSleepMs(50)
         if (!editParamDialogOpenFlag) break
     }
     editParamDLG.close()
@@ -1409,7 +1403,7 @@ async function blxSetup() {
     setupDialogOpenFlag = true
     setupDLG.showModal()
     for (; ;) {
-        await dashSleepMs(50)
+        await JD.dashSleepMs(50)
         if (!setupDialogOpenFlag) break
     }
     setupDLG.close()
@@ -1492,7 +1486,7 @@ async function deviceDialogDo(idx) {
     deviceDialogResult = '?' // Unknown
     deviceDialog.showModal()
     for (; ;) {
-        await dashSleepMs(50)
+        await JD.dashSleepMs(50)
         if (deviceDialogResult == 'remove') {
             let okres = await okDialogDo(`Remove Device (from Local Storage)?<br><br><b>Name: '${dev.advname}'</b><br>MAC: ${dev.mac}<br>`, true)
             if (okres === true) {
@@ -1567,6 +1561,7 @@ async function setup() {
 }
 
 // -- Debugging --
+
 async function dbg_action() {
     //await editParamDialogDo(1, "<b>Edit Parameter</b>")
     // await okDialogDo('<b>Test</b><br><br><br>Dialog Template', false,10)
@@ -1574,6 +1569,7 @@ async function dbg_action() {
     // sagmal("This is not a Lovesong. OiOiOi! Lies dieses Lied leise Elise")   
     //await addDevice('0011223344556677', '0011223344556677')
 
+    //Schhiebt Footer hoch, allerdings SOFORT
 }
 
 if (window.jdDebug > 1) {

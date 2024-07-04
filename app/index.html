@@ -2,7 +2,7 @@
 <!-- 
     Dashboards nach aktueller Struktur. 
     Benoetigt Server wenn import oder fetch(). (Dann location.protocol === 'file:' disabled)
-    Icons: Font Awesome V6 Free -> https://fontawesome.com/docs/web/style/styling
+    Icons: Font Awesome V6 Free -> https://fontawesome.com , https://fontawesome.com/docs/web/style/styling
     (die ganzen fa-beat, fa-spin, ...- Klassen kann man auch auf andere Elemente verwenden)
 
     Kontakt: joembedded@gmail.com
@@ -16,6 +16,7 @@
     dann load auf Mobile via localhost
     dann chrome://inspect/#devices
 -->
+
 
 <html lang="en">
 
@@ -44,7 +45,7 @@
 
     <script>
         window.jdDebug = 0 // PWA - global DebugLevel: 0:Run
-        if(location.hostname == 'localhost') window.jdDebug = 1 // DEBUG -  global DebugLevel: 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
+        if (location.hostname == 'localhost') window.jdDebug = 1 // DEBUG -  global DebugLevel: 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
         function installServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').then(function (reg) {
@@ -71,13 +72,15 @@
 
 </head>
 
-<body class="shcontainer"> <!-- BODY START -->
+<body class="shcontainer"> <!-- ----- BODY START ----- -->
 
+    <!-- Hauptfenster, besteht aus Header/Content/Footer, wobei Content noch Sidebar enthaelt -->
     <header class="cheader">
         <i class="fa fa-fw fa-bars" id="sidebar_menue"><span id="cheader-hint"></span></i>
         <span class="cheader-txt"><b>BLX Dashboard</b> - PREVIEW - <span ll="lang">HierSprache</span> </span>
     </header>
 
+    <!-- Content-Teil des Haupptfensters mit Komponenten Sidebar und ucontent (use-content) -->
     <div class="ccontent">
         <div class="hccontainer">
             <nav id="sidebar_left" class="clnav">
@@ -147,7 +150,6 @@
 
 
                 </div>
-
             </nav>
 
             <div id="main_content" class="ucontent">
@@ -178,7 +180,7 @@
 
                             <span id="blxPinEnter" style="display:none">
                                 <button id="blxSetPinButton">Set PIN</button>
-                                <button id="blxScanPinButton" style="color: darkgreen"> 
+                                <button id="blxScanPinButton" style="color: darkgreen">
                                     Scan <img class="qrimg" src='static/qr20.png'>
                                 </button>
                                 <br class="mobile-br">
@@ -252,21 +254,55 @@
         </div>
     </div>
 
+    <!-- Im Footer kann auch noch Infos, Debug-Zeugs und ein Hilfsmenue untergebracht sein -->
     <footer class="cfooter">
-        <span id="jd-footeronline" style="color: limegreen;"><i class="fa-solid fa-fw fa-link fa-lg"></i> Online</span>
-        <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-fw fa-link-slash fa-lg"></i>
-            Offline</span>
-        &nbsp;
-        &nbsp;
+        <div> <!-- Online-Info -->
+            <span id="jd-footeronline" style="color: limegreen;"><i class="fa-solid fa-fw fa-link fa-lg"></i>
+                Online</span>
+            <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-fw fa-link-slash fa-lg"></i>
+                Offline</span>
+            &nbsp;
+            &nbsp;
+        </div>
+
         <!-- Enable fuer Debug, else hidden -->
         <button hidden id="dbg-action">(Debug)</button>
 
         <div id="footerReason"></div>&nbsp;
         <div style="color:dodgerblue" id="footerInfo">Info</div>&nbsp;
         <div id="footerSubInfo">SubInfo</div>
-    </footer>
 
-    <!-- Dialog Elements <dialog> / Modal new in HTML5 -->
+        <!-- Footer-Dialog -->
+        <div class="fmenucontent" id="fmenu_content" hidden>
+            
+            <!-- Einfacher Slider -->
+            <div>Von:0 Bis:100</div>
+            <div class="jdrange1">
+                <input class = "jdslider" type="range" min="0" max="100" value="30">
+            </div>
+    
+            <!-- Testweise DualRangs Slider-->
+            <div>Min:0 Max:100</div>
+            <div class="jdrange2">
+                <div class="jdrange-slider">
+                    <span class="jdrange-selected"></span>
+                </div>
+                <div class="jdrange-input">
+                    <input type="range" class="min" min="0" max="100" value="30">
+                    <input type="range" class="max" min="0" max="100" value="70">
+                </div>
+            </div>
+        </div>
+        <!-- Ende Footer-Dialog -->
+
+        <div class="fmenubutton">
+            <i class="fa fa-fw fa-caret-up" id="footer_menue"></i>
+        </div>
+    </footer>
+    <!-- Ende Hauptfenster -->
+
+    <!-- -----Dialog Elements <dialog> / Modal new in HTML5----- -->
+    <!-- Edit-Device iparam/sysparam Parameter-Dialog -->
     <dialog id="edit-params">
         <button class="dlgBtnClose" id='editBtnClose'>&#10006;</button>
         <div id="blxParameterEdit">-</div>
@@ -278,7 +314,7 @@
         </div>
     </dialog>
 
-    <!-- Globaler Spinner -->
+    <!-- Globaler Spinner als Overlay -->
     <dialog id='spinner'>
         <h1><i class="fa-solid fa-spinner fa-2xl fa-spin"></i></h1>
         <div id="spinnerReason"></div>
@@ -350,7 +386,7 @@
         </div>
     </dialog>
 
-    <!-- Device Dialog  -->
+    <!-- Device MAC Dialog  -->
     <dialog id='device-dialog'>
         <button class="dlgBtnClose" id='deviceDialogBtnClose'>&#10006;</button>
         <b>Device</b><br><br><br>
@@ -365,8 +401,7 @@
         </div>
     </dialog>
 
-
-    <!-- Externer Dialog aus qrscanner.js -->
+    <!-- Scanner-Fenster - Externer Dialog aus qrscanner.js -->
     <dialog id='qrscanner-dialog'>
         <video style="display: none;" id='qroriginal-video' playsinline mute></video>
         <div id='qrvideo-header'><select id='qrcam-selector'></select></div>

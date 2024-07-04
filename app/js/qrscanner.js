@@ -11,7 +11,13 @@
 
     <script src="./js/jsQR.min.js"></script>
 */
-
+// Only for Development: (see index.html)
+if (window.jdDebug > 1) {
+    const cqrscript = document.createElement("script");  // create a script DOM node
+    cqrscript.src = "./js/jsQR.min.js"
+    document.head.appendChild(cqrscript);  // add Script
+    console.log("Cozmo QR Emulation init (window.jdDebug: " + window.jdDebug + ")")
+}
 class cozmoQR {
     constructor(setup) {
         this.setup = setup;
@@ -44,6 +50,7 @@ class cozmoQR {
         return ret
     }
 } // Ende class cozmoQR
+
 
 // DOMs
 let scanDialog
@@ -350,7 +357,7 @@ function closeCam() {
     scanDialog.close()
     qrScanDialogOpen = false
 }
-async function setTorch(newState){
+async function setTorch(newState) {
     torchFlag = newState
     const videoTrack = camStream.getVideoTracks()[0]; // getVideoTracks()/getTracks()
     await videoTrack.applyConstraints({ torch: torchFlag });
@@ -373,6 +380,6 @@ export async function scannerBusy() {
         await qrSleepMs(50)
     }
 }
-console.log("Qrscanner")
+console.log("qrscanner.js init")
 
 // ***

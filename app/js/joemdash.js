@@ -1,5 +1,10 @@
 /* joemdash.js - Sidebar state machine 21.01.2024 (C) Joembedded */
 
+//---- helpers----
+export async function dashSleepMs(ms = 1) { // use: await qrSleepMs()
+    let np = new Promise(resolve => setTimeout(resolve, ms))
+    return np
+}
 
 let sidebarState = 0 /* Global, static: 0:Expanded 1:Shrinked 2:Hidden  (3:Exp, 4:Shrinked, 5:Hidden*)*/
 function sidebar_hint() {
@@ -7,6 +12,8 @@ function sidebar_hint() {
     const sbh = ['&ltrif;', '&ltrif;', '&rtrif;', '', '', '&rtrif;']
     document.getElementById('cheader-hint').innerHTML = sbh[sidebarState]
 }
+
+// Sidebar CLose/Klein/Open
 function sidebar() {
     let pdst = "0px"
     const nb = document.querySelectorAll('.clnav')
@@ -38,6 +45,8 @@ export function sidebarMax(factor) {
     sidebar_hint()
 }
 
+
+
 // Font setzen - Wichtig dabei nochmal Grenzen checken
 export function dashSetFont(nrel) {
     if (nrel < 0.5) nrel = 0.5
@@ -51,6 +60,47 @@ export function dashSetFont(nrel) {
     sidebar_hint()
 }
 
+// Langsam das Footermneu einbauen
+async function footermenu(){
+    const olde = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--ftrxpx'))
+    let rot
+    let newe
+    let scswt
+    const fmc = document.getElementById("fmenu_content")
+    if(olde>0){
+        newe=0
+        rot=0
+        scswt = 20
+    }else{
+        fmc.hidden = false
+        newe=fmc.offsetHeight
+        rot=180
+        scswt = 1
+    }
+    document.getElementById("footer_menue").style.transform = `rotate(${rot}deg)`
+
+
+    const si=(newe-olde)/15 // per JS in/out sliden
+    let akte = olde
+    let xit = false
+    do{
+        akte += si
+        if(si>0){
+            if(akte>newe) {
+                akte=newe
+                xit=true
+            }
+        }else{
+            if(akte<0) {
+                akte=0
+                xit=true
+                fmc.hidden = true
+            }
+        }
+        document.documentElement.style.setProperty("--ftrxpx", akte)    
+        await dashSleepMs(scswt)
+    }while(!xit)
+}
 
 // Themen invertieren hell-dunkel
 export function dashToggleTheme() {
@@ -72,11 +122,19 @@ function dashInit() {
         sidebarState = 5; // Next CLick: Shrink 
     }
 
-    document.getElementById("sidebar_menue").addEventListener("click", sidebar)
-    sidebar_hint()
+    const sb = document.getElementById("sidebar_menue")
+    if(sb){
+        sb.addEventListener("click", sidebar)
+        sidebar_hint()
+    }
+
+    const fm=document.getElementById("footer_menue") // Optional
+    if(fm){
+        fm.addEventListener("click", footermenu)
+    }
 }
 
-console.log("JoEmDash")
 window.addEventListener("load", dashInit)
+console.log("joemdash.js init")
 
 /***/
