@@ -80,6 +80,10 @@ const editParamDLG = document.getElementById("edit-params")
 const setupDLG = document.getElementById("setup-dialog")
 const deviceDialog = document.getElementById("device-dialog")
 
+//TEST: Footer-Dialog
+const footerDialog = document.getElementById("footer-dialog")
+
+
 // UI Elemente
 const jdFooteronline = document.getElementById("jd-footeronline")
 const jdFooteroffline = document.getElementById("jd-footeroffline")
@@ -1502,6 +1506,27 @@ async function deviceDialogDo(idx) {
     return deviceDialogResult
 }
 
+//Test: Footer-Dialog: Allgemeines Parameter-Panel, Nicht-Modal!
+let footerDialogInit = false
+let footerDialogOpenFlag = false
+async function footerDialogDo() {
+    const fm = document.getElementById("footer_menue")
+    if (!footerDialogInit) {
+        footerDialogInit = true
+    }
+    if(!footerDialogOpenFlag){
+        footerDialog.style.position="absolute"
+        footerDialog.style.bottom="0px"
+        footerDialogOpenFlag = true
+        fm.style.transform = "rotate(180deg)"
+        footerDialog.show()
+    }else{
+        footerDialogOpenFlag = false
+        footerDialog.close()
+        fm.style.transform = "rotate(0)"
+    }
+}
+
 //---------------- setup ------------
 async function setup() {
     // Isolate URL Parameters
@@ -1557,6 +1582,9 @@ async function setup() {
     }
 
     await updateDeviceList()
+
+    document.getElementById("footer_menue").addEventListener("click", footerDialogDo)
+
 
 }
 

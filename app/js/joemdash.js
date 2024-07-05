@@ -60,48 +60,6 @@ export function dashSetFont(nrel) {
     sidebar_hint()
 }
 
-// Langsam das Footermneu einbauen
-async function footermenu(){
-    const olde = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--ftrxpx'))
-    let rot
-    let newe
-    let scswt
-    const fmc = document.getElementById("fmenu_content")
-    if(olde>0){
-        newe=0
-        rot=0
-        scswt = 20
-    }else{
-        fmc.hidden = false
-        newe=fmc.offsetHeight
-        rot=180
-        scswt = 1
-    }
-    document.getElementById("footer_menue").style.transform = `rotate(${rot}deg)`
-
-
-    const si=(newe-olde)/15 // per JS in/out sliden
-    let akte = olde
-    let xit = false
-    do{
-        akte += si
-        if(si>0){
-            if(akte>newe) {
-                akte=newe
-                xit=true
-            }
-        }else{
-            if(akte<0) {
-                akte=0
-                xit=true
-                fmc.hidden = true
-            }
-        }
-        document.documentElement.style.setProperty("--ftrxpx", akte)    
-        await dashSleepMs(scswt)
-    }while(!xit)
-}
-
 // Themen invertieren hell-dunkel
 export function dashToggleTheme() {
     const cvar = ['--white', '--black', '--whitegray', '--lightgray', '--infogray', '--hovergray', '--midgray', '--darkgray', '--txtwhite', '--txtblack']
@@ -126,11 +84,6 @@ function dashInit() {
     if(sb){
         sb.addEventListener("click", sidebar)
         sidebar_hint()
-    }
-
-    const fm=document.getElementById("footer_menue") // Optional
-    if(fm){
-        fm.addEventListener("click", footermenu)
     }
 }
 

@@ -43,9 +43,16 @@
     <!-- BarcodeDetector - Scanner-Dialog -->
     <link rel="stylesheet" href="./css/qrscanner.css">
 
+    <!-- Fuer MAP S via Leaflet (TEST)-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+
     <script>
         window.jdDebug = 0 // PWA - global DebugLevel: 0:Run
-        if (location.hostname == 'localhost') window.jdDebug = 1 // DEBUG -  global DebugLevel: 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
+        if (location.hostname == 'localhost') window.jdDebug = 1 // 1-2: DEBUG -  global DebugLevel: 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
         function installServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').then(function (reg) {
@@ -250,54 +257,46 @@
                     <hr>
                     <div id="blxTerminal"></div>
                 </div>
+
+                <!-- Testhalber eine MAP (TEST) -->
+                <div id="section_map" class="usection">
+                    <div id="map" style="width: 100vw; height: 100vh;">a MAP for the World</div>
+                </div>
+                
+
             </div>
         </div>
     </div>
 
     <!-- Im Footer kann auch noch Infos, Debug-Zeugs und ein Hilfsmenue untergebracht sein -->
     <footer class="cfooter">
-        <div> <!-- Online-Info -->
+
+        <div>
             <span id="jd-footeronline" style="color: limegreen;"><i class="fa-solid fa-fw fa-link fa-lg"></i>
                 Online</span>
             <span hidden id="jd-footeroffline" style="color: red;"><i class="fa-solid fa-fw fa-link-slash fa-lg"></i>
                 Offline</span>
-            &nbsp;
-            &nbsp;
         </div>
+
+        <div>
+            <span id="footerReason"></span> &nbsp;
+            <span style="color:dodgerblue" id="footerInfo">Info</span> &nbsp;
+            <span id="footerSubInfo">SubInfo</span>
+        </div>
+
+        <!-- Einfacher Slider -->
+        <div class="jdrange1" style="width: 60vw">
+            <input class="jdslider" type="range" min="0" max="100" value="30">
+        </div>
+        <div>Pos: 33333</div>
 
         <!-- Enable fuer Debug, else hidden -->
         <button hidden id="dbg-action">(Debug)</button>
 
-        <div id="footerReason"></div>&nbsp;
-        <div style="color:dodgerblue" id="footerInfo">Info</div>&nbsp;
-        <div id="footerSubInfo">SubInfo</div>
-
-        <!-- Footer-Dialog -->
-        <div class="fmenucontent" id="fmenu_content" hidden>
-            
-            <!-- Einfacher Slider -->
-            <div>Von:0 Bis:100</div>
-            <div class="jdrange1">
-                <input class = "jdslider" type="range" min="0" max="100" value="30">
-            </div>
-    
-            <!-- Testweise DualRangs Slider-->
-            <div>Min:0 Max:100</div>
-            <div class="jdrange2">
-                <div class="jdrange-slider">
-                    <span class="jdrange-selected"></span>
-                </div>
-                <div class="jdrange-input">
-                    <input type="range" class="min" min="0" max="100" value="30">
-                    <input type="range" class="max" min="0" max="100" value="70">
-                </div>
-            </div>
-        </div>
-        <!-- Ende Footer-Dialog -->
-
         <div class="fmenubutton">
             <i class="fa fa-fw fa-caret-up" id="footer_menue"></i>
         </div>
+
     </footer>
     <!-- Ende Hauptfenster -->
 
@@ -386,7 +385,7 @@
         </div>
     </dialog>
 
-    <!-- Device MAC Dialog  -->
+    <!-- Device MAC Dialog device -->
     <dialog id='device-dialog'>
         <button class="dlgBtnClose" id='deviceDialogBtnClose'>&#10006;</button>
         <b>Device</b><br><br><br>
@@ -401,6 +400,27 @@
         </div>
     </dialog>
 
+    <!-- Test-Dialog Footer, ohne  CLose/OK -->
+    <dialog id='footer-dialog'>
+        <!-- Einfacher Slider -->
+        <div>Pos.:30/100</div>
+        <div class="jdrange1">
+            <input class="jdslider" type="range" min="0" max="100" value="30">
+        </div>
+        <!-- Testweise DualRangs Slider-->
+        <div>Min:30 Max:70</div>
+        <div class="jdrange2">
+            <div class="jdrange-slider">
+                <span class="jdrange-selected"></span>
+            </div>
+            <div class="jdrange-input">
+                <input type="range" class="jdpos1" min="0" max="100" value="30">
+                <input type="range" class="jdpos2" min="0" max="100" value="70">
+            </div>
+        </div>
+    </dialog>
+
+
     <!-- Scanner-Fenster - Externer Dialog aus qrscanner.js -->
     <dialog id='qrscanner-dialog'>
         <video style="display: none;" id='qroriginal-video' playsinline mute></video>
@@ -411,6 +431,16 @@
     </dialog>
 
 </body> <!-- BODY END -->
+
+<!-- MAP zum Testen -->
+<script>
+    const map = L.map('map', { zoomControl: false }).fitWorld()
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map)
+</script>
+
 
 <script src="./js/blxDash.js" type="module"></script>
 

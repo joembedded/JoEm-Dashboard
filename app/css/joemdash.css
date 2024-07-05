@@ -33,11 +33,9 @@
     --lnavwidth_max: calc(32px + var(--fontrel)*220px);
     --lnavwidth_small: calc(32px + var(--fontrel)*32px);
 
-    /* Heights Header/Footer, unterschiedlich falls noch Menues rein muessen
-    Man kann so mit ftrxpx zusaetzliche Menues einbauen, z.B. GPS-Positionierungen etc */
+    /* Heights Header/Footer, unterschiedlich falls noch Menues rein muessen */
     --hdrheight: calc(8px + var(--fontrel)*32px);
-    --ftrxpx: 0;
-    --ftrheight: calc(8px + var(--fontrel)*32px + var(--ftrxpx)*1px);
+    --ftrheight: calc(8px + var(--fontrel)*32px);
 
     /* Working var */
     --lnavwidth_wrk: var(--lnavwidth_max);
@@ -144,45 +142,32 @@ input[type=checkbox] {
     background-color: var(--darkgray);
     color: var(--txtwhite);
     height: var(--ftrheight);
-    padding-left: 8px;
+    padding: 0 8px;
     display: flex;
     align-items: center;
     white-space: nowrap;
     overflow: hidden;
+    flex-direction: row;
     position: relative;
 
-    .fmenucontent {
-        border: 2px solid var(--midgray);
-        border-radius: 8px;
-        background-color: var(--white);
-        color: var(--txtblack);
-        font-size: calc(1rem * var(--fontrel));
-        padding: 4px 8px;
-        overflow: auto;
-        white-space: nowrap;
-
-        margin: 0 8px;
-        flex-grow: 100;
-    }
     .fmenubutton {
-        position: absolute;
-        right: 8px;
-        top: 4px;
         i {
             /* Traditionell icons via i, fuer Text ruecksetzen */
+            position: absolute;
+            right: 8px;
+            bottom: 4px;
+            vertical-align: center;
             color: var(--txtblack);
             font-style: normal;
             font-size: calc(2rem * var(--fontrel));
-            vertical-align: middle;
+            
             background-color: var(--lightgray);
             border-radius: 4px;
-            position: relative;
 
             &:hover {
                 background-color: var(--hovergray)
             }
         }
-
     }
 }
 
@@ -393,6 +378,7 @@ dialog {
     position: relative;
     overflow: auto;
     white-space: nowrap;
+    z-index: 1000; /* Ansch. fuer Leaflet >=401.. */
 
     &#spinner {
         color: var(--dodgerblue);
@@ -435,10 +421,10 @@ dialog {
 
 /* (Dual) Range-Sliders */
 .jdrange2 { /* Dual */
-    padding: 8px calc(var(--fontrel) * 48px) 8px 0px;
+    padding: 8px;
 }
 .jdrange1 { /* Single */
-    padding: 0px calc(var(--fontrel) * 48px) 4px 0px;
+    padding: 8px;
 }
 
 .jdrange-slider {
