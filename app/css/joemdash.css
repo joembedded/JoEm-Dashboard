@@ -37,8 +37,8 @@
     --hdrheight: calc(8px + var(--fontrel)*32px);
     --ftrheight: calc(8px + var(--fontrel)*32px);
 
-    /* Working var */
-    --lnavwidth_wrk: var(--lnavwidth_max);
+    /* Working vars */
+    --lnavwidth_wrk: var(--lnavwidth_max)
 }
 
 /* Variable Breakpoints Typ <br class='xx-br> */
@@ -230,7 +230,7 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         white-space: nowrap;
         overflow: hidden;
         opacity: 1;
-        transition: var(--scrollms);
+        transition: all var(--scrollms);
 
     }
 
@@ -260,7 +260,7 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         vertical-align: middle;
         margin-left: 10px;
         opacity: 1;
-        transition: var(--scrollms);
+        transition: all var(--scrollms);
     }
 
     /* Simple-Info: unwichtig */
@@ -272,7 +272,7 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         background-color: var(--infogray);
         opacity: 1;
         border-radius: 32px;
-        transition: var(--scrollms);
+        transition: all var(--scrollms);
     }
 
     /* Normale Info: Verziert am Smbol wenn minimiert*/
@@ -293,12 +293,12 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         text-overflow: ellipsis;
         /* opacity: 0.5;
         font-size: calc(0.75rem * var(--fontrel)); 
-        transition: var(--scrollms); */
+        transition: all var(--scrollms); */
     }
 
     .navitem-txt {
         opacity: 0;
-        transition: var(--scrollms);
+        transition: all var(--scrollms);
     }
 
     .navitem-pointout {
@@ -309,12 +309,12 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
         border-radius: 50%;
         text-indent: -1000px;
         border: 2px solid var(--txtwhite);
-        transition: var(--scrollms);
+        transition: all var(--scrollms);
     }
 
     .navitem-simple-pointout {
         opacity: 0;
-        transition: var(--scrollms);
+        transition: all var(--scrollms);
     }
 }
 
@@ -491,4 +491,9 @@ dialog {
     background-color: var(--lightgray);
 }
 
+canvas {
+    width: calc(100svw - 32px );
+    height: calc(100svh - var(--hdrheight) - var(--ftrheight) - 16px); 
+    border: 1px solid red;
+}
 /***/

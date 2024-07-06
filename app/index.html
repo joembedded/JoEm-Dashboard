@@ -43,12 +43,7 @@
     <!-- BarcodeDetector - Scanner-Dialog -->
     <link rel="stylesheet" href="./css/qrscanner.css">
 
-    <!-- Fuer MAP S via Leaflet (TEST)-->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
+   
 
     <script>
         window.jdDebug = 0 // PWA - global DebugLevel: 0:Run
@@ -102,6 +97,12 @@
                     <i class="fa-solid fa-fw fa-keyboard"></i>
                     <span class="navitem-txt">Terminal</span>
                 </button>
+
+                <button id="button6-graph" class="navitem">
+                    <i class="fa-solid fa-fw fa-chart-line"></i> 
+                    <span class="navitem-txt">Graphics</span>
+                </button>
+
 
                 <div class="thin-hr"></div>
 
@@ -258,11 +259,10 @@
                     <div id="blxTerminal"></div>
                 </div>
 
-                <!-- Testhalber eine MAP (TEST) -->
-                <div id="section_map" class="usection">
-                    <div id="map" style="width: 100vw; height: 100vh;">a MAP for the World</div>
+                <!-- Testhalber eine GRAPH (TEST) -->
+                <div id="section_graph" class="usection">
+                    <canvas id="id_canvas0" width="300" height="200"></canvas>
                 </div>
-                
 
             </div>
         </div>
@@ -432,16 +432,19 @@
 
 </body> <!-- BODY END -->
 
-<!-- MAP zum Testen -->
-<script>
-    const map = L.map('map', { zoomControl: false }).fitWorld()
-    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map)
-</script>
-
 
 <script src="./js/blxDash.js" type="module"></script>
+
+<!-- Test GRAPH -->
+<script>
+    const canvas = document.getElementById("id_canvas0");
+    const ctx = canvas.getContext("2d");
+    
+    ctx.beginPath();
+    for(let i=10;i<1000;i+=10)
+    ctx.arc(i,i/2,i/5,0,2*Math.PI);
+    ctx.stroke();
+    </script>
+    
 
 </html>

@@ -70,6 +70,7 @@ const button2MainMenu = document.getElementById("button2-maincontent")
 const button3Setup = document.getElementById("button3-setup")
 const button4ServerSync = document.getElementById("button4-sync")
 const button5Adddevice = document.getElementById('button5-adddevice')
+const button6Graph = document.getElementById('button6-graph')
 // Dialoge
 //const qrscannerDialog = document.getElementById("qrscanner-dialog") - via openSelectedCamera()
 const spinnerDLG = document.getElementById("spinner")
@@ -1511,12 +1512,14 @@ let footerDialogInit = false
 let footerDialogOpenFlag = false
 async function footerDialogDo() {
     const fm = document.getElementById("footer_menue")
+    const fl = document.querySelector(".cfooter")
     if (!footerDialogInit) {
         footerDialogInit = true
     }
     if(!footerDialogOpenFlag){
+        footerDialog.style.minWidth = "calc(100% - 32px)"
         footerDialog.style.position="absolute"
-        footerDialog.style.bottom="0px"
+        footerDialog.style.bottom=`${fl.offsetHeight}px`
         footerDialogOpenFlag = true
         fm.style.transform = "rotate(180deg)"
         footerDialog.show()
@@ -1571,6 +1574,11 @@ async function setup() {
     button3Setup.addEventListener('click', blxSetup)
     button4ServerSync.addEventListener('click', blxServerDataSync)
     button5Adddevice.addEventListener('click', blxQRAdddevice)
+
+    button6Graph.addEventListener('click', () => {
+        location.href = '#section_graph'
+        JD.sidebarMax(0.5)
+    })
 
     await blStore.get('#blxDash_#SETUP')
     const so = blStore.result()

@@ -71,6 +71,7 @@ export function dashToggleTheme() {
     })
 }
 
+
 function dashInit() {
     const scw = document.documentElement.clientWidth;
     const sbw = document.querySelector('.clnav').clientWidth;
