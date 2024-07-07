@@ -328,12 +328,14 @@ ELemente: navitem. class 'collapse' gesetzt wenn nicht expandiert
 }
 
 .usection {
-    min-height: calc(100svh - var(--hdrheight) - var(--ftrheight));
+    height: calc(100svh - var(--hdrheight) - var(--ftrheight));
     overflow: hidden;
     background-color: var(--white);
     color: var(--txtblack);
     font-size: calc(1rem * var(--fontrel));
     padding: 8px;
+    display: flex; 
+    flex-direction: column;
 }
 
 .qrimg {
@@ -492,8 +494,8 @@ dialog {
 }
 
 canvas {
-    width: calc(100svw - 32px );
-    height: calc(100svh - var(--hdrheight) - var(--ftrheight) - 16px); 
+    flex-grow: 1;
+    max-height: calc(100svh - var(--hdrheight) - var(--ftrheight) - 52px);
     border: 1px solid red;
 }
 /***/
