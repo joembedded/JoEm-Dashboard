@@ -83,6 +83,8 @@ const deviceDialog = document.getElementById("device-dialog")
 
 //TEST: Footer-Dialog
 const footerDialog = document.getElementById("footer-dialog")
+// TEST: Canvas-Test
+const canvas0 = document.getElementById("id_canvas0");
 
 
 // UI Elemente
@@ -1593,10 +1595,62 @@ async function setup() {
 
     document.getElementById("footer_menue").addEventListener("click", footerDialogDo)
 
+    // TEST
+    initDrawEvents();
+
+}
+// -- Debugging und TEST --
+const gx = {    // Relevate Daten fuer gDraw
+    ctx:    undefined, // Context, wenn undefined: Setup
+    cxh:    undefined, // Canvas High
+    cxw:    undefined, // Canvas Width
+}
+function initDrawEvents(){
+    canvas0.addEventListener("wheel", function (e) {
+console.log(e.offsetX,e.offsetY);
+e.preventDefault();   
+},{passive: false} );
+}
+function setup_gx() { // Canvas Dimension und Setup. DOM-Namen muessen bekannt sein
+    // https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model/Determining_the_dimensions_of_elements
+    gx.ctx = canvas0.getContext("2d")
+    gx.cxw = gx.ctx.canvas.width = canvas0.offsetWidth * 2
+    gx.cxh = gx.ctx.canvas.height = canvas0.offsetHeight * 2
+
+    // ***Informativ*** Size anzeigen lassen
+    console.log("Canvas: W:" + gx.cxw + ", H:" + gx.cxh +  "dw:"+ gx.cxw+ " dh:" + gx.cxh)
+}
+function do_draw(clear = false) {
+    if (gx.cxh == undefined) setup_gx()
+    if (clear) gx.ctx.clearRect(0, 0, gx.cxw, gx.cxh);
+
+    gx.ctx.beginPath()
+    // Diagonal
+    gx.ctx.moveTo(0, 0)
+    gx.ctx.lineTo(gx.cxw - 1, gx.cxh - 1)
+    gx.ctx.moveTo(0, gx.cxh - 1)
+    gx.ctx.lineTo(gx.cxw - 1, 0)
+
+    // Kreus
+    gx.ctx.moveTo(gx.cxw / 2, 0)
+    gx.ctx.lineTo(gx.cxw / 2, gx.cxh - 1)
+    gx.ctx.moveTo(0, gx.cxh / 2)
+    gx.ctx.lineTo(gx.cxw - 1, gx.cxh / 2)
+
+    // Aussenrahmen
+    gx.ctx.moveTo(0, 0)
+    gx.ctx.lineTo(gx.cxw - 1, 0)
+    gx.ctx.lineTo(gx.cxw - 1, gx.cxh - 1)
+    gx.ctx.lineTo(0, gx.cxh - 1)
+    gx.ctx.lineTo(0, 0)
+
+    gx.ctx.stroke()
+
+    gx.ctx.font = "30px Arial";
+    gx.ctx.fillText(`W:${gx.cxw} H:${gx.cxh}`, 20, 50);
 
 }
 
-// -- Debugging --
 
 async function dbg_action() {
     //await editParamDialogDo(1, "<b>Edit Parameter</b>")
@@ -1606,6 +1660,10 @@ async function dbg_action() {
     //await addDevice('0011223344556677', '0011223344556677')
 
     //Schhiebt Footer hoch, allerdings SOFORT
+    location.href = '#section_graph'
+    JD.sidebarMax(0.5)
+    gx.cxh = undefined
+    do_draw(true)
 }
 
 if (window.jdDebug > 1) {

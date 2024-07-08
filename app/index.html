@@ -47,7 +47,7 @@
 
     <script>
         window.jdDebug = 0 // PWA - global DebugLevel: 0:Run
-        if (location.hostname == 'localhost') window.jdDebug = 1 // 1-2: DEBUG -  global DebugLevel: 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
+        if (location.hostname == 'localhost') window.jdDebug = 2 // 1-2: DEBUG -  global DebugLevel: 1:LocalhostDev,NoQRScannerPolyfill, 2: Debug,ScannerPolyfill
         function installServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').then(function (reg) {
@@ -263,11 +263,11 @@
                 <!-- Testhalber eine GRAPH (TEST) -->
                 <div id="section_graph" class="usection">
                     <div>
-                        <b>Graph</b>
+                        <b>Graph</b> MAC:0011223344556677 'IrgendeinGerät'
                         <hr>
                     </div>
 
-                    <canvas id="id_canvas0" width="300" height="200"></canvas>
+                    <canvas id="id_canvas0" ></canvas>
                 </div>
 
             </div>
@@ -440,17 +440,4 @@
 
 
 <script src="./js/blxDash.js" type="module"></script>
-
-<!-- Test GRAPH -->
-<script>
-    const canvas = document.getElementById("id_canvas0");
-    const ctx = canvas.getContext("2d");
-
-    ctx.beginPath();
-    for (let i = 10; i < 1000; i += 10)
-        ctx.arc(i, i / 2, i / 5, 0, 2 * Math.PI);
-    ctx.stroke();
-</script>
-
-
 </html>

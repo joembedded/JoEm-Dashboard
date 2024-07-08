@@ -496,6 +496,6 @@ dialog {
 canvas {
     flex-grow: 1;
     max-height: calc(100svh - var(--hdrheight) - var(--ftrheight) - 52px);
-    border: 1px solid red;
+    /* border: 1px solid red; */
 }
 /***/
