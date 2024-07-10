@@ -133,7 +133,7 @@ function bleCallback(m, v, xinfo) {
     switch (m) {
         case 'CON':
             connectionLevel = v
-console.log("CON-Level: "+v)
+            console.log("CON-Level: " + v)
             switch (v) {
                 case 0: // norm. never sent
                 case 1:
@@ -366,7 +366,7 @@ async function blxConnect() {
     blxCmdRes.textContent = '-'
     disabler(true)
     let reconFlag = false
-    if (connectionLevel <2 &&  lastAdvertisingName!== undefined) {
+    if (connectionLevel < 2 && lastAdvertisingName !== undefined) {
         reconFlag = await okDialogDo(`<b>Reconnect?</b><br><br><br>Reconnect to Device?<br>
         <b>Name: '${lastAdvertisingName}'</b><br><br>OK to Reconnect (or close)`)
     }
@@ -376,7 +376,7 @@ async function blxConnect() {
         if (connectionLevel >= 2) {
             await _blxCmdSend(".d") // disconnect
         } else {
-            if(reconFlag) await _blxCmdSend(".r") // reconnect
+            if (reconFlag) await _blxCmdSend(".r") // reconnect
             else await _blxCmdSend(".c") // connect
             await show_details()
         }
@@ -731,15 +731,15 @@ function _blxBusyMonitor() {
 
         // Bei Multifile Upload % aur Realtive Menge beziegen
         if (uplStatus.ndata) {
-            let alrup = uplStatus.sumsize/uplStatus.totalsize *100 // alredy uploaded %
-            let thup = uplStatus.filesize/uplStatus.totalsize * uplStatus.fproc // this upload %
+            let alrup = uplStatus.sumsize / uplStatus.totalsize * 100 // alredy uploaded %
+            let thup = uplStatus.filesize / uplStatus.totalsize * uplStatus.fproc // this upload %
             let sinfo = `${(alrup + thup).toFixed(0)}%`
             footerSubInfo.textContent = sinfo
             uplStatus.ndata = false
         }
     } else { // Alles OK
         footerReason.textContent = ''
-        footerInfo.innerHTML = '' 
+        footerInfo.innerHTML = ''
         footerSubInfo.textContent = ''
     }
 
@@ -896,7 +896,7 @@ async function blxClearDevice() {
 async function blxServerDataSync() {
     disabler(true)
     blx.terminalPrint("Server-Synchronize...")
-    if(isUrlGit) {
+    if (isUrlGit) {
         okDialogDo(`<b>ERROR:</b><br><br><br>Can't Open Server on GITs ('${location.hostname}')<br>`)
         return
     }
@@ -929,7 +929,7 @@ async function blxServerDataSync() {
                             } else {
                                 //console.log(sendResult) // Control
                                 let sendResult = res
-                                if(typeof res == 'object') sendResult = res.status
+                                if (typeof res == 'object') sendResult = res.status
                                 throw sendResult
                             }
                         }
@@ -1388,9 +1388,9 @@ async function blxSetup() {
             showSetupInfo()
         })
         setupDLG.querySelector('#jd-servertest').addEventListener('click', (e) => {
-            if(isUrlGit) okDialogDo(`<b>ERROR:</b><br><br><br>Can't Open Server on GITs ('${location.hostname}')<br>`)
+            if (isUrlGit) okDialogDo(`<b>ERROR:</b><br><br><br>Can't Open Server on GITs ('${location.hostname}')<br>`)
             // Open WITH token, but no cmd
-            else   window.open(setupDLG.querySelector('#jd-server').value + '?k=' + setupDLG.querySelector('#jd-accesstoken').value);
+            else window.open(setupDLG.querySelector('#jd-server').value + '?k=' + setupDLG.querySelector('#jd-accesstoken').value);
         })
 
         setupDialogInit = true
@@ -1460,10 +1460,10 @@ async function deviceDialogDo(idx) {
             const defi = dev.files[i]
             if (defi.nowsyncflag) tel += '<tr style="background-color:chocolate;")>'
             else tel += '<tr>'
-            if(defi.fname == 'xtract.edt'){
-                let link = "<a target='_blank' href='../gdraw/gdraw.html?st=" + dev.mac + "_xtract.edt&sn=" +   dev.advname + "'> Show Graph </a>"
+            if (defi.fname == 'xtract.edt') {
+                let link = "<a target='_blank' href='../gdraw/gdraw.html?st=" + dev.mac + "_xtract.edt&sn=" + dev.advname + "'> Show Graph </a>"
                 tel += `<td>${link}</td>`
-            }else tel += `<td>'${defi.fname}'</td>`
+            } else tel += `<td>'${defi.fname}'</td>`
 
             tel += `<td>${defi.aktlen}</td>`
             tel += `<td> ${defi.syncflag ? '&#10004;' : '-'}</td><td>`
@@ -1518,14 +1518,14 @@ async function footerDialogDo() {
     if (!footerDialogInit) {
         footerDialogInit = true
     }
-    if(!footerDialogOpenFlag){
+    if (!footerDialogOpenFlag) {
         footerDialog.style.minWidth = "calc(100% - 32px)"
-        footerDialog.style.position="absolute"
-        footerDialog.style.bottom=`${fl.offsetHeight}px`
+        footerDialog.style.position = "absolute"
+        footerDialog.style.bottom = `${fl.offsetHeight}px`
         footerDialogOpenFlag = true
         fm.style.transform = "rotate(180deg)"
         footerDialog.show()
-    }else{
+    } else {
         footerDialogOpenFlag = false
         footerDialog.close()
         fm.style.transform = "rotate(0)"
@@ -1535,7 +1535,7 @@ async function footerDialogDo() {
 //---------------- setup ------------
 async function setup() {
     // Isolate URL Parameters
-    isUrlGit = (location.hostname.toLowerCase().indexOf('github.io')>=0) // Currently hosted on github.io
+    isUrlGit = (location.hostname.toLowerCase().indexOf('github.io') >= 0) // Currently hosted on github.io
     const qs = location.search.substring(1).split('&')
     urlpar = {}
     for (let x = 0; x < qs.length; x++) {
@@ -1601,24 +1601,104 @@ async function setup() {
 }
 // -- Debugging und TEST --
 const gx = {    // Relevate Daten fuer gDraw
-    ctx:    undefined, // Context, wenn undefined: Setup
-    cxh:    undefined, // Canvas High
-    cxw:    undefined, // Canvas Width
+    ctx: undefined, // Context, wenn undefined: Setup
+    cxh: undefined, // Canvas High
+    cxw: undefined, // Canvas Width
 }
-function initDrawEvents(){
+
+var myrad = 1;
+function initDrawEvents() {
+
+    // Mousmove.buttons auf Mobile am Rand ausgeloest, aber buttons immer 0
     canvas0.addEventListener("wheel", function (e) {
-console.log(e.offsetX,e.offsetY);
-e.preventDefault();   
-},{passive: false} );
+        if (gx.cxh == undefined) return
+        // Das kann dynamisch sein
+        const relx = gx.cxw / canvas0.offsetWidth
+        const rely = gx.cxh / canvas0.offsetHeight
+        const cx = e.offsetX * relx
+        const cy = e.offsetY * rely
+        if(e.deltaY<0) myrad+=5
+        else if(myrad>1) myrad -=1
+        gx.ctx.beginPath()
+        gx.ctx.arc(cx, cy, myrad, 0, 2 * Math.PI)
+        gx.ctx.stroke()
+
+        e.preventDefault();
+        console.log("Wheel ",e.offsetX, e.offsetY);
+    }, { passive: false });
+
+    canvas0.addEventListener("mousemove", function (e) {
+        if (gx.cxh == undefined) return
+        // Das kann dynamisch sein
+        const relx = gx.cxw / canvas0.offsetWidth
+        const rely = gx.cxh / canvas0.offsetHeight
+        const cx = e.offsetX * relx
+        const cy = e.offsetY * rely
+        myrad=0.3
+        if(e.buttons) myrad=4
+        gx.ctx.beginPath()
+        gx.ctx.arc(cx, cy, myrad, 0, 2 * Math.PI)
+        gx.ctx.stroke()
+
+        e.preventDefault();
+        console.log("MouseMove ",e.offsetX, e.offsetY, e.buttons);
+    }, { passive: false });
+
+
+    canvas0.addEventListener("touchstart", function (e) {
+        if (gx.cxh == undefined) return
+        // Absolute Positionen anscheinend nur per ClientRecht
+        const cr = canvas0.getBoundingClientRect()
+        const relx = gx.cxw / cr.width
+        const rely = gx.cxh / cr.height
+        const cx = (e.touches[0].clientX-cr.x) * relx
+        const cy = (e.touches[0].clientY-cr.y) * rely
+        myrad=5
+        gx.ctx.beginPath()
+        gx.ctx.arc(cx, cy, myrad, 0, 2 * Math.PI)
+        gx.ctx.stroke()
+
+        console.log("TouchStart ID:",e.touches[0].identifier,e.touches[0].clientX-cr.x,e.touches[0].clientY-cr.y);
+        e.preventDefault();
+    }, { passive: false });
+
+
+    canvas0.addEventListener("touchmove", function (e) {
+        if (gx.cxh == undefined) return
+        // Das kann dynamisch sein
+        const relx = gx.cxw / canvas0.offsetWidth
+        const rely = gx.cxh / canvas0.offsetHeight
+        const cx = e.offsetX * relx
+        const cy = e.offsetY * rely
+        myrad=5
+        gx.ctx.beginPath()
+        gx.ctx.arc(cx, cy, myrad, 0, 2 * Math.PI)
+        gx.ctx.stroke()
+
+        e.preventDefault();
+        // console.log("TouchMove ",e);
+        // blx.terminalPrint("TouchMove " + e.offsetX +","+e.offsetY)
+    }, { passive: false });
+
+
+
+
 }
+
+
+
+
 function setup_gx() { // Canvas Dimension und Setup. DOM-Namen muessen bekannt sein
     // https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model/Determining_the_dimensions_of_elements
     gx.ctx = canvas0.getContext("2d")
-    gx.cxw = gx.ctx.canvas.width = canvas0.offsetWidth * 2
-    gx.cxh = gx.ctx.canvas.height = canvas0.offsetHeight * 2
-
+    let wi = canvas0.offsetWidth * 2
+    if (wi < 150) wi = 150
+    let he = canvas0.offsetHeight * 2
+    if (he < 150) he = 150
+    gx.cxw = gx.ctx.canvas.width = wi
+    gx.cxh = gx.ctx.canvas.height = he
     // ***Informativ*** Size anzeigen lassen
-    console.log("Canvas: W:" + gx.cxw + ", H:" + gx.cxh +  "dw:"+ gx.cxw+ " dh:" + gx.cxh)
+    console.log("Canvas: W:" + gx.cxw + ", H:" + gx.cxh + "dw:" + gx.cxw + " dh:" + gx.cxh)
 }
 function do_draw(clear = false) {
     if (gx.cxh == undefined) setup_gx()
