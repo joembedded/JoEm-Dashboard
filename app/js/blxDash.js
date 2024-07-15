@@ -1595,6 +1595,13 @@ async function setup() {
 
     document.getElementById("footer_menue").addEventListener("click", footerDialogDo)
 
+    window.addEventListener('beforeunload', function (e) { // in 'Run' Ask before reload
+        if (window.jdDebug == 0) {
+            e.preventDefault()
+            return "Reload/Leave?" // Never shown
+        }
+    })
+
     // TEST
     initDrawEvents();
 
@@ -1627,6 +1634,27 @@ function initDrawEvents() {
         console.log("Wheel ",e.offsetX, e.offsetY);
     }, { passive: false });
 
+    // Wichtig: canvas0: 'touch-action: none;', buttons nur bei Desktop 0 wenn nicht gedr., bei Mobile immer 1
+    canvas0.addEventListener("pointermove", function (e) {
+        if (gx.cxh == undefined) return
+        // Das kann dynamisch sein
+        const relx = gx.cxw / canvas0.offsetWidth
+        const rely = gx.cxh / canvas0.offsetHeight
+        const cx = e.offsetX * relx
+        const cy = e.offsetY * rely
+        myrad=0.3
+        if(e.buttons) myrad=4
+        gx.ctx.beginPath()
+        gx.ctx.arc(cx, cy, myrad, 0, 2 * Math.PI)
+        gx.ctx.stroke()
+
+        e.preventDefault();
+        console.log("PointerMove ",e.offsetX, e.offsetY, e.buttons, e.pointerId) ;
+    }, { passive: false });
+
+
+
+    /*
     canvas0.addEventListener("mousemove", function (e) {
         if (gx.cxh == undefined) return
         // Das kann dynamisch sein
@@ -1657,7 +1685,8 @@ function initDrawEvents() {
         gx.ctx.beginPath()
         gx.ctx.arc(cx, cy, myrad, 0, 2 * Math.PI)
         gx.ctx.stroke()
-
+        
+        // Der ID ist wichtig:
         console.log("TouchStart ID:",e.touches[0].identifier,e.touches[0].clientX-cr.x,e.touches[0].clientY-cr.y);
         e.preventDefault();
     }, { passive: false });
@@ -1676,11 +1705,11 @@ function initDrawEvents() {
         gx.ctx.stroke()
 
         e.preventDefault();
-        // console.log("TouchMove ",e);
+        console.log("TouchMove ",e);
         // blx.terminalPrint("TouchMove " + e.offsetX +","+e.offsetY)
     }, { passive: false });
 
-
+*/
 
 
 }

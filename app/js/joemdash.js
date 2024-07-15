@@ -82,10 +82,15 @@ function dashInit() {
     }
 
     const sb = document.getElementById("sidebar_menue")
-    if(sb){
+    if (sb) {
         sb.addEventListener("click", sidebar)
         sidebar_hint()
     }
+    window.addEventListener('beforeunload', function (e) {
+            e.preventDefault()
+            return "Reload/Leave?"
+        })
+
 }
 
 window.addEventListener("load", dashInit)
